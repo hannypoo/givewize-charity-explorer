@@ -2,137 +2,143 @@
 @tailwind components;
 @tailwind utilities;
 
-/* GiveWiZe Design System - Warm Navy + Gold Editorial
-   Deep Navy: Primary base for trust and sophistication
-   Warm Gold: Accent for warmth, premium feel, and call-to-actions
-   Rich Cream: Warm backgrounds that feel inviting
-   Charcoal: Headlines with depth
+/* GiveWiZe Design System - Plum + Rose Gold Glassmorphism
+   Deep Plum: Rich, luxurious primary
+   Rose Gold: Warm, premium accent
+   Frosted Glass: Modern depth and layering
 */
 
 @layer base {
   :root {
-    /* Warm cream background - inviting and warm */
-    --background: 40 30% 97%;
-    /* Deep charcoal - strong headlines */
-    --foreground: 220 30% 12%;
+    /* Soft warm white background */
+    --background: 30 25% 97%;
+    /* Deep plum for text */
+    --foreground: 280 30% 15%;
 
-    /* Cream white cards with subtle warmth */
-    --card: 40 25% 99%;
-    --card-foreground: 220 30% 12%;
+    /* Frosted white cards */
+    --card: 0 0% 100%;
+    --card-foreground: 280 30% 15%;
 
-    --popover: 40 25% 99%;
-    --popover-foreground: 220 30% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 280 30% 15%;
 
-    /* Deep Navy Blue - trust, sophistication */
-    --primary: 220 60% 20%;
-    --primary-foreground: 40 30% 97%;
+    /* Deep Plum - luxurious primary */
+    --primary: 280 45% 25%;
+    --primary-foreground: 30 25% 97%;
 
-    /* Light navy tint for secondary */
-    --secondary: 220 40% 94%;
-    --secondary-foreground: 220 60% 18%;
+    /* Light plum tint for secondary */
+    --secondary: 280 30% 94%;
+    --secondary-foreground: 280 45% 22%;
 
-    /* Warm muted grays */
-    --muted: 40 15% 94%;
-    --muted-foreground: 220 15% 42%;
+    /* Warm muted grays with plum undertone */
+    --muted: 280 10% 94%;
+    --muted-foreground: 280 12% 45%;
 
-    /* Warm Gold - premium accent */
-    --accent: 38 85% 55%;
-    --accent-foreground: 220 30% 12%;
+    /* Rose Gold - warm premium accent */
+    --accent: 15 60% 65%;
+    --accent-foreground: 280 30% 12%;
 
     /* Soft destructive */
-    --destructive: 0 72% 55%;
+    --destructive: 0 65% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Warm borders */
-    --border: 40 20% 88%;
-    --input: 40 20% 88%;
-    --ring: 38 85% 55%;
+    /* Warm borders with slight plum tint */
+    --border: 280 15% 88%;
+    --input: 280 15% 88%;
+    --ring: 15 60% 65%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
-    /* Header/Sidebar - Deep Navy */
-    --sidebar-background: 220 50% 12%;
-    --sidebar-foreground: 40 30% 97%;
-    --sidebar-primary: 38 85% 55%;
-    --sidebar-primary-foreground: 220 30% 12%;
-    --sidebar-accent: 220 45% 18%;
-    --sidebar-accent-foreground: 40 30% 97%;
-    --sidebar-border: 220 40% 18%;
-    --sidebar-ring: 38 85% 55%;
+    /* Sidebar - Deep Plum */
+    --sidebar-background: 280 40% 14%;
+    --sidebar-foreground: 30 25% 97%;
+    --sidebar-primary: 15 60% 65%;
+    --sidebar-primary-foreground: 280 30% 12%;
+    --sidebar-accent: 280 35% 20%;
+    --sidebar-accent-foreground: 30 25% 97%;
+    --sidebar-border: 280 30% 20%;
+    --sidebar-ring: 15 60% 65%;
 
     /* Semantic Colors */
-    --success: 152 60% 38%;
+    --success: 152 55% 42%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 220 30% 12%;
-    --error: 0 72% 55%;
+    --warning: 38 85% 55%;
+    --warning-foreground: 280 30% 12%;
+    --error: 0 65% 55%;
     --error-foreground: 0 0% 100%;
 
-    /* Custom tokens for editorial design */
-    --gold: 38 85% 55%;
-    --gold-light: 40 80% 75%;
-    --gold-dark: 35 85% 42%;
-    --navy: 220 60% 20%;
-    --navy-light: 220 50% 30%;
-    --navy-dark: 220 65% 12%;
+    /* Custom design tokens */
+    --plum: 280 45% 25%;
+    --plum-light: 280 40% 35%;
+    --plum-dark: 280 50% 16%;
+    --rose: 15 60% 65%;
+    --rose-light: 15 70% 80%;
+    --rose-dark: 15 55% 50%;
+    
+    /* Glass effect tokens */
+    --glass-bg: 0 0% 100% / 0.7;
+    --glass-border: 0 0% 100% / 0.3;
   }
 
   .dark {
-    /* Dark mode - rich dark navy */
-    --background: 220 50% 6%;
-    --foreground: 40 25% 95%;
+    /* Dark mode - rich plum darkness */
+    --background: 280 40% 6%;
+    --foreground: 30 20% 95%;
 
-    --card: 220 45% 10%;
-    --card-foreground: 40 25% 95%;
+    --card: 280 35% 10%;
+    --card-foreground: 30 20% 95%;
 
-    --popover: 220 45% 10%;
-    --popover-foreground: 40 25% 95%;
+    --popover: 280 35% 10%;
+    --popover-foreground: 30 20% 95%;
 
-    /* Brighter navy for dark mode */
-    --primary: 220 55% 45%;
-    --primary-foreground: 40 30% 97%;
+    /* Brighter plum for dark mode */
+    --primary: 280 50% 50%;
+    --primary-foreground: 30 25% 97%;
 
-    --secondary: 220 35% 16%;
-    --secondary-foreground: 220 40% 75%;
+    --secondary: 280 30% 16%;
+    --secondary-foreground: 280 35% 75%;
 
-    --muted: 220 30% 14%;
-    --muted-foreground: 40 15% 60%;
+    --muted: 280 25% 14%;
+    --muted-foreground: 30 15% 60%;
 
-    /* Gold stays vibrant */
-    --accent: 38 90% 58%;
-    --accent-foreground: 220 30% 12%;
+    /* Rose gold stays vibrant */
+    --accent: 15 65% 62%;
+    --accent-foreground: 280 30% 12%;
 
-    --destructive: 0 65% 50%;
+    --destructive: 0 60% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 35% 18%;
-    --input: 220 35% 18%;
-    --ring: 38 90% 58%;
+    --border: 280 30% 18%;
+    --input: 280 30% 18%;
+    --ring: 15 65% 62%;
 
-    --sidebar-background: 220 50% 8%;
-    --sidebar-foreground: 40 25% 95%;
-    --sidebar-primary: 38 90% 58%;
-    --sidebar-primary-foreground: 220 30% 12%;
-    --sidebar-accent: 220 40% 14%;
-    --sidebar-accent-foreground: 40 25% 95%;
-    --sidebar-border: 220 35% 16%;
-    --sidebar-ring: 38 90% 58%;
+    --sidebar-background: 280 40% 8%;
+    --sidebar-foreground: 30 20% 95%;
+    --sidebar-primary: 15 65% 62%;
+    --sidebar-primary-foreground: 280 30% 12%;
+    --sidebar-accent: 280 35% 14%;
+    --sidebar-accent-foreground: 30 20% 95%;
+    --sidebar-border: 280 30% 16%;
+    --sidebar-ring: 15 65% 62%;
 
     /* Semantic Colors - Dark mode */
-    --success: 152 65% 42%;
+    --success: 152 60% 45%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 55%;
-    --warning-foreground: 220 30% 12%;
-    --error: 0 72% 55%;
+    --warning: 38 85% 55%;
+    --warning-foreground: 280 30% 12%;
+    --error: 0 65% 55%;
     --error-foreground: 0 0% 100%;
 
     /* Custom tokens */
-    --gold: 38 90% 58%;
-    --gold-light: 40 85% 70%;
-    --gold-dark: 35 85% 45%;
-    --navy: 220 55% 45%;
-    --navy-light: 220 50% 55%;
-    --navy-dark: 220 60% 30%;
+    --plum: 280 50% 50%;
+    --plum-light: 280 45% 60%;
+    --plum-dark: 280 55% 35%;
+    --rose: 15 65% 62%;
+    --rose-light: 15 70% 75%;
+    --rose-dark: 15 60% 48%;
+    
+    --glass-bg: 280 40% 12% / 0.8;
+    --glass-border: 280 30% 25% / 0.5;
   }
 }
 
@@ -146,7 +152,7 @@
   }
 }
 
-/* Editorial typography enhancement */
+/* Glassmorphism utilities */
 @layer utilities {
   .text-display {
     @apply tracking-tight leading-[1.05];
@@ -156,11 +162,27 @@
     @apply tracking-[-0.02em] leading-[1.1];
   }
 
-  .gold-gradient {
-    @apply bg-gradient-to-r from-[hsl(38,85%,55%)] via-[hsl(40,90%,65%)] to-[hsl(38,85%,55%)] bg-clip-text text-transparent;
+  .rose-gradient {
+    @apply bg-gradient-to-r from-[hsl(15,60%,65%)] via-[hsl(20,70%,75%)] to-[hsl(15,60%,65%)] bg-clip-text text-transparent;
   }
 
-  .navy-gradient {
-    @apply bg-gradient-to-br from-[hsl(220,60%,20%)] to-[hsl(220,65%,12%)];
+  .plum-gradient {
+    @apply bg-gradient-to-br from-[hsl(280,45%,25%)] via-[hsl(280,40%,30%)] to-[hsl(280,50%,20%)];
+  }
+
+  .glass {
+    @apply bg-white/70 backdrop-blur-xl border border-white/30 shadow-xl;
+  }
+
+  .glass-dark {
+    @apply bg-[hsl(280,40%,12%)]/80 backdrop-blur-xl border border-white/10;
+  }
+
+  .glow-rose {
+    box-shadow: 0 0 40px -10px hsl(15 60% 65% / 0.4);
+  }
+
+  .glow-plum {
+    box-shadow: 0 0 40px -10px hsl(280 45% 35% / 0.4);
   }
 }
