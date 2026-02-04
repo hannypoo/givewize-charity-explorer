@@ -74,30 +74,37 @@ export default {
           DEFAULT: "hsl(var(--error))",
           foreground: "hsl(var(--error-foreground))",
         },
-        // Editorial design tokens
-        gold: {
-          DEFAULT: "hsl(var(--gold))",
-          light: "hsl(var(--gold-light))",
-          dark: "hsl(var(--gold-dark))",
+        // Plum + Rose Gold design tokens
+        plum: {
+          DEFAULT: "hsl(var(--plum))",
+          light: "hsl(var(--plum-light))",
+          dark: "hsl(var(--plum-dark))",
         },
-        navy: {
-          DEFAULT: "hsl(var(--navy))",
-          light: "hsl(var(--navy-light))",
-          dark: "hsl(var(--navy-dark))",
+        rose: {
+          DEFAULT: "hsl(var(--rose))",
+          light: "hsl(var(--rose-light))",
+          dark: "hsl(var(--rose-dark))",
         },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        "2xl": "1.25rem",
+        "3xl": "1.5rem",
       },
       boxShadow: {
-        soft: "0 2px 8px -2px rgba(0, 0, 0, 0.05), 0 4px 16px -4px rgba(0, 0, 0, 0.1)",
-        card: "0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05)",
-        elevated: "0 8px 30px -8px rgba(0, 0, 0, 0.12), 0 16px 40px -12px rgba(0, 0, 0, 0.15)",
-        gold: "0 4px 20px -4px rgba(200, 150, 50, 0.35)",
-        "gold-lg": "0 8px 32px -6px rgba(200, 150, 50, 0.4)",
-        navy: "0 4px 20px -4px rgba(30, 50, 80, 0.25)",
+        soft: "0 2px 8px -2px rgba(0, 0, 0, 0.05), 0 4px 16px -4px rgba(0, 0, 0, 0.08)",
+        card: "0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04)",
+        elevated: "0 12px 40px -12px rgba(0, 0, 0, 0.15), 0 20px 50px -15px rgba(0, 0, 0, 0.12)",
+        glass: "0 8px 32px 0 rgba(0, 0, 0, 0.08)",
+        rose: "0 4px 25px -5px rgba(210, 140, 130, 0.4)",
+        "rose-lg": "0 8px 40px -8px rgba(210, 140, 130, 0.5)",
+        plum: "0 4px 25px -5px rgba(100, 60, 120, 0.35)",
+        "plum-lg": "0 8px 40px -8px rgba(100, 60, 120, 0.45)",
+      },
+      backdropBlur: {
+        xs: "2px",
       },
       keyframes: {
         "accordion-down": {
@@ -122,7 +129,11 @@ export default {
         },
         "float": {
           "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-10px)" },
+          "50%": { transform: "translateY(-12px)" },
+        },
+        "glow-pulse": {
+          "0%, 100%": { opacity: "0.5" },
+          "50%": { opacity: "1" },
         },
       },
       animation: {
@@ -132,6 +143,7 @@ export default {
         "slide-in": "slide-in 0.3s ease-out",
         "shimmer": "shimmer 2.5s ease-in-out infinite",
         "float": "float 6s ease-in-out infinite",
+        "glow-pulse": "glow-pulse 3s ease-in-out infinite",
       },
     },
   },
