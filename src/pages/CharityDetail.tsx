@@ -264,7 +264,7 @@ const CharityDetail = () => {
                     </div>
 
                     {/* Percentage Labels */}
-                    <div className="flex justify-center gap-6 mt-4">
+                    <div className="flex flex-wrap justify-center gap-4 md:gap-6 mt-4">
                       <div className="flex items-center gap-2">
                         <div className="h-3 w-3 rounded-full" style={{ backgroundColor: "hsl(142, 76%, 36%)" }} />
                         <span className="text-sm text-muted-foreground">
@@ -274,20 +274,24 @@ const CharityDetail = () => {
                       <div className="flex items-center gap-2">
                         <div className="h-3 w-3 rounded-full" style={{ backgroundColor: "hsl(45, 93%, 47%)" }} />
                         <span className="text-sm text-muted-foreground">
-                          Admin: <span className="font-semibold text-foreground">{charity.admin_expense_percentage}%</span>
+                          Admin: <span className="font-semibold text-foreground">{charity.admin_expense_percentage ?? "—"}%</span>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="h-3 w-3 rounded-full" style={{ backgroundColor: "hsl(25, 95%, 53%)" }} />
                         <span className="text-sm text-muted-foreground">
-                          Fundraising: <span className="font-semibold text-foreground">{charity.fundraising_expense_percentage}%</span>
+                          Fundraising: <span className="font-semibold text-foreground">{charity.fundraising_expense_percentage ?? "—"}%</span>
                         </span>
                       </div>
                     </div>
                   </>
                 ) : (
-                  <div className="flex items-center justify-center h-64 text-muted-foreground">
-                    <p>Financial data not available</p>
+                  <div className="flex flex-col items-center justify-center h-64 rounded-lg bg-muted/30 border border-dashed border-border">
+                    <div className="h-24 w-24 rounded-full bg-muted/50 flex items-center justify-center mb-4">
+                      <PieChart className="h-10 w-10 text-muted-foreground/50" />
+                    </div>
+                    <p className="text-muted-foreground font-medium">Data pending</p>
+                    <p className="text-sm text-muted-foreground/70 mt-1">Financial breakdown not yet available</p>
                   </div>
                 )}
               </div>
@@ -298,23 +302,27 @@ const CharityDetail = () => {
                 <div className="space-y-3">
                   <TransparencyItem
                     label="Form 990 Filed"
-                    checked={charity.complete_990_filed}
+                    status={charity.complete_990_filed}
                     description="Annual tax return filed with the IRS"
                   />
                   <TransparencyItem
                     label="Annual Report Available"
-                    checked={!!charity.annual_report_url}
+                    status={charity.annual_report_url ? true : charity.annual_report_url === null ? null : false}
                     description="Publicly accessible annual report"
                     link={charity.annual_report_url}
                   />
                   <TransparencyItem
                     label="Financials Published"
-                    checked={charity.financials_published}
+                    status={charity.financials_published}
                     description="Financial statements publicly available"
                   />
                   <TransparencyItem
                     label="Independent Audit"
-                    checked={charity.complete_990_filed && charity.financials_published}
+                    status={
+                      charity.complete_990_filed === null || charity.financials_published === null
+                        ? null
+                        : charity.complete_990_filed && charity.financials_published
+                    }
                     description="Audited by independent third party"
                   />
                 </div>
@@ -341,27 +349,41 @@ const CharityDetail = () => {
 
 interface TransparencyItemProps {
   label: string;
-  checked: boolean;
+  status: boolean | null; // null = pending, true = yes, false = no
   description: string;
   link?: string | null;
 }
 
-function TransparencyItem({ label, checked, description, link }: TransparencyItemProps) {
+function TransparencyItem({ label, status, description, link }: TransparencyItemProps) {
+  const isPending = status === null;
+  const isChecked = status === true;
+
   return (
-    <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+    <div className={`flex items-start gap-3 p-3 rounded-lg ${isPending ? "bg-muted/30" : "bg-muted/50"}`}>
       <div
         className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
-          checked ? "bg-primary/20 text-primary" : "bg-muted-foreground/20 text-muted-foreground"
+          isPending
+            ? "bg-muted-foreground/10 text-muted-foreground/50"
+            : isChecked
+            ? "bg-primary/20 text-primary"
+            : "bg-muted-foreground/20 text-muted-foreground"
         }`}
       >
-        {checked ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
+        {isPending ? (
+          <span className="text-xs font-medium">?</span>
+        ) : isChecked ? (
+          <Check className="h-4 w-4" />
+        ) : (
+          <X className="h-4 w-4" />
+        )}
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <p className={`font-medium ${checked ? "text-foreground" : "text-muted-foreground"}`}>
+          <p className={`font-medium ${isPending ? "text-muted-foreground/70" : isChecked ? "text-foreground" : "text-muted-foreground"}`}>
             {label}
+            {isPending && <span className="ml-2 text-xs font-normal text-muted-foreground/50">(Data pending)</span>}
           </p>
-          {link && (
+          {link && !isPending && (
             <a
               href={link}
               target="_blank"
@@ -372,7 +394,7 @@ function TransparencyItem({ label, checked, description, link }: TransparencyIte
             </a>
           )}
         </div>
-        <p className="text-sm text-muted-foreground">{description}</p>
+        <p className={`text-sm ${isPending ? "text-muted-foreground/50" : "text-muted-foreground"}`}>{description}</p>
       </div>
     </div>
   );
