@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Heart } from "lucide-react";
 import givewizeIcon from "@/assets/givewize-icon.jpg";
 
 const navLinks = [
@@ -10,34 +11,31 @@ const navLinks = [
 
 export function Footer() {
   return (
-    <footer className="bg-foreground text-background">
-      {/* Top accent line */}
-      <div className="h-1 bg-gradient-to-r from-primary via-coral to-primary" />
-      
+    <footer className="bg-card border-t border-border">
       <div className="container py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
           {/* Brand */}
           <div className="flex flex-col items-center md:items-start">
             <Link to="/" className="flex items-center gap-3 mb-4">
-              <div className="h-10 w-10 border-2 border-background/30 p-1">
+              <div className="h-10 w-10 bg-gradient-to-br from-primary/20 to-accent/10 rounded-xl p-1.5">
                 <img 
                   src={givewizeIcon} 
                   alt="GiveWiZe" 
-                  className="h-full w-full object-contain"
+                  className="h-full w-full object-contain rounded-lg"
                 />
               </div>
-              <span className="font-bold text-lg">
+              <span className="font-bold text-lg text-foreground">
                 GiveWiZe
               </span>
             </Link>
-            <p className="text-sm text-background/60 text-center md:text-left">
+            <p className="text-sm text-muted-foreground text-center md:text-left">
               Empowering thoughtful giving through transparency.
             </p>
           </div>
 
           {/* Navigation */}
           <div className="flex flex-col items-center">
-            <span className="text-xs font-semibold uppercase tracking-widest text-coral mb-4">
+            <span className="text-sm font-medium text-foreground mb-4">
               Navigate
             </span>
             <nav className="flex flex-col items-center gap-2">
@@ -45,7 +43,7 @@ export function Footer() {
                 <Link
                   key={link.to}
                   to={link.to}
-                  className="text-sm text-background/60 hover:text-coral transition-colors"
+                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -55,27 +53,27 @@ export function Footer() {
 
           {/* Stats */}
           <div className="flex justify-center md:justify-end">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="border border-background/20 p-4 text-center">
-                <div className="text-2xl font-bold text-coral">71</div>
-                <div className="text-xs text-background/50 uppercase tracking-wide">Charities</div>
+            <div className="flex gap-4">
+              <div className="bg-secondary rounded-2xl p-4 text-center min-w-[80px]">
+                <div className="text-xl font-bold text-primary">71</div>
+                <div className="text-xs text-muted-foreground">Charities</div>
               </div>
-              <div className="border border-background/20 p-4 text-center">
-                <div className="text-2xl font-bold text-primary">A+</div>
-                <div className="text-xs text-background/50 uppercase tracking-wide">Avg Rating</div>
+              <div className="bg-accent/10 rounded-2xl p-4 text-center min-w-[80px]">
+                <div className="text-xl font-bold text-accent">A+</div>
+                <div className="text-xs text-muted-foreground">Avg Rating</div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Bottom */}
-        <div className="mt-12 pt-6 border-t border-background/10 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-background/40">
-            © 2025 GiveWiZe. All rights reserved.
+        <div className="mt-12 pt-6 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-sm text-muted-foreground flex items-center gap-1">
+            Made with <Heart className="h-3 w-3 text-accent" /> © 2025 GiveWiZe
           </p>
-          <div className="flex items-center gap-6 text-sm text-background/40">
-            <Link to="#" className="hover:text-coral transition-colors">Privacy</Link>
-            <Link to="#" className="hover:text-coral transition-colors">Terms</Link>
+          <div className="flex items-center gap-6 text-sm text-muted-foreground">
+            <Link to="#" className="hover:text-primary transition-colors">Privacy</Link>
+            <Link to="#" className="hover:text-primary transition-colors">Terms</Link>
           </div>
         </div>
       </div>

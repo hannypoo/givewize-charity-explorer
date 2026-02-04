@@ -73,17 +73,18 @@ export default {
           DEFAULT: "hsl(var(--error))",
           foreground: "hsl(var(--error-foreground))",
         },
-        // Teal + Coral tokens
-        teal: {
-          DEFAULT: "hsl(var(--teal))",
-          light: "hsl(var(--teal-light))",
-          dark: "hsl(var(--teal-dark))",
+        // Blue + Orange tokens
+        blue: {
+          DEFAULT: "hsl(var(--blue))",
+          light: "hsl(var(--blue-light))",
+          dark: "hsl(var(--blue-dark))",
         },
-        coral: {
-          DEFAULT: "hsl(var(--coral))",
-          light: "hsl(var(--coral-light))",
-          dark: "hsl(var(--coral-dark))",
+        orange: {
+          DEFAULT: "hsl(var(--orange))",
+          light: "hsl(var(--orange-light))",
+          dark: "hsl(var(--orange-dark))",
         },
+        peach: "hsl(var(--peach))",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -91,12 +92,12 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       boxShadow: {
-        subtle: "0 1px 2px 0 rgba(0, 0, 0, 0.03)",
-        soft: "0 2px 8px -2px rgba(0, 0, 0, 0.08)",
-        card: "0 4px 12px -2px rgba(0, 0, 0, 0.06)",
-        elevated: "0 8px 24px -4px rgba(0, 0, 0, 0.1)",
-        teal: "0 4px 20px -4px rgba(50, 160, 140, 0.35)",
-        coral: "0 4px 20px -4px rgba(230, 100, 80, 0.35)",
+        subtle: "0 1px 3px 0 rgba(0, 0, 0, 0.04)",
+        soft: "0 4px 12px -4px rgba(0, 0, 0, 0.08)",
+        card: "0 8px 24px -8px rgba(0, 0, 0, 0.08)",
+        elevated: "0 16px 40px -12px rgba(0, 0, 0, 0.12)",
+        glow: "0 8px 32px -8px rgba(60, 130, 220, 0.25)",
+        warm: "0 8px 32px -8px rgba(255, 150, 80, 0.25)",
       },
       keyframes: {
         "accordion-down": {
