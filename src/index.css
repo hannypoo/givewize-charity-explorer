@@ -3,40 +3,42 @@
 @tailwind utilities;
 
 /* GiveWiZe Design System
-   Primary Blue: #4A90D9 - Trust & professionalism
-   Dark Navy: #1E293B - Headers & primary text
+   Logo Blue: #4A90D9 - THE accent color (buttons, links, hover states)
+   Dark Charcoal: #1F2937 - Headlines
+   Charcoal Gray: #374151 - Header background
+   Medium Gray: #6B7280 - Body text
    Light Gray: #F8FAFC - Page backgrounds
    White: #FFFFFF - Cards & containers
-   Success Green: #22C55E - Positive indicators
-   Warning Amber: #F59E0B - Medium scores
-   Error Red: #EF4444 - Low scores, alerts
 */
 
 @layer base {
   :root {
     /* Light Gray - Page backgrounds */
     --background: 210 40% 98%;
-    --foreground: 222 32% 17%;
+    /* Dark Charcoal - Headlines & primary text */
+    --foreground: 220 26% 17%;
 
     /* White - Cards & containers */
     --card: 0 0% 100%;
-    --card-foreground: 222 32% 17%;
+    --card-foreground: 220 26% 17%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 32% 17%;
+    --popover-foreground: 220 26% 17%;
 
-    /* Primary Blue */
+    /* Logo Blue - THE accent color */
     --primary: 210 62% 57%;
     --primary-foreground: 0 0% 100%;
 
-    /* Light blue tint for secondary */
-    --secondary: 210 40% 96%;
+    /* Light blue tint for secondary backgrounds */
+    --secondary: 210 30% 96%;
     --secondary-foreground: 210 62% 45%;
 
-    --muted: 210 20% 95%;
-    --muted-foreground: 215 16% 47%;
+    /* Muted grays */
+    --muted: 220 14% 96%;
+    /* Medium Gray - Body text */
+    --muted-foreground: 220 9% 46%;
 
-    /* Accent - slightly warmer blue */
+    /* Accent = Primary (single accent color) */
     --accent: 210 62% 57%;
     --accent-foreground: 0 0% 100%;
 
@@ -44,20 +46,20 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 20% 90%;
-    --input: 214 20% 90%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
     --ring: 210 62% 57%;
 
     --radius: 0.625rem;
 
-    /* Sidebar - Dark Navy */
-    --sidebar-background: 222 32% 17%;
+    /* Sidebar/Header - Charcoal Gray */
+    --sidebar-background: 220 13% 26%;
     --sidebar-foreground: 210 40% 98%;
     --sidebar-primary: 210 62% 57%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222 25% 25%;
+    --sidebar-accent: 220 13% 32%;
     --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 222 25% 25%;
+    --sidebar-border: 220 13% 32%;
     --sidebar-ring: 210 62% 57%;
 
     /* Semantic Colors */
@@ -70,26 +72,25 @@
   }
 
   .dark {
-    /* Dark Navy - Dark mode background */
-    --background: 222 32% 12%;
+    /* Dark mode - inverted grays */
+    --background: 220 20% 10%;
     --foreground: 210 40% 98%;
 
-    /* Darker card backgrounds */
-    --card: 222 32% 17%;
+    --card: 220 18% 14%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222 32% 17%;
+    --popover: 220 18% 14%;
     --popover-foreground: 210 40% 98%;
 
-    /* Primary Blue - slightly brighter for dark mode */
+    /* Logo Blue - slightly brighter for dark mode */
     --primary: 210 62% 62%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 222 25% 22%;
+    --secondary: 220 15% 18%;
     --secondary-foreground: 210 50% 80%;
 
-    --muted: 222 25% 20%;
-    --muted-foreground: 215 16% 60%;
+    --muted: 220 15% 20%;
+    --muted-foreground: 220 10% 60%;
 
     --accent: 210 62% 62%;
     --accent-foreground: 0 0% 100%;
@@ -97,17 +98,17 @@
     --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 222 25% 25%;
-    --input: 222 25% 25%;
+    --border: 220 15% 25%;
+    --input: 220 15% 25%;
     --ring: 210 62% 62%;
 
-    --sidebar-background: 222 32% 10%;
+    --sidebar-background: 220 18% 12%;
     --sidebar-foreground: 210 40% 95%;
     --sidebar-primary: 210 62% 62%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222 25% 18%;
+    --sidebar-accent: 220 15% 18%;
     --sidebar-accent-foreground: 210 40% 95%;
-    --sidebar-border: 222 25% 20%;
+    --sidebar-border: 220 15% 20%;
     --sidebar-ring: 210 62% 62%;
 
     /* Semantic Colors - Dark mode */
