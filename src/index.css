@@ -16,54 +16,54 @@
     /* Light Gray - Page backgrounds */
     --background: 210 40% 98%;
     /* Dark Charcoal - Headlines & primary text */
-    --foreground: 220 26% 17%;
+    --foreground: 220 35% 14%;
 
     /* White - Cards & containers */
     --card: 0 0% 100%;
-    --card-foreground: 220 26% 17%;
+    --card-foreground: 220 35% 14%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 26% 17%;
+    --popover-foreground: 220 35% 14%;
 
-    /* Logo Blue - THE accent color */
-    --primary: 210 62% 57%;
+    /* Deep Rich Blue - THE accent color */
+    --primary: 215 80% 42%;
     --primary-foreground: 0 0% 100%;
 
     /* Light blue tint for secondary backgrounds */
-    --secondary: 210 30% 96%;
-    --secondary-foreground: 210 62% 45%;
+    --secondary: 210 50% 95%;
+    --secondary-foreground: 215 80% 35%;
 
     /* Muted grays */
     --muted: 220 14% 96%;
     /* Medium Gray - Body text */
-    --muted-foreground: 220 9% 46%;
+    --muted-foreground: 220 12% 40%;
 
     /* Accent = Primary (single accent color) */
-    --accent: 210 62% 57%;
+    --accent: 215 80% 42%;
     --accent-foreground: 0 0% 100%;
 
     /* Error Red */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 210 62% 57%;
+    --border: 220 20% 88%;
+    --input: 220 20% 88%;
+    --ring: 215 80% 42%;
 
-    --radius: 0.625rem;
+    --radius: 0.75rem;
 
-    /* Sidebar/Header - Charcoal Gray */
-    --sidebar-background: 220 13% 26%;
+    /* Sidebar/Header - Deep Navy */
+    --sidebar-background: 220 30% 18%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 210 62% 57%;
+    --sidebar-primary: 215 80% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 13% 32%;
+    --sidebar-accent: 220 25% 24%;
     --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 220 13% 32%;
-    --sidebar-ring: 210 62% 57%;
+    --sidebar-border: 220 25% 24%;
+    --sidebar-ring: 215 80% 50%;
 
     /* Semantic Colors */
-    --success: 142 71% 45%;
+    --success: 152 76% 40%;
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
@@ -73,46 +73,46 @@
 
   .dark {
     /* Dark mode - inverted grays */
-    --background: 220 20% 10%;
+    --background: 220 25% 8%;
     --foreground: 210 40% 98%;
 
-    --card: 220 18% 14%;
+    --card: 220 22% 12%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 220 18% 14%;
+    --popover: 220 22% 12%;
     --popover-foreground: 210 40% 98%;
 
-    /* Logo Blue - slightly brighter for dark mode */
-    --primary: 210 62% 62%;
+    /* Deep Rich Blue - brighter for dark mode */
+    --primary: 215 85% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 15% 18%;
-    --secondary-foreground: 210 50% 80%;
+    --secondary: 220 20% 16%;
+    --secondary-foreground: 210 60% 80%;
 
-    --muted: 220 15% 20%;
-    --muted-foreground: 220 10% 60%;
+    --muted: 220 18% 18%;
+    --muted-foreground: 220 12% 60%;
 
-    --accent: 210 62% 62%;
+    --accent: 215 85% 55%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62% 50%;
+    --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 25%;
-    --input: 220 15% 25%;
-    --ring: 210 62% 62%;
+    --border: 220 18% 22%;
+    --input: 220 18% 22%;
+    --ring: 215 85% 55%;
 
-    --sidebar-background: 220 18% 12%;
+    --sidebar-background: 220 22% 10%;
     --sidebar-foreground: 210 40% 95%;
-    --sidebar-primary: 210 62% 62%;
+    --sidebar-primary: 215 85% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 15% 18%;
+    --sidebar-accent: 220 18% 16%;
     --sidebar-accent-foreground: 210 40% 95%;
-    --sidebar-border: 220 15% 20%;
-    --sidebar-ring: 210 62% 62%;
+    --sidebar-border: 220 18% 18%;
+    --sidebar-ring: 215 85% 55%;
 
     /* Semantic Colors - Dark mode */
-    --success: 142 71% 50%;
+    --success: 152 76% 45%;
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 55%;
     --warning-foreground: 0 0% 100%;
