@@ -11,7 +11,10 @@ import {
   Loader2,
   Check,
   X,
-  Info
+  Info,
+  Users,
+  Target,
+  TrendingUp
 } from "lucide-react";
 import { useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
@@ -339,6 +342,106 @@ const CharityDetail = () => {
                   please visit the organization's official website.
                 </p>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Programs & Services Section */}
+        <Card className="mb-10">
+          <CardContent className="p-6 md:p-8">
+            <h2 className="font-display text-xl font-semibold text-foreground mb-6">
+              Programs & Services
+            </h2>
+
+            {/* Full Description */}
+            <div className="mb-6">
+              {charity.full_description ? (
+                <p className="text-muted-foreground leading-relaxed">
+                  {charity.full_description}
+                </p>
+              ) : (
+                <p className="text-muted-foreground/60 italic">Information being collected</p>
+              )}
+            </div>
+
+            {/* Programs List */}
+            {charity.programs_list && charity.programs_list.length > 0 ? (
+              <div>
+                <h3 className="font-medium text-foreground mb-3">Key Programs</h3>
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {charity.programs_list.map((program, index) => (
+                    <li key={index} className="flex items-start gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-primary mt-2 shrink-0" />
+                      <span className="text-muted-foreground">{program}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <div>
+                <h3 className="font-medium text-foreground mb-3">Key Programs</h3>
+                <p className="text-muted-foreground/60 italic">Information being collected</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Impact & Outcomes Section */}
+        <Card className="mb-10">
+          <CardContent className="p-6 md:p-8">
+            <h2 className="font-display text-xl font-semibold text-foreground mb-6">
+              Impact & Outcomes
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Target Population */}
+              <Card className="bg-muted/30 border-0">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                      <Target className="h-5 w-5 text-primary" />
+                    </div>
+                    <h3 className="font-medium text-foreground">Target Population</h3>
+                  </div>
+                  {charity.target_population ? (
+                    <p className="text-muted-foreground">{charity.target_population}</p>
+                  ) : (
+                    <p className="text-muted-foreground/60 italic">Information being collected</p>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* People Served */}
+              <Card className="bg-muted/30 border-0">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                      <Users className="h-5 w-5 text-primary" />
+                    </div>
+                    <h3 className="font-medium text-foreground">People Served Annually</h3>
+                  </div>
+                  {charity.people_served_annually ? (
+                    <p className="text-2xl font-display font-bold text-foreground">
+                      {charity.people_served_annually.toLocaleString()}
+                    </p>
+                  ) : (
+                    <p className="text-muted-foreground/60 italic">Information being collected</p>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Measurable Outcomes */}
+              <Card className="bg-muted/30 border-0">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                      <TrendingUp className="h-5 w-5 text-primary" />
+                    </div>
+                    <h3 className="font-medium text-foreground">Measurable Outcomes</h3>
+                  </div>
+                  <p className="text-muted-foreground/60 italic">Information being collected</p>
+                </CardContent>
+              </Card>
             </div>
           </CardContent>
         </Card>
