@@ -2,135 +2,131 @@
 @tailwind components;
 @tailwind utilities;
 
-/* GiveWiZe Design System - Sage + Warm Neutrals, Clean & Minimal
-   Soft Sage: Calming, trustworthy primary
-   Warm Cream: Inviting, human backgrounds
-   Terracotta: Warm accent for CTAs
-   Elegant simplicity with generous whitespace
+/* GiveWiZe Design System - Teal + Coral, Geometric & Modern
+   Fresh Teal/Emerald: Modern, trustworthy primary
+   Warm Coral: Friendly, energetic accent
+   Geometric patterns, crisp lines, structured grids
 */
 
 @layer base {
   :root {
-    /* Warm cream background */
-    --background: 40 40% 98%;
-    /* Deep warm gray for text */
-    --foreground: 30 15% 18%;
+    /* Clean white background */
+    --background: 0 0% 99%;
+    /* Deep slate for text */
+    --foreground: 200 25% 12%;
 
     /* Pure white cards */
     --card: 0 0% 100%;
-    --card-foreground: 30 15% 18%;
+    --card-foreground: 200 25% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 30 15% 18%;
+    --popover-foreground: 200 25% 12%;
 
-    /* Soft Sage - calming primary */
-    --primary: 150 25% 35%;
+    /* Fresh Teal - modern primary */
+    --primary: 172 66% 38%;
     --primary-foreground: 0 0% 100%;
 
-    /* Light sage tint */
-    --secondary: 150 20% 94%;
-    --secondary-foreground: 150 25% 30%;
+    /* Light teal tint */
+    --secondary: 172 40% 95%;
+    --secondary-foreground: 172 66% 30%;
 
-    /* Warm neutral muted */
-    --muted: 40 20% 94%;
-    --muted-foreground: 30 10% 45%;
+    /* Cool neutral muted */
+    --muted: 200 15% 95%;
+    --muted-foreground: 200 15% 45%;
 
-    /* Warm Terracotta - inviting accent */
-    --accent: 18 70% 55%;
+    /* Warm Coral - energetic accent */
+    --accent: 12 80% 62%;
     --accent-foreground: 0 0% 100%;
 
-    /* Soft destructive */
-    --destructive: 0 60% 50%;
+    /* Destructive */
+    --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Warm subtle borders */
-    --border: 40 15% 90%;
-    --input: 40 15% 90%;
-    --ring: 150 25% 35%;
+    /* Clean borders */
+    --border: 200 20% 90%;
+    --input: 200 20% 90%;
+    --ring: 172 66% 38%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    /* Sidebar - Soft sage */
-    --sidebar-background: 150 20% 18%;
-    --sidebar-foreground: 40 40% 98%;
-    --sidebar-primary: 18 70% 55%;
+    /* Sidebar */
+    --sidebar-background: 200 30% 10%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 12 80% 62%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 150 18% 24%;
-    --sidebar-accent-foreground: 40 40% 98%;
-    --sidebar-border: 150 15% 24%;
-    --sidebar-ring: 18 70% 55%;
+    --sidebar-accent: 200 25% 16%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 200 20% 18%;
+    --sidebar-ring: 12 80% 62%;
 
     /* Semantic Colors */
-    --success: 150 50% 40%;
+    --success: 172 60% 40%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 85% 50%;
-    --warning-foreground: 30 15% 18%;
-    --error: 0 60% 50%;
+    --warning: 38 90% 55%;
+    --warning-foreground: 200 25% 12%;
+    --error: 0 70% 55%;
     --error-foreground: 0 0% 100%;
 
-    /* Custom design tokens */
-    --sage: 150 25% 35%;
-    --sage-light: 150 20% 45%;
-    --sage-dark: 150 30% 25%;
-    --terracotta: 18 70% 55%;
-    --terracotta-light: 18 65% 70%;
-    --terracotta-dark: 18 75% 42%;
-    --cream: 40 40% 96%;
+    /* Custom tokens */
+    --teal: 172 66% 38%;
+    --teal-light: 172 55% 50%;
+    --teal-dark: 172 70% 28%;
+    --coral: 12 80% 62%;
+    --coral-light: 12 75% 75%;
+    --coral-dark: 12 85% 48%;
   }
 
   .dark {
-    /* Dark mode - deep sage darkness */
-    --background: 150 20% 6%;
-    --foreground: 40 30% 95%;
+    --background: 200 30% 6%;
+    --foreground: 0 0% 96%;
 
-    --card: 150 18% 10%;
-    --card-foreground: 40 30% 95%;
+    --card: 200 28% 10%;
+    --card-foreground: 0 0% 96%;
 
-    --popover: 150 18% 10%;
-    --popover-foreground: 40 30% 95%;
+    --popover: 200 28% 10%;
+    --popover-foreground: 0 0% 96%;
 
-    --primary: 150 30% 50%;
+    --primary: 172 60% 45%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 150 20% 16%;
-    --secondary-foreground: 150 25% 75%;
+    --secondary: 200 25% 16%;
+    --secondary-foreground: 172 50% 70%;
 
-    --muted: 150 15% 14%;
-    --muted-foreground: 40 15% 60%;
+    --muted: 200 20% 14%;
+    --muted-foreground: 200 15% 60%;
 
-    --accent: 18 70% 58%;
+    --accent: 12 75% 58%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 55% 50%;
+    --destructive: 0 65% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 150 15% 18%;
-    --input: 150 15% 18%;
-    --ring: 150 30% 50%;
+    --border: 200 20% 18%;
+    --input: 200 20% 18%;
+    --ring: 172 60% 45%;
 
-    --sidebar-background: 150 20% 8%;
-    --sidebar-foreground: 40 30% 95%;
-    --sidebar-primary: 18 70% 58%;
+    --sidebar-background: 200 30% 8%;
+    --sidebar-foreground: 0 0% 96%;
+    --sidebar-primary: 12 75% 58%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 150 18% 14%;
-    --sidebar-accent-foreground: 40 30% 95%;
-    --sidebar-border: 150 15% 16%;
-    --sidebar-ring: 18 70% 58%;
+    --sidebar-accent: 200 25% 14%;
+    --sidebar-accent-foreground: 0 0% 96%;
+    --sidebar-border: 200 20% 16%;
+    --sidebar-ring: 12 75% 58%;
 
-    --success: 150 45% 45%;
+    --success: 172 55% 48%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 85% 55%;
-    --warning-foreground: 30 15% 18%;
-    --error: 0 60% 50%;
+    --warning: 38 90% 58%;
+    --warning-foreground: 200 25% 12%;
+    --error: 0 70% 55%;
     --error-foreground: 0 0% 100%;
 
-    --sage: 150 30% 50%;
-    --sage-light: 150 25% 60%;
-    --sage-dark: 150 35% 35%;
-    --terracotta: 18 70% 58%;
-    --terracotta-light: 18 65% 72%;
-    --terracotta-dark: 18 75% 45%;
-    --cream: 40 25% 12%;
+    --teal: 172 60% 45%;
+    --teal-light: 172 50% 55%;
+    --teal-dark: 172 65% 35%;
+    --coral: 12 75% 58%;
+    --coral-light: 12 70% 70%;
+    --coral-dark: 12 80% 45%;
   }
 }
 
@@ -144,9 +140,27 @@
   }
 }
 
-/* Minimal design utilities */
+/* Geometric pattern utilities */
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  .geometric-grid {
+    background-image: 
+      linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border)) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  .geometric-dots {
+    background-image: radial-gradient(circle, hsl(var(--primary) / 0.15) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .diagonal-lines {
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      hsl(var(--primary) / 0.03) 10px,
+      hsl(var(--primary) / 0.03) 20px
+    );
   }
 }

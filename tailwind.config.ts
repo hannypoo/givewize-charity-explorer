@@ -9,7 +9,7 @@ export default {
       center: true,
       padding: "2rem",
       screens: {
-        "2xl": "1200px",
+        "2xl": "1400px",
       },
     },
     extend: {
@@ -73,18 +73,17 @@ export default {
           DEFAULT: "hsl(var(--error))",
           foreground: "hsl(var(--error-foreground))",
         },
-        // Sage + Terracotta tokens
-        sage: {
-          DEFAULT: "hsl(var(--sage))",
-          light: "hsl(var(--sage-light))",
-          dark: "hsl(var(--sage-dark))",
+        // Teal + Coral tokens
+        teal: {
+          DEFAULT: "hsl(var(--teal))",
+          light: "hsl(var(--teal-light))",
+          dark: "hsl(var(--teal-dark))",
         },
-        terracotta: {
-          DEFAULT: "hsl(var(--terracotta))",
-          light: "hsl(var(--terracotta-light))",
-          dark: "hsl(var(--terracotta-dark))",
+        coral: {
+          DEFAULT: "hsl(var(--coral))",
+          light: "hsl(var(--coral-light))",
+          dark: "hsl(var(--coral-dark))",
         },
-        cream: "hsl(var(--cream))",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -92,11 +91,12 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       boxShadow: {
-        // Minimal, subtle shadows
         subtle: "0 1px 2px 0 rgba(0, 0, 0, 0.03)",
-        soft: "0 2px 8px -2px rgba(0, 0, 0, 0.06)",
-        card: "0 1px 3px 0 rgba(0, 0, 0, 0.04)",
-        elevated: "0 4px 12px -2px rgba(0, 0, 0, 0.08)",
+        soft: "0 2px 8px -2px rgba(0, 0, 0, 0.08)",
+        card: "0 4px 12px -2px rgba(0, 0, 0, 0.06)",
+        elevated: "0 8px 24px -4px rgba(0, 0, 0, 0.1)",
+        teal: "0 4px 20px -4px rgba(50, 160, 140, 0.35)",
+        coral: "0 4px 20px -4px rgba(230, 100, 80, 0.35)",
       },
       keyframes: {
         "accordion-down": {
@@ -108,14 +108,19 @@ export default {
           to: { height: "0" },
         },
         "fade-in": {
-          from: { opacity: "0", transform: "translateY(8px)" },
+          from: { opacity: "0", transform: "translateY(10px)" },
           to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "slide-in": {
+          from: { transform: "translateX(-100%)" },
+          to: { transform: "translateX(0)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 0.4s ease-out",
+        "slide-in": "slide-in 0.3s ease-out",
       },
     },
   },
