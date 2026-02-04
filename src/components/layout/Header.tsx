@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
-import logoImage from "@/assets/givewize-logo-dark.jpg";
+import logoImage from "@/assets/givewize-logo-transparent.jpg";
 
 const navLinks = [
   { to: "/", label: "Home" },
@@ -23,7 +23,7 @@ export function Header() {
           <img 
             src={logoImage} 
             alt="GiveWiZe" 
-            className="h-10 w-auto object-contain"
+            className="h-12 w-auto object-contain"
           />
         </Link>
 
