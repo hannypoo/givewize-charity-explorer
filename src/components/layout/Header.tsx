@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
+import logoImage from "@/assets/givewize-logo-dark.jpg";
 
 const navLinks = [
   { to: "/", label: "Home" },
@@ -18,14 +19,12 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full bg-sidebar border-b border-sidebar-border">
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-3">
-          {/* Logo placeholder - will be replaced with actual logo */}
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-            <span className="font-display text-xl font-bold text-primary-foreground">G</span>
-          </div>
-          <span className="font-display text-xl font-bold text-sidebar-foreground">
-            GiveWiZe
-          </span>
+        <Link to="/" className="flex items-center">
+          <img 
+            src={logoImage} 
+            alt="GiveWiZe" 
+            className="h-10 w-auto object-contain"
+          />
         </Link>
 
         {/* Desktop Navigation */}
