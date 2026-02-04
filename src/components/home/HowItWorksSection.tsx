@@ -1,24 +1,24 @@
 import { Link } from "react-router-dom";
-import { ClipboardList, Search, Heart, ArrowRight } from "lucide-react";
+import { ClipboardList, Sparkles, ShieldCheck, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const steps = [
   {
     icon: ClipboardList,
-    title: "Take the Quiz",
-    description: "Answer a few questions about your values, interests, and giving preferences.",
+    title: "Take Our Quiz",
+    description: "Answer a few questions about your values and causes you care about.",
     color: "bg-primary text-primary-foreground",
   },
   {
-    icon: Search,
-    title: "Discover Matches",
-    description: "Get personalized charity recommendations based on your unique profile.",
+    icon: Sparkles,
+    title: "Get Matched",
+    description: "Our AI analyzes your responses to find charities aligned with your priorities.",
     color: "bg-accent text-accent-foreground",
   },
   {
-    icon: Heart,
-    title: "Make an Impact",
-    description: "Choose your favorite charities and start making a difference today.",
+    icon: ShieldCheck,
+    title: "Give Confidently",
+    description: "Review transparent financial data and make an informed donation.",
     color: "bg-primary text-primary-foreground",
   },
 ];
