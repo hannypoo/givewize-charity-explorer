@@ -14,7 +14,111 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      charities: {
+        Row: {
+          admin_expense_percentage: number | null
+          annual_report_url: string | null
+          city: string | null
+          community_rating_average: number | null
+          community_rating_count: number | null
+          complete_990_filed: boolean | null
+          country: string | null
+          created_at: string
+          ein: string | null
+          financials_published: boolean | null
+          full_description: string | null
+          fundraising_expense_percentage: number | null
+          geographic_scope: Database["public"]["Enums"]["geographic_scope"]
+          headquarters: string | null
+          id: string
+          logo_url: string | null
+          mission_statement: string | null
+          name: string
+          people_served_annually: number | null
+          primary_category: Database["public"]["Enums"]["cause_category"]
+          program_expense_percentage: number | null
+          programs_list: string[] | null
+          score_financial_efficiency: number | null
+          score_impact: number | null
+          score_longevity: number | null
+          score_overall: number | null
+          score_transparency: number | null
+          state: string | null
+          target_population: string | null
+          updated_at: string
+          website: string | null
+          year_founded: number | null
+        }
+        Insert: {
+          admin_expense_percentage?: number | null
+          annual_report_url?: string | null
+          city?: string | null
+          community_rating_average?: number | null
+          community_rating_count?: number | null
+          complete_990_filed?: boolean | null
+          country?: string | null
+          created_at?: string
+          ein?: string | null
+          financials_published?: boolean | null
+          full_description?: string | null
+          fundraising_expense_percentage?: number | null
+          geographic_scope?: Database["public"]["Enums"]["geographic_scope"]
+          headquarters?: string | null
+          id?: string
+          logo_url?: string | null
+          mission_statement?: string | null
+          name: string
+          people_served_annually?: number | null
+          primary_category: Database["public"]["Enums"]["cause_category"]
+          program_expense_percentage?: number | null
+          programs_list?: string[] | null
+          score_financial_efficiency?: number | null
+          score_impact?: number | null
+          score_longevity?: number | null
+          score_overall?: number | null
+          score_transparency?: number | null
+          state?: string | null
+          target_population?: string | null
+          updated_at?: string
+          website?: string | null
+          year_founded?: number | null
+        }
+        Update: {
+          admin_expense_percentage?: number | null
+          annual_report_url?: string | null
+          city?: string | null
+          community_rating_average?: number | null
+          community_rating_count?: number | null
+          complete_990_filed?: boolean | null
+          country?: string | null
+          created_at?: string
+          ein?: string | null
+          financials_published?: boolean | null
+          full_description?: string | null
+          fundraising_expense_percentage?: number | null
+          geographic_scope?: Database["public"]["Enums"]["geographic_scope"]
+          headquarters?: string | null
+          id?: string
+          logo_url?: string | null
+          mission_statement?: string | null
+          name?: string
+          people_served_annually?: number | null
+          primary_category?: Database["public"]["Enums"]["cause_category"]
+          program_expense_percentage?: number | null
+          programs_list?: string[] | null
+          score_financial_efficiency?: number | null
+          score_impact?: number | null
+          score_longevity?: number | null
+          score_overall?: number | null
+          score_transparency?: number | null
+          state?: string | null
+          target_population?: string | null
+          updated_at?: string
+          website?: string | null
+          year_founded?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +127,26 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      cause_category:
+        | "rare-diseases"
+        | "medical-health"
+        | "education"
+        | "hunger-food-security"
+        | "animal-welfare"
+        | "child-welfare"
+        | "environment-climate"
+        | "emergency-relief"
+        | "housing-homelessness"
+        | "mental-health"
+        | "veterans"
+        | "arts-culture"
+        | "human-rights"
+        | "disability-services"
+        | "senior-services"
+        | "community-development"
+        | "faith-based"
+        | "international-development"
+      geographic_scope: "local" | "national" | "global"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +273,28 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      cause_category: [
+        "rare-diseases",
+        "medical-health",
+        "education",
+        "hunger-food-security",
+        "animal-welfare",
+        "child-welfare",
+        "environment-climate",
+        "emergency-relief",
+        "housing-homelessness",
+        "mental-health",
+        "veterans",
+        "arts-culture",
+        "human-rights",
+        "disability-services",
+        "senior-services",
+        "community-development",
+        "faith-based",
+        "international-development",
+      ],
+      geographic_scope: ["local", "national", "global"],
+    },
   },
 } as const
