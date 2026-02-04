@@ -18,70 +18,50 @@ export function Header() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
-    <header className="fixed top-0 z-50 w-full">
-      {/* Glassmorphic header background */}
+    <header className="sticky top-0 z-50 w-full">
+      {/* Clean background */}
       <div 
-        className={`absolute inset-0 transition-all duration-500 ${
+        className={`absolute inset-0 transition-all duration-300 ${
           isScrolled 
-            ? "bg-white/70 backdrop-blur-2xl shadow-[0_4px_30px_rgba(0,0,0,0.08)] border-b border-white/50" 
-            : "bg-white/5 backdrop-blur-xl"
+            ? "bg-background/95 backdrop-blur-sm border-b border-border shadow-subtle" 
+            : "bg-background"
         }`} 
       />
       
-      <div className="container relative flex h-20 py-4 items-center justify-between">
-        {/* Logo in glass bubble */}
-        <Link to="/" className="flex items-center gap-3 group">
-          <div className="relative">
-            {/* Glow effect */}
-            <div className="absolute inset-0 bg-rose/30 rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            {/* Glass container */}
-            <div className="relative h-12 w-12 rounded-xl bg-white/80 backdrop-blur-xl p-1.5 ring-2 ring-rose/30 shadow-[0_4px_20px_rgba(210,140,130,0.25)] group-hover:ring-rose/50 group-hover:shadow-[0_8px_30px_rgba(210,140,130,0.35)] transition-all duration-300">
-              <img 
-                src={givewizeIcon} 
-                alt="GiveWiZe" 
-                className="h-full w-full object-contain rounded-lg"
-              />
-            </div>
+      <div className="container relative flex h-16 items-center justify-between">
+        {/* Simple logo */}
+        <Link to="/" className="flex items-center gap-2.5">
+          <div className="h-9 w-9 rounded-lg bg-white p-1 shadow-subtle ring-1 ring-border">
+            <img 
+              src={givewizeIcon} 
+              alt="GiveWiZe" 
+              className="h-full w-full object-contain rounded-md"
+            />
           </div>
-          <span className={`font-display text-xl font-bold transition-colors duration-300 ${
-            isScrolled ? "text-foreground" : "text-white"
-          }`}>
+          <span className="font-semibold text-lg text-foreground">
             GiveWiZe
           </span>
         </Link>
 
-        {/* Desktop Navigation - Glass pill */}
-        <nav className="hidden md:flex items-center">
-          <div className={`flex items-center gap-1 rounded-full p-1.5 transition-all duration-300 ${
-            isScrolled 
-              ? "bg-white/60 backdrop-blur-xl ring-1 ring-white/50 shadow-[0_4px_15px_rgba(0,0,0,0.05)]" 
-              : "bg-white/10 backdrop-blur-xl ring-1 ring-white/25"
-          }`}>
-            {navLinks.map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                className={`px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-200 ${
-                  isScrolled 
-                    ? "text-muted-foreground hover:text-foreground hover:bg-white/80" 
-                    : "text-white/70 hover:text-white hover:bg-white/15"
-                }`}
-                activeClassName={isScrolled 
-                  ? "text-foreground bg-white shadow-[0_2px_10px_rgba(0,0,0,0.08)]" 
-                  : "text-white bg-white/20"
-                }
-              >
-                {link.label}
-              </NavLink>
-            ))}
-          </div>
+        {/* Desktop Navigation - Simple links */}
+        <nav className="hidden md:flex items-center gap-1">
+          {navLinks.map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              className="px-4 py-2 text-sm font-medium text-muted-foreground rounded-lg transition-colors hover:text-foreground hover:bg-secondary"
+              activeClassName="text-foreground bg-secondary"
+            >
+              {link.label}
+            </NavLink>
+          ))}
         </nav>
 
         {/* Desktop CTA */}
@@ -89,39 +69,28 @@ export function Header() {
           <Button 
             variant="ghost" 
             size="sm" 
-            className={`transition-colors rounded-full ${
-              isScrolled 
-                ? "text-muted-foreground hover:text-foreground hover:bg-muted" 
-                : "text-white/80 hover:text-white hover:bg-white/10"
-            }`}
+            className="text-muted-foreground hover:text-foreground"
             asChild
           >
-            <Link to="/auth">Sign In</Link>
+            <Link to="/auth">Sign in</Link>
           </Button>
-          {/* CTA in glass wrapper */}
-          <div className="bg-white/10 backdrop-blur-xl rounded-full p-1 ring-1 ring-white/20">
-            <Button 
-              size="sm" 
-              className="rounded-full bg-gradient-to-r from-rose to-rose-dark hover:from-rose-dark hover:to-rose text-white font-semibold shadow-[0_4px_20px_rgba(210,140,130,0.35)] group px-5"
-              asChild
-            >
-              <Link to="/quiz" className="flex items-center gap-1.5">
-                Get Started
-                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-              </Link>
-            </Button>
-          </div>
+          <Button 
+            size="sm" 
+            className="rounded-lg bg-accent hover:bg-terracotta-dark text-accent-foreground font-medium shadow-subtle"
+            asChild
+          >
+            <Link to="/quiz" className="flex items-center gap-1.5">
+              Get started
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </Button>
         </div>
 
         {/* Mobile Menu Button */}
         <Button
           variant="ghost"
           size="icon"
-          className={`md:hidden rounded-full ${
-            isScrolled 
-              ? "text-foreground hover:bg-muted" 
-              : "text-white hover:bg-white/10"
-          }`}
+          className="md:hidden text-foreground"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
         >
@@ -136,45 +105,45 @@ export function Header() {
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div 
-          className="fixed inset-0 top-20 z-40 bg-plum-dark/50 backdrop-blur-md md:hidden"
+          className="fixed inset-0 top-16 z-40 bg-foreground/5 md:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
 
-      {/* Mobile Menu - Glass panel */}
+      {/* Mobile Menu - Clean slide panel */}
       <div
-        className={`fixed top-20 right-0 z-50 h-[calc(100vh-5rem)] w-80 bg-white/80 backdrop-blur-3xl border-l border-white/50 shadow-[0_0_50px_rgba(0,0,0,0.15)] transform transition-transform duration-300 ease-out md:hidden ${
+        className={`fixed top-16 right-0 z-50 h-[calc(100vh-4rem)] w-72 bg-background border-l border-border shadow-elevated transform transition-transform duration-200 ease-out md:hidden ${
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <nav className="flex flex-col p-5 gap-2">
+        <nav className="flex flex-col p-4 gap-1">
           {navLinks.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}
-              className="px-5 py-4 text-sm font-medium text-muted-foreground transition-all duration-200 hover:text-foreground hover:bg-white/60 rounded-xl"
-              activeClassName="text-foreground bg-white/80 shadow-soft"
+              className="px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground hover:bg-secondary rounded-lg"
+              activeClassName="text-foreground bg-secondary"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {link.label}
             </NavLink>
           ))}
-          <div className="mt-8 pt-8 border-t border-border/50 flex flex-col gap-3">
+          <div className="mt-6 pt-6 border-t border-border flex flex-col gap-3">
             <Button 
               variant="outline" 
-              className="w-full rounded-xl border-border/50 bg-white/50 backdrop-blur-sm py-6"
+              className="w-full rounded-lg"
               asChild
             >
               <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
-                Sign In
+                Sign in
               </Link>
             </Button>
             <Button 
-              className="w-full rounded-xl bg-gradient-to-r from-rose to-rose-dark text-white font-semibold shadow-rose py-6"
+              className="w-full rounded-lg bg-accent hover:bg-terracotta-dark text-accent-foreground"
               asChild
             >
               <Link to="/quiz" onClick={() => setIsMobileMenuOpen(false)}>
-                Get Started
+                Get started
               </Link>
             </Button>
           </div>
