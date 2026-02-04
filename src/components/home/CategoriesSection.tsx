@@ -24,42 +24,53 @@ const categories = [
 
 export function CategoriesSection() {
   return (
-    <section className="py-20 md:py-28 bg-secondary/30">
-      <div className="container">
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-12 gap-4">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-semibold text-foreground tracking-tight">
-              Browse by cause
-            </h2>
-            <p className="text-muted-foreground mt-1">
-              Find organizations working on what matters to you.
-            </p>
+    <section className="py-20 md:py-28 bg-secondary/30 relative overflow-hidden">
+      {/* Geometric pattern */}
+      <div className="absolute inset-0 diagonal-lines" />
+      
+      <div className="container relative">
+        {/* Section Header with geometric accent */}
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12 gap-4">
+          <div className="flex items-start gap-4">
+            <div className="w-1 h-16 bg-coral hidden md:block" />
+            <div>
+              <span className="text-xs font-semibold text-primary uppercase tracking-widest mb-2 block">
+                Categories
+              </span>
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground tracking-tight">
+                Browse by cause
+              </h2>
+            </div>
           </div>
           <Link 
             to="/charities" 
-            className="group inline-flex items-center text-sm font-medium text-primary hover:text-sage-dark transition-colors"
+            className="group inline-flex items-center text-sm font-semibold text-foreground hover:text-coral transition-colors"
           >
-            View all
-            <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            VIEW ALL
+            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
 
-        {/* Simple grid */}
+        {/* Geometric grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {categories.map((category) => (
+          {categories.map((category, index) => (
             <Link
               key={category.slug}
               to={`/charities?category=${category.slug}`}
-              className="group flex flex-col p-5 rounded-xl bg-card border border-border transition-all hover:shadow-soft hover:border-primary/30"
+              className="group relative bg-card border-2 border-border hover:border-primary transition-all p-5"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary mb-4">
-                <category.icon className="h-5 w-5 text-primary" />
+              {/* Corner accent on hover */}
+              <div className="absolute top-0 right-0 w-0 h-0 bg-coral transition-all group-hover:w-4 group-hover:h-4" />
+              
+              {/* Icon in geometric box */}
+              <div className="w-12 h-12 bg-primary/10 border border-primary/30 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:border-primary transition-all">
+                <category.icon className="h-5 w-5 text-primary group-hover:text-primary-foreground transition-colors" />
               </div>
-              <h3 className="font-medium text-foreground text-sm group-hover:text-primary transition-colors">
+              
+              <h3 className="font-semibold text-foreground text-sm group-hover:text-primary transition-colors">
                 {category.name}
               </h3>
-              <span className="text-xs text-muted-foreground mt-0.5">
+              <span className="text-xs text-muted-foreground mt-1 block">
                 {category.count} charities
               </span>
             </Link>
