@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Smile } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import givewizeIcon from "@/assets/givewize-icon.jpg";
 
 export function HeroSection() {
   return (
@@ -13,11 +14,13 @@ export function HeroSection() {
 
       <div className="container relative">
         <div className="mx-auto max-w-3xl text-center">
-          {/* Decorative smiley */}
+          {/* Decorative icon */}
           <div className="mb-8 inline-flex items-center justify-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-              <Smile className="h-8 w-8 text-primary" />
-            </div>
+            <img 
+              src={givewizeIcon} 
+              alt="GiveWiZe" 
+              className="h-20 w-20 object-contain"
+            />
           </div>
 
           {/* Headline */}
