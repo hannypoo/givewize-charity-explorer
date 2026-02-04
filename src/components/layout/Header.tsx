@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Heart } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
 
 const navLinks = [
   { to: "/", label: "Home" },
-  { to: "/explore", label: "Explore Charities" },
-  { to: "/quiz", label: "Quiz" },
+  { to: "/charities", label: "Explore Charities" },
+  { to: "/quiz", label: "Take the Quiz" },
   { to: "/about", label: "About" },
 ];
 
@@ -15,15 +15,16 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full bg-sidebar border-b border-sidebar-border">
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-            <Heart className="h-5 w-5 text-primary-foreground" fill="currentColor" />
+        <Link to="/" className="flex items-center gap-3">
+          {/* Logo placeholder - will be replaced with actual logo */}
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
+            <span className="font-display text-xl font-bold text-primary-foreground">G</span>
           </div>
-          <span className="font-display text-xl font-bold text-foreground">
-            Give<span className="text-primary">WiZe</span>
+          <span className="font-display text-xl font-bold text-sidebar-foreground">
+            GiveWiZe
           </span>
         </Link>
 
@@ -33,7 +34,7 @@ export function Header() {
             <NavLink
               key={link.to}
               to={link.to}
-              className="px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="px-4 py-2 text-sm font-medium text-sidebar-foreground/80 transition-colors hover:text-primary"
               activeClassName="text-primary"
             >
               {link.label}
@@ -43,11 +44,13 @@ export function Header() {
 
         {/* Desktop CTA */}
         <div className="hidden md:flex items-center gap-3">
-          <Button variant="ghost" size="sm" asChild>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-sidebar-foreground/80 hover:text-primary hover:bg-sidebar-accent"
+            asChild
+          >
             <Link to="/auth">Sign In</Link>
-          </Button>
-          <Button size="sm" className="shadow-soft" asChild>
-            <Link to="/quiz">Take the Quiz</Link>
           </Button>
         </div>
 
@@ -55,7 +58,7 @@ export function Header() {
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden"
+          className="md:hidden text-sidebar-foreground hover:bg-sidebar-accent"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
         >
@@ -67,36 +70,45 @@ export function Header() {
         </Button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div className="md:hidden border-t border-border animate-slide-in">
-          <nav className="container flex flex-col gap-1 py-4">
-            {navLinks.map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                className="px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground hover:bg-muted rounded-md"
-                activeClassName="text-primary bg-secondary"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {link.label}
-              </NavLink>
-            ))}
-            <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-border">
-              <Button variant="outline" asChild>
-                <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
-                  Sign In
-                </Link>
-              </Button>
-              <Button className="shadow-soft" asChild>
-                <Link to="/quiz" onClick={() => setIsMobileMenuOpen(false)}>
-                  Take the Quiz
-                </Link>
-              </Button>
-            </div>
-          </nav>
-        </div>
+        <div 
+          className="fixed inset-0 top-16 z-40 bg-foreground/20 backdrop-blur-sm md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
       )}
+
+      {/* Mobile Menu - Slides from right */}
+      <div
+        className={`fixed top-16 right-0 z-50 h-[calc(100vh-4rem)] w-72 bg-sidebar border-l border-sidebar-border transform transition-transform duration-300 ease-in-out md:hidden ${
+          isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <nav className="flex flex-col p-4">
+          {navLinks.map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              className="px-4 py-3 text-sm font-medium text-sidebar-foreground/80 transition-colors hover:text-primary hover:bg-sidebar-accent rounded-lg"
+              activeClassName="text-primary bg-sidebar-accent"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              {link.label}
+            </NavLink>
+          ))}
+          <div className="mt-6 pt-6 border-t border-sidebar-border">
+            <Button 
+              variant="outline" 
+              className="w-full border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent"
+              asChild
+            >
+              <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
+                Sign In
+              </Link>
+            </Button>
+          </div>
+        </nav>
+      </div>
     </header>
   );
 }
