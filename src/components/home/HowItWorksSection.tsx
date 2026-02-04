@@ -4,104 +4,73 @@ import { Button } from "@/components/ui/button";
 
 const steps = [
   {
+    number: "1",
     icon: Heart,
-    title: "Share Your Values",
-    description: "Tell us what causes matter most to you through a quick, personalized quiz.",
-    accent: "01",
+    title: "Share your values",
+    description: "Take a quick quiz to tell us what causes matter most to you.",
   },
   {
+    number: "2",
     icon: Sparkles,
-    title: "Get Matched",
+    title: "Get matched",
     description: "Our AI matches you with vetted charities aligned with your priorities.",
-    accent: "02",
   },
   {
+    number: "3",
     icon: ShieldCheck,
-    title: "Give Confidently",
-    description: "Review transparent financials and donate with complete peace of mind.",
-    accent: "03",
+    title: "Give confidently",
+    description: "Review transparent financials and donate with peace of mind.",
   },
 ];
 
 export function HowItWorksSection() {
   return (
-    <section className="py-24 md:py-32 relative overflow-hidden">
-      {/* Rich gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-plum via-plum-dark to-[hsl(290,45%,10%)]" />
-      
-      {/* Colorful blurred orbs for glassmorphism */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-[5%] left-[5%] h-[500px] w-[500px] rounded-full bg-rose/30 blur-[100px]" />
-        <div className="absolute bottom-[10%] right-[10%] h-[450px] w-[450px] rounded-full bg-[hsl(320,50%,45%)]/25 blur-[90px]" />
-        <div className="absolute top-[40%] right-[30%] h-[300px] w-[300px] rounded-full bg-rose-light/20 blur-[70px]" />
-      </div>
-
-      <div className="container relative z-10">
-        {/* Section Header in glass card */}
-        <div className="text-center mb-20">
-          <div className="inline-block bg-white/10 backdrop-blur-2xl rounded-[2rem] px-12 py-10 border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.1)]">
-            <span className="text-rose font-semibold text-sm tracking-wide uppercase mb-4 block">
-              Simple Process
-            </span>
-            <h2 className="font-display text-editorial text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
-              Three Steps to
-              <span className="rose-gradient"> Meaningful Impact</span>
-            </h2>
-            <p className="text-white/60 text-lg max-w-xl mx-auto">
-              We've made giving simple, transparent, and rewarding.
-            </p>
-          </div>
+    <section className="py-20 md:py-28">
+      <div className="container">
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <h2 className="text-2xl md:text-3xl font-semibold text-foreground tracking-tight mb-3">
+            How it works
+          </h2>
+          <p className="text-muted-foreground max-w-md mx-auto">
+            Three simple steps to find your perfect charity match.
+          </p>
         </div>
 
-        {/* Steps - Stacked glass cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto mb-16">
-          {steps.map((step, index) => (
+        {/* Steps - Clean cards with numbers */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
+          {steps.map((step) => (
             <div 
               key={step.title} 
-              className="group relative"
-              style={{ transform: `translateY(${index * 10}px)` }}
+              className="relative p-6 rounded-xl bg-card border border-border"
             >
-              {/* Glass card */}
-              <div className="relative h-full flex flex-col items-center text-center p-10 bg-white/10 backdrop-blur-2xl rounded-[2rem] border border-white/25 shadow-[0_8px_32px_rgba(0,0,0,0.12)] transition-all duration-500 hover:bg-white/15 hover:border-white/35 hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(0,0,0,0.2)]">
-                {/* Inner highlight */}
-                <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-b from-white/10 via-transparent to-transparent pointer-events-none" />
-                
-                {/* Large step number */}
-                <span className="absolute top-6 left-6 text-7xl font-bold text-white/5 group-hover:text-rose/10 transition-colors duration-500">
-                  {step.accent}
-                </span>
-                
-                {/* Icon in glass circle */}
-                <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-white/15 backdrop-blur-xl ring-2 ring-rose/30 mb-8 shadow-[0_8px_30px_rgba(210,140,130,0.3)] group-hover:ring-rose/50 transition-all">
-                  <step.icon className="h-9 w-9 text-rose" />
-                </div>
-                
-                {/* Content */}
-                <h3 className="relative font-display text-xl font-bold text-white mb-4">
-                  {step.title}
-                </h3>
-                <p className="relative text-white/60 text-sm leading-relaxed">
-                  {step.description}
-                </p>
+              {/* Step number */}
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold mb-4">
+                {step.number}
               </div>
+              
+              <h3 className="font-medium text-foreground mb-2">
+                {step.title}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {step.description}
+              </p>
             </div>
           ))}
         </div>
 
-        {/* CTA in glass pill */}
+        {/* Simple CTA */}
         <div className="text-center">
-          <div className="inline-block bg-white/5 backdrop-blur-xl rounded-full p-2 border border-white/15">
-            <Button 
-              size="lg" 
-              className="rounded-full bg-gradient-to-r from-rose to-rose-dark hover:from-rose-dark hover:to-rose text-white font-semibold px-10 py-6 text-base shadow-[0_8px_30px_rgba(210,140,130,0.4)] group"
-              asChild
-            >
-              <Link to="/quiz">
-                Start Your Journey
-                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </Link>
-            </Button>
-          </div>
+          <Button 
+            size="lg" 
+            className="rounded-xl bg-accent hover:bg-terracotta-dark text-accent-foreground font-medium shadow-soft"
+            asChild
+          >
+            <Link to="/quiz">
+              Start the quiz
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
         </div>
       </div>
     </section>
