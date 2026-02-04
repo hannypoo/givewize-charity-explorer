@@ -1,57 +1,65 @@
 import { Link } from "react-router-dom";
 import { 
-  Heart, 
+  Dna, 
+  HeartPulse, 
   GraduationCap, 
-  Leaf, 
-  Globe, 
-  Home, 
   Utensils,
+  PawPrint,
+  Baby,
+  Leaf, 
+  Siren,
   ArrowRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const categories = [
   {
-    icon: Heart,
-    name: "Health",
-    description: "Medical research, patient care, and health equity",
-    color: "bg-red-500/10 text-red-600",
-    count: 124,
+    icon: Dna,
+    name: "Rare Diseases",
+    slug: "rare-diseases",
+    count: 42,
+  },
+  {
+    icon: HeartPulse,
+    name: "Medical & Health",
+    slug: "medical-health",
+    count: 156,
   },
   {
     icon: GraduationCap,
     name: "Education",
-    description: "Schools, scholarships, and learning programs",
-    color: "bg-blue-500/10 text-blue-600",
+    slug: "education",
     count: 98,
   },
   {
-    icon: Leaf,
-    name: "Environment",
-    description: "Climate action, conservation, and sustainability",
-    color: "bg-green-500/10 text-green-600",
-    count: 76,
-  },
-  {
-    icon: Globe,
-    name: "International",
-    description: "Global development and humanitarian aid",
-    color: "bg-purple-500/10 text-purple-600",
-    count: 89,
-  },
-  {
-    icon: Home,
-    name: "Housing",
-    description: "Homelessness prevention and affordable housing",
-    color: "bg-amber-500/10 text-amber-600",
-    count: 45,
-  },
-  {
     icon: Utensils,
-    name: "Hunger",
-    description: "Food security and nutrition programs",
-    color: "bg-orange-500/10 text-orange-600",
+    name: "Hunger & Food Security",
+    slug: "hunger-food-security",
     count: 67,
+  },
+  {
+    icon: PawPrint,
+    name: "Animal Welfare",
+    slug: "animal-welfare",
+    count: 84,
+  },
+  {
+    icon: Baby,
+    name: "Child Welfare",
+    slug: "child-welfare",
+    count: 73,
+  },
+  {
+    icon: Leaf,
+    name: "Environment & Climate",
+    slug: "environment-climate",
+    count: 91,
+  },
+  {
+    icon: Siren,
+    name: "Emergency Relief",
+    slug: "emergency-relief",
+    count: 38,
   },
 ];
 
@@ -70,30 +78,20 @@ export function CategoriesSection() {
         </div>
 
         {/* Categories Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {categories.map((category) => (
             <Link
-              key={category.name}
-              to={`/explore?category=${category.name.toLowerCase()}`}
-              className="group relative rounded-xl border border-border bg-card p-6 transition-all hover:shadow-lg hover:border-primary/30 hover:-translate-y-1"
+              key={category.slug}
+              to={`/explore?category=${category.slug}`}
+              className="group relative flex flex-col items-center rounded-xl border border-border bg-card p-5 md:p-6 text-center transition-all hover:shadow-lg hover:border-primary/30 hover:-translate-y-1"
             >
-              <div className="flex items-start gap-4">
-                <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${category.color}`}>
-                  <category.icon className="h-6 w-6" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
-                      {category.name}
-                    </h3>
-                    <span className="text-sm text-muted-foreground">{category.count} charities</span>
-                  </div>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {category.description}
-                  </p>
-                </div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary mb-3">
+                <category.icon className="h-6 w-6" />
               </div>
-              <ArrowRight className="absolute bottom-6 right-6 h-5 w-5 text-muted-foreground opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-1" />
+              <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors text-sm md:text-base">
+                {category.name}
+              </h3>
+              <span className="mt-1 text-xs text-muted-foreground">{category.count} charities</span>
             </Link>
           ))}
         </div>
