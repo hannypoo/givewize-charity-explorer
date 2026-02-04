@@ -73,18 +73,18 @@ export default {
           DEFAULT: "hsl(var(--error))",
           foreground: "hsl(var(--error-foreground))",
         },
-        // Blue + Orange tokens
-        blue: {
-          DEFAULT: "hsl(var(--blue))",
-          light: "hsl(var(--blue-light))",
-          dark: "hsl(var(--blue-dark))",
+        // Forest + Amber tokens
+        forest: {
+          DEFAULT: "hsl(var(--forest))",
+          light: "hsl(var(--forest-light))",
+          dark: "hsl(var(--forest-dark))",
         },
-        orange: {
-          DEFAULT: "hsl(var(--orange))",
-          light: "hsl(var(--orange-light))",
-          dark: "hsl(var(--orange-dark))",
+        amber: {
+          DEFAULT: "hsl(var(--amber))",
+          light: "hsl(var(--amber-light))",
+          dark: "hsl(var(--amber-dark))",
         },
-        peach: "hsl(var(--peach))",
+        cream: "hsl(var(--cream))",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -92,12 +92,11 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       boxShadow: {
-        subtle: "0 1px 3px 0 rgba(0, 0, 0, 0.04)",
-        soft: "0 4px 12px -4px rgba(0, 0, 0, 0.08)",
-        card: "0 8px 24px -8px rgba(0, 0, 0, 0.08)",
-        elevated: "0 16px 40px -12px rgba(0, 0, 0, 0.12)",
-        glow: "0 8px 32px -8px rgba(60, 130, 220, 0.25)",
-        warm: "0 8px 32px -8px rgba(255, 150, 80, 0.25)",
+        brutal: "4px 4px 0 0 hsl(var(--foreground))",
+        "brutal-lg": "8px 8px 0 0 hsl(var(--foreground))",
+        "brutal-accent": "4px 4px 0 0 hsl(var(--accent))",
+        "brutal-primary": "4px 4px 0 0 hsl(var(--primary))",
+        "brutal-sm": "2px 2px 0 0 hsl(var(--foreground))",
       },
       keyframes: {
         "accordion-down": {
@@ -116,12 +115,17 @@ export default {
           from: { transform: "translateX(-100%)" },
           to: { transform: "translateX(0)" },
         },
+        "marquee": {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-50%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 0.4s ease-out",
         "slide-in": "slide-in 0.3s ease-out",
+        "marquee": "marquee 20s linear infinite",
       },
     },
   },
