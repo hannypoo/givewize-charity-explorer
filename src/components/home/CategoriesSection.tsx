@@ -7,7 +7,8 @@ import {
   PawPrint,
   Baby,
   Leaf, 
-  Siren
+  Siren,
+  ArrowRight
 } from "lucide-react";
 
 const categories = [
@@ -63,32 +64,54 @@ const categories = [
 
 export function CategoriesSection() {
   return (
-    <section className="py-20 md:py-28 bg-[#F8FAFC]">
+    <section className="py-24 md:py-32 bg-background">
       <div className="container">
-        {/* Section Header */}
-        <div className="text-center mb-14">
-          <h2 className="font-display text-3xl font-bold text-[#1a365d] sm:text-4xl">
-            Browse by Cause
-          </h2>
+        {/* Section Header - Editorial style */}
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-16 gap-6">
+          <div>
+            <span className="text-gold font-semibold text-sm tracking-wide uppercase mb-3 block">
+              Explore Causes
+            </span>
+            <h2 className="font-display text-editorial text-3xl md:text-4xl lg:text-5xl font-bold text-foreground">
+              Find Your
+              <span className="gold-gradient"> Passion</span>
+            </h2>
+          </div>
+          <Link 
+            to="/charities" 
+            className="group inline-flex items-center text-navy font-semibold hover:text-gold transition-colors"
+          >
+            View All Categories
+            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Link>
         </div>
 
-        {/* Categories Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 max-w-5xl mx-auto">
+        {/* Categories Grid - Bold cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {categories.map((category) => (
             <Link
               key={category.slug}
               to={`/charities?category=${category.slug}`}
-              className="group flex flex-col items-center rounded-xl bg-white p-6 text-center transition-all duration-200 hover:shadow-md hover:-translate-y-1 border-2 border-transparent hover:border-[#4A90D9]"
+              className="group relative flex flex-col items-start rounded-2xl bg-card p-6 transition-all duration-300 hover:shadow-elevated hover:-translate-y-2 border border-border hover:border-gold/30 overflow-hidden"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#4A90D9]/10 mb-4">
-                <category.icon className="h-6 w-6 text-[#4A90D9]" />
+              {/* Background gradient on hover */}
+              <div className="absolute inset-0 bg-gradient-to-br from-gold/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              
+              {/* Icon container */}
+              <div className="relative flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-navy to-navy-dark ring-2 ring-gold/20 group-hover:ring-gold/40 transition-all mb-5 shadow-navy">
+                <category.icon className="h-6 w-6 text-gold" />
               </div>
-              <h3 className="font-semibold text-[#1a365d] text-sm md:text-base">
+              
+              {/* Content */}
+              <h3 className="relative font-bold text-foreground text-base md:text-lg mb-1 group-hover:text-navy transition-colors">
                 {category.name}
               </h3>
-              <span className="mt-1 text-xs text-[#9CA3AF]">
+              <span className="relative text-sm text-muted-foreground">
                 {category.count} charities
               </span>
+
+              {/* Hover arrow */}
+              <ArrowRight className="absolute bottom-6 right-6 h-5 w-5 text-gold opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
             </Link>
           ))}
         </div>
