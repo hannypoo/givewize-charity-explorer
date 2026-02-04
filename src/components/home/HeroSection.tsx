@@ -21,15 +21,15 @@ export function HeroSection() {
 
           {/* Headline */}
           <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl">
-            Give with{" "}
-            <span className="text-primary">Confidence</span>,{" "}
-            <span className="text-accent">Impact</span> with Purpose
+            Give With <span className="text-primary">Confidence</span>.{" "}
+            <br className="hidden sm:block" />
+            Give With <span className="text-accent">Purpose</span>.
           </h1>
 
           {/* Subheadline */}
           <p className="mt-6 text-lg text-muted-foreground md:text-xl max-w-2xl mx-auto">
-            Find charities that align with your values. Take our personalized quiz 
-            and discover causes that matter to you.
+            AI-powered charity matching that helps you find vetted organizations 
+            aligned with your values—with complete financial transparency.
           </p>
 
           {/* CTAs */}
