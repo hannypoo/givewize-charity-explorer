@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Filter, X } from "lucide-react";
+import { Filter } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { CharityFilters } from "@/components/charities/CharityFilters";
 import { CharityGrid } from "@/components/charities/CharityGrid";
@@ -26,7 +26,7 @@ const Charities = () => {
   
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
-  const [selectedScope, setSelectedScope] = useState("all");
+  const [selectedScopes, setSelectedScopes] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
@@ -42,11 +42,11 @@ const Charities = () => {
         selectedCategory === "all" || charity.category === selectedCategory;
 
       const matchesScope =
-        selectedScope === "all" || charity.geographicScope === selectedScope;
+        selectedScopes.length === 0 || selectedScopes.includes(charity.geographicScope);
 
       return matchesSearch && matchesCategory && matchesScope;
     });
-  }, [searchQuery, selectedCategory, selectedScope]);
+  }, [searchQuery, selectedCategory, selectedScopes]);
 
   // Paginate results
   const totalPages = Math.ceil(filteredCharities.length / ITEMS_PER_PAGE);
@@ -73,21 +73,25 @@ const Charities = () => {
     setSearchParams(searchParams);
   };
 
-  const handleScopeChange = (value: string) => {
-    setSelectedScope(value);
+  const handleScopeToggle = (value: string) => {
+    setSelectedScopes((prev) =>
+      prev.includes(value)
+        ? prev.filter((s) => s !== value)
+        : [...prev, value]
+    );
     setCurrentPage(1);
   };
 
   const clearFilters = () => {
     setSearchQuery("");
     setSelectedCategory("all");
-    setSelectedScope("all");
+    setSelectedScopes([]);
     setCurrentPage(1);
     setSearchParams({});
   };
 
   const hasActiveFilters =
-    searchQuery !== "" || selectedCategory !== "all" || selectedScope !== "all";
+    searchQuery !== "" || selectedCategory !== "all" || selectedScopes.length > 0;
 
   const FiltersContent = (
     <CharityFilters
@@ -95,140 +99,110 @@ const Charities = () => {
       onSearchChange={handleSearchChange}
       selectedCategory={selectedCategory}
       onCategoryChange={handleCategoryChange}
-      selectedScope={selectedScope}
-      onScopeChange={handleScopeChange}
+      selectedScopes={selectedScopes}
+      onScopeToggle={handleScopeToggle}
+      onClearFilters={clearFilters}
+      hasActiveFilters={hasActiveFilters}
     />
   );
 
   return (
     <Layout>
-      <div className="bg-secondary/30 py-8 md:py-12">
+      {/* Page Header */}
+      <div className="bg-white border-b border-gray-100 py-10 md:py-14">
         <div className="container">
-          <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl">
+          <h1 className="font-display text-3xl font-bold text-[#1a365d] md:text-4xl">
             Explore Charities
           </h1>
-          <p className="mt-2 text-muted-foreground">
+          <p className="mt-2 text-[#6B7280]">
             Discover vetted organizations making a real impact
           </p>
         </div>
       </div>
 
-      <div className="container py-8">
-        <div className="flex gap-8">
-          {/* Desktop Sidebar */}
-          <aside className="hidden lg:block w-64 shrink-0">
-            <div className="sticky top-24 rounded-xl border border-border bg-card p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="font-semibold text-foreground">Filters</h2>
-                {hasActiveFilters && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={clearFilters}
-                    className="h-auto p-1 text-xs text-muted-foreground hover:text-foreground"
-                  >
-                    Clear all
-                  </Button>
-                )}
+      <div className="bg-[#F8FAFC] min-h-screen">
+        <div className="container py-8">
+          <div className="flex gap-8">
+            {/* Desktop Sidebar */}
+            <aside className="hidden lg:block w-64 shrink-0">
+              <div className="sticky top-24 rounded-xl bg-white p-6 shadow-sm">
+                <h2 className="font-semibold text-[#1a365d] mb-6">Filters</h2>
+                {FiltersContent}
               </div>
-              {FiltersContent}
-            </div>
-          </aside>
+            </aside>
 
-          {/* Main Content */}
-          <main className="flex-1 min-w-0">
-            {/* Mobile Filter Button */}
-            <div className="lg:hidden mb-6 flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">
-                {filteredCharities.length} charities found
-              </p>
-              <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
-                <SheetTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Filter className="mr-2 h-4 w-4" />
-                    Filters
-                    {hasActiveFilters && (
-                      <span className="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
-                        !
-                      </span>
-                    )}
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="w-80">
-                  <SheetHeader>
-                    <SheetTitle className="flex items-center justify-between">
+            {/* Main Content */}
+            <main className="flex-1 min-w-0">
+              {/* Mobile Filter Button */}
+              <div className="lg:hidden mb-6 flex items-center justify-between">
+                <p className="text-sm text-[#6B7280]">
+                  {filteredCharities.length} charities found
+                </p>
+                <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" size="sm" className="border-gray-200">
+                      <Filter className="mr-2 h-4 w-4" />
                       Filters
                       {hasActiveFilters && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={clearFilters}
-                          className="h-auto p-1 text-xs"
-                        >
-                          Clear all
-                        </Button>
+                        <span className="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#4A90D9] text-xs text-white">
+                          !
+                        </span>
                       )}
-                    </SheetTitle>
-                  </SheetHeader>
-                  <div className="mt-6">{FiltersContent}</div>
-                </SheetContent>
-              </Sheet>
-            </div>
-
-            {/* Results count (desktop) */}
-            <div className="hidden lg:flex items-center justify-between mb-6">
-              <p className="text-sm text-muted-foreground">
-                Showing {paginatedCharities.length} of {filteredCharities.length} charities
-              </p>
-              {hasActiveFilters && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={clearFilters}
-                  className="text-xs"
-                >
-                  <X className="mr-1 h-3 w-3" />
-                  Clear filters
-                </Button>
-              )}
-            </div>
-
-            {/* Charity Grid */}
-            <CharityGrid charities={paginatedCharities} />
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="mt-8">
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious
-                        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                        className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                      />
-                    </PaginationItem>
-                    {[...Array(totalPages)].map((_, i) => (
-                      <PaginationItem key={i + 1}>
-                        <PaginationLink
-                          onClick={() => setCurrentPage(i + 1)}
-                          isActive={currentPage === i + 1}
-                          className="cursor-pointer"
-                        >
-                          {i + 1}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
-                    <PaginationItem>
-                      <PaginationNext
-                        onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-80 bg-white">
+                    <SheetHeader>
+                      <SheetTitle className="text-[#1a365d]">Filters</SheetTitle>
+                    </SheetHeader>
+                    <div className="mt-6">{FiltersContent}</div>
+                  </SheetContent>
+                </Sheet>
               </div>
-            )}
-          </main>
+
+              {/* Results count (desktop) */}
+              <div className="hidden lg:block mb-6">
+                <p className="text-sm text-[#6B7280]">
+                  Showing {paginatedCharities.length} of {filteredCharities.length} charities
+                </p>
+              </div>
+
+              {/* Charity Grid */}
+              <CharityGrid charities={paginatedCharities} />
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="mt-8">
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious
+                          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                          className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                        />
+                      </PaginationItem>
+                      {[...Array(totalPages)].map((_, i) => (
+                        <PaginationItem key={i + 1}>
+                          <PaginationLink
+                            onClick={() => setCurrentPage(i + 1)}
+                            isActive={currentPage === i + 1}
+                            className="cursor-pointer"
+                          >
+                            {i + 1}
+                          </PaginationLink>
+                        </PaginationItem>
+                      ))}
+                      <PaginationItem>
+                        <PaginationNext
+                          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                          className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                </div>
+              )}
+            </main>
+          </div>
         </div>
       </div>
     </Layout>
