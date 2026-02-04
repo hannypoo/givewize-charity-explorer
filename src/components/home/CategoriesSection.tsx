@@ -24,63 +24,52 @@ const categories = [
 
 export function CategoriesSection() {
   return (
-    <section className="py-20 md:py-28 relative overflow-hidden">
-      {/* Soft gradient background */}
-      <div className="absolute inset-0 gradient-soft" />
+    <section className="py-16 md:py-24 bg-secondary relative overflow-hidden">
+      {/* Zigzag top border */}
+      <div className="absolute top-0 left-0 right-0 h-4 zigzag-border" />
       
       <div className="container relative">
-        {/* Section Header */}
-        <div className="text-center mb-12">
-          <span className="inline-flex items-center gap-2 text-sm font-medium text-accent mb-3">
-            <span className="w-8 h-[2px] bg-accent rounded-full" />
-            Categories
-            <span className="w-8 h-[2px] bg-accent rounded-full" />
-          </span>
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground tracking-tight mb-4">
-            Browse by cause
-          </h2>
-          <p className="text-muted-foreground max-w-md mx-auto">
-            Find organizations aligned with what matters most to you
-          </p>
+        {/* Section Header - Brutalist */}
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-10 gap-4">
+          <div>
+            <div className="inline-block bg-accent border-3 border-foreground px-3 py-1 mb-4 -rotate-1 brutal-shadow-sm">
+              <span className="text-xs font-black uppercase">Categories</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground uppercase tracking-tight">
+              Browse by cause
+            </h2>
+          </div>
+          <Link 
+            to="/charities" 
+            className="group inline-flex items-center text-sm font-black text-foreground uppercase hover:text-primary transition-colors"
+          >
+            View All
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
         </div>
 
-        {/* Organic grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-          {categories.map((category) => (
+        {/* Brutalist grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {categories.map((category, index) => (
             <Link
               key={category.slug}
               to={`/charities?category=${category.slug}`}
-              className="group relative bg-card rounded-2xl border border-border hover:border-primary/30 hover:shadow-card transition-all duration-300 p-5"
+              className="group relative bg-card border-3 border-foreground hover:bg-accent transition-all brutal-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none p-5"
+              style={{ transform: `rotate(${index % 2 === 0 ? '-1' : '1'}deg)` }}
             >
-              {/* Hover glow */}
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
-              
-              <div className="relative">
-                {/* Icon in soft circle */}
-                <div className="w-12 h-12 bg-secondary rounded-xl flex items-center justify-center mb-4 group-hover:bg-primary/10 transition-colors">
-                  <category.icon className="h-5 w-5 text-primary" />
-                </div>
-                
-                <h3 className="font-semibold text-foreground text-sm group-hover:text-primary transition-colors">
-                  {category.name}
-                </h3>
-                <span className="text-xs text-muted-foreground mt-1 block">
-                  {category.count} charities
-                </span>
+              {/* Icon box */}
+              <div className="w-12 h-12 bg-primary border-3 border-foreground flex items-center justify-center mb-4 group-hover:bg-foreground transition-colors">
+                <category.icon className="h-5 w-5 text-primary-foreground" />
               </div>
+              
+              <h3 className="font-black text-foreground text-sm uppercase group-hover:text-accent-foreground transition-colors">
+                {category.name}
+              </h3>
+              <span className="text-xs font-bold text-muted-foreground mt-1 block group-hover:text-accent-foreground/80 transition-colors">
+                {category.count} charities
+              </span>
             </Link>
           ))}
-        </div>
-
-        {/* View all link */}
-        <div className="text-center">
-          <Link 
-            to="/charities" 
-            className="group inline-flex items-center text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-          >
-            View all categories
-            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Link>
         </div>
       </div>
     </section>

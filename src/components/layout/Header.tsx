@@ -26,26 +26,24 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full">
-      {/* Soft background with blur */}
+      {/* Solid background with thick border */}
       <div 
-        className={`absolute inset-0 transition-all duration-300 ${
-          isScrolled 
-            ? "bg-background/90 backdrop-blur-lg shadow-soft" 
-            : "bg-background/60 backdrop-blur-sm"
+        className={`absolute inset-0 transition-all duration-200 bg-background ${
+          isScrolled ? "border-b-3 border-foreground" : "border-b-3 border-foreground"
         }`} 
       />
       
       <div className="container relative flex h-16 items-center justify-between">
-        {/* Logo - Organic style */}
+        {/* Logo - Brutalist style */}
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="relative h-10 w-10 bg-gradient-to-br from-primary/20 to-accent/10 rounded-xl p-1.5 group-hover:shadow-glow transition-shadow">
+          <div className="relative h-10 w-10 bg-primary border-3 border-foreground p-1 brutal-shadow-sm group-hover:translate-x-0.5 group-hover:translate-y-0.5 group-hover:shadow-none transition-all">
             <img 
               src={givewizeIcon} 
               alt="GiveWiZe" 
-              className="h-full w-full object-contain rounded-lg"
+              className="h-full w-full object-contain"
             />
           </div>
-          <span className="font-bold text-lg text-foreground tracking-tight">
+          <span className="font-black text-xl text-foreground uppercase tracking-tight">
             GiveWiZe
           </span>
         </Link>
@@ -56,8 +54,8 @@ export function Header() {
             <NavLink
               key={link.to}
               to={link.to}
-              className="px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground rounded-full hover:bg-secondary"
-              activeClassName="text-foreground bg-secondary"
+              className="px-4 py-2 text-sm font-bold uppercase text-foreground transition-all hover:bg-accent hover:text-accent-foreground border-3 border-transparent hover:border-foreground"
+              activeClassName="bg-secondary border-foreground"
             >
               {link.label}
             </NavLink>
@@ -69,19 +67,19 @@ export function Header() {
           <Button 
             variant="ghost" 
             size="sm" 
-            className="text-muted-foreground hover:text-foreground font-medium rounded-full"
+            className="text-foreground font-bold uppercase hover:bg-secondary border-3 border-transparent hover:border-foreground"
             asChild
           >
             <Link to="/auth">Sign in</Link>
           </Button>
           <Button 
             size="sm" 
-            className="rounded-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold shadow-warm group px-5"
+            className="bg-accent hover:bg-accent text-accent-foreground font-black uppercase border-3 border-foreground brutal-shadow-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all"
             asChild
           >
             <Link to="/quiz" className="flex items-center gap-1.5">
-              Get Started
-              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+              Start
+              <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
         </div>
@@ -90,7 +88,7 @@ export function Header() {
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden text-foreground rounded-full"
+          className="md:hidden text-foreground border-3 border-foreground bg-background"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
         >
@@ -105,33 +103,33 @@ export function Header() {
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div 
-          className="fixed inset-0 top-16 z-40 bg-foreground/10 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 top-16 z-40 bg-foreground/20 md:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu - Brutalist panel */}
       <div
-        className={`fixed top-16 right-0 z-50 h-[calc(100vh-4rem)] w-72 bg-card/95 backdrop-blur-xl rounded-l-3xl shadow-elevated transform transition-transform duration-300 ease-out md:hidden ${
+        className={`fixed top-16 right-0 z-50 h-[calc(100vh-4rem)] w-72 bg-background border-l-3 border-foreground transform transition-transform duration-200 ease-out md:hidden ${
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <nav className="flex flex-col p-6 gap-2">
+        <nav className="flex flex-col p-4 gap-2">
           {navLinks.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}
-              className="px-4 py-3 text-sm font-medium text-muted-foreground transition-all hover:text-foreground rounded-xl hover:bg-secondary"
-              activeClassName="text-foreground bg-secondary"
+              className="px-4 py-3 text-sm font-bold uppercase text-foreground transition-all hover:bg-accent hover:text-accent-foreground border-3 border-transparent hover:border-foreground"
+              activeClassName="bg-secondary border-foreground"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {link.label}
             </NavLink>
           ))}
-          <div className="mt-6 pt-6 border-t border-border flex flex-col gap-3">
+          <div className="mt-6 pt-6 border-t-3 border-foreground flex flex-col gap-3">
             <Button 
               variant="outline" 
-              className="w-full rounded-full"
+              className="w-full border-3 border-foreground font-bold uppercase"
               asChild
             >
               <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
@@ -139,7 +137,7 @@ export function Header() {
               </Link>
             </Button>
             <Button 
-              className="w-full rounded-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold"
+              className="w-full bg-accent hover:bg-accent text-accent-foreground font-black uppercase border-3 border-foreground brutal-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
               asChild
             >
               <Link to="/quiz" onClick={() => setIsMobileMenuOpen(false)}>
