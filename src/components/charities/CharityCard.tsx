@@ -28,50 +28,52 @@ function getScopeLabel(scope: string): string {
 export function CharityCard({ charity }: CharityCardProps) {
   return (
     <Link to={`/charities/${charity.id}`}>
-      <div className="group h-full bg-card border-2 border-border hover:border-primary transition-all p-5 relative">
-        {/* Corner accent on hover */}
-        <div className="absolute top-0 right-0 w-0 h-0 bg-coral transition-all group-hover:w-4 group-hover:h-4" />
+      <div className="group h-full bg-card rounded-2xl border border-border hover:border-primary/30 hover:shadow-card transition-all duration-300 p-5 relative overflow-hidden">
+        {/* Soft hover glow */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
         
-        {/* Top row */}
-        <div className="flex items-start justify-between mb-4">
-          {/* Logo in geometric box */}
-          <div className="w-12 h-12 bg-primary/10 border border-primary/30 flex items-center justify-center group-hover:bg-primary group-hover:border-primary transition-all">
-            {charity.logoUrl ? (
-              <img
-                src={charity.logoUrl}
-                alt={`${charity.name} logo`}
-                className="h-8 w-8 object-contain"
-              />
-            ) : (
-              <Building2 className="h-5 w-5 text-primary group-hover:text-primary-foreground transition-colors" />
-            )}
+        <div className="relative">
+          {/* Top row */}
+          <div className="flex items-start justify-between mb-4">
+            {/* Logo in soft container */}
+            <div className="w-12 h-12 bg-secondary rounded-xl flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+              {charity.logoUrl ? (
+                <img
+                  src={charity.logoUrl}
+                  alt={`${charity.name} logo`}
+                  className="h-8 w-8 object-contain"
+                />
+              ) : (
+                <Building2 className="h-5 w-5 text-primary" />
+              )}
+            </div>
+            
+            {/* Scope pill */}
+            <span className="text-xs font-medium text-muted-foreground bg-muted rounded-full px-2.5 py-1">
+              {getScopeLabel(charity.geographicScope)}
+            </span>
           </div>
-          
-          {/* Scope */}
-          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-            {getScopeLabel(charity.geographicScope)}
+
+          {/* Name */}
+          <h3 className="font-semibold text-foreground line-clamp-1 group-hover:text-primary transition-colors mb-1">
+            {charity.name}
+          </h3>
+
+          {/* Category */}
+          <span className="text-xs font-medium text-accent">
+            {charity.categoryLabel}
           </span>
-        </div>
 
-        {/* Name */}
-        <h3 className="font-bold text-foreground line-clamp-1 group-hover:text-primary transition-colors mb-1">
-          {charity.name}
-        </h3>
+          {/* Mission */}
+          <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed mt-3">
+            {charity.mission}
+          </p>
 
-        {/* Category */}
-        <span className="text-xs font-semibold text-coral">
-          {charity.categoryLabel}
-        </span>
-
-        {/* Mission */}
-        <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed mt-3">
-          {charity.mission}
-        </p>
-
-        {/* Hover link */}
-        <div className="mt-4 flex items-center text-xs font-semibold text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-          <span>VIEW DETAILS</span>
-          <ArrowRight className="ml-1 h-3 w-3" />
+          {/* Hover link */}
+          <div className="mt-4 flex items-center text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+            <span>View details</span>
+            <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </div>
         </div>
       </div>
     </Link>

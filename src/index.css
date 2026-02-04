@@ -2,131 +2,132 @@
 @tailwind components;
 @tailwind utilities;
 
-/* GiveWiZe Design System - Teal + Coral, Geometric & Modern
-   Fresh Teal/Emerald: Modern, trustworthy primary
-   Warm Coral: Friendly, energetic accent
-   Geometric patterns, crisp lines, structured grids
+/* GiveWiZe Design System - Rich Blue + Warm Orange, Soft & Organic
+   Deep trustworthy blue with warm peach/orange accents
+   Rounded shapes, gentle animations, soft gradients
 */
 
 @layer base {
   :root {
-    /* Clean white background */
-    --background: 0 0% 99%;
-    /* Deep slate for text */
-    --foreground: 200 25% 12%;
+    /* Warm cream background */
+    --background: 35 40% 98%;
+    /* Deep navy for text */
+    --foreground: 220 40% 15%;
 
-    /* Pure white cards */
-    --card: 0 0% 100%;
-    --card-foreground: 200 25% 12%;
+    /* Soft warm white cards */
+    --card: 35 30% 99%;
+    --card-foreground: 220 40% 15%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 200 25% 12%;
+    --popover: 35 30% 99%;
+    --popover-foreground: 220 40% 15%;
 
-    /* Fresh Teal - modern primary */
-    --primary: 172 66% 38%;
+    /* Rich blue - trustworthy primary */
+    --primary: 220 70% 50%;
     --primary-foreground: 0 0% 100%;
 
-    /* Light teal tint */
-    --secondary: 172 40% 95%;
-    --secondary-foreground: 172 66% 30%;
+    /* Soft blue tint */
+    --secondary: 220 50% 95%;
+    --secondary-foreground: 220 70% 40%;
 
-    /* Cool neutral muted */
-    --muted: 200 15% 95%;
-    --muted-foreground: 200 15% 45%;
+    /* Warm neutral muted */
+    --muted: 35 20% 94%;
+    --muted-foreground: 220 15% 45%;
 
-    /* Warm Coral - energetic accent */
-    --accent: 12 80% 62%;
+    /* Warm Orange/Peach - friendly accent */
+    --accent: 25 95% 60%;
     --accent-foreground: 0 0% 100%;
 
     /* Destructive */
     --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Clean borders */
-    --border: 200 20% 90%;
-    --input: 200 20% 90%;
-    --ring: 172 66% 38%;
+    /* Soft borders */
+    --border: 35 20% 88%;
+    --input: 35 20% 88%;
+    --ring: 220 70% 50%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
 
     /* Sidebar */
-    --sidebar-background: 200 30% 10%;
+    --sidebar-background: 220 45% 12%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 12 80% 62%;
+    --sidebar-primary: 25 95% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 200 25% 16%;
+    --sidebar-accent: 220 40% 18%;
     --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 200 20% 18%;
-    --sidebar-ring: 12 80% 62%;
+    --sidebar-border: 220 30% 20%;
+    --sidebar-ring: 25 95% 60%;
 
     /* Semantic Colors */
-    --success: 172 60% 40%;
+    --success: 160 60% 42%;
     --success-foreground: 0 0% 100%;
     --warning: 38 90% 55%;
-    --warning-foreground: 200 25% 12%;
+    --warning-foreground: 220 40% 15%;
     --error: 0 70% 55%;
     --error-foreground: 0 0% 100%;
 
     /* Custom tokens */
-    --teal: 172 66% 38%;
-    --teal-light: 172 55% 50%;
-    --teal-dark: 172 70% 28%;
-    --coral: 12 80% 62%;
-    --coral-light: 12 75% 75%;
-    --coral-dark: 12 85% 48%;
+    --blue: 220 70% 50%;
+    --blue-light: 220 60% 65%;
+    --blue-dark: 220 75% 38%;
+    --orange: 25 95% 60%;
+    --orange-light: 30 90% 75%;
+    --orange-dark: 20 95% 48%;
+    --peach: 20 80% 92%;
   }
 
   .dark {
-    --background: 200 30% 6%;
-    --foreground: 0 0% 96%;
+    --background: 220 40% 8%;
+    --foreground: 35 30% 96%;
 
-    --card: 200 28% 10%;
-    --card-foreground: 0 0% 96%;
+    --card: 220 38% 12%;
+    --card-foreground: 35 30% 96%;
 
-    --popover: 200 28% 10%;
-    --popover-foreground: 0 0% 96%;
+    --popover: 220 38% 12%;
+    --popover-foreground: 35 30% 96%;
 
-    --primary: 172 60% 45%;
+    --primary: 220 65% 58%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 200 25% 16%;
-    --secondary-foreground: 172 50% 70%;
+    --secondary: 220 35% 18%;
+    --secondary-foreground: 220 50% 75%;
 
-    --muted: 200 20% 14%;
-    --muted-foreground: 200 15% 60%;
+    --muted: 220 25% 16%;
+    --muted-foreground: 220 15% 60%;
 
-    --accent: 12 75% 58%;
+    --accent: 25 90% 55%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 65% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 200 20% 18%;
-    --input: 200 20% 18%;
-    --ring: 172 60% 45%;
+    --border: 220 25% 20%;
+    --input: 220 25% 20%;
+    --ring: 220 65% 58%;
 
-    --sidebar-background: 200 30% 8%;
-    --sidebar-foreground: 0 0% 96%;
-    --sidebar-primary: 12 75% 58%;
+    --sidebar-background: 220 42% 10%;
+    --sidebar-foreground: 35 30% 96%;
+    --sidebar-primary: 25 90% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 200 25% 14%;
-    --sidebar-accent-foreground: 0 0% 96%;
-    --sidebar-border: 200 20% 16%;
-    --sidebar-ring: 12 75% 58%;
+    --sidebar-accent: 220 35% 16%;
+    --sidebar-accent-foreground: 35 30% 96%;
+    --sidebar-border: 220 25% 18%;
+    --sidebar-ring: 25 90% 55%;
 
-    --success: 172 55% 48%;
+    --success: 160 55% 48%;
     --success-foreground: 0 0% 100%;
     --warning: 38 90% 58%;
-    --warning-foreground: 200 25% 12%;
+    --warning-foreground: 220 40% 15%;
     --error: 0 70% 55%;
     --error-foreground: 0 0% 100%;
 
-    --teal: 172 60% 45%;
-    --teal-light: 172 50% 55%;
-    --teal-dark: 172 65% 35%;
-    --coral: 12 75% 58%;
-    --coral-light: 12 70% 70%;
-    --coral-dark: 12 80% 45%;
+    --blue: 220 65% 58%;
+    --blue-light: 220 55% 68%;
+    --blue-dark: 220 70% 45%;
+    --orange: 25 90% 55%;
+    --orange-light: 30 85% 70%;
+    --orange-dark: 20 90% 45%;
+    --peach: 20 40% 20%;
   }
 }
 
@@ -140,27 +141,30 @@
   }
 }
 
-/* Geometric pattern utilities */
+/* Soft & Organic utilities */
 @layer utilities {
-  .geometric-grid {
-    background-image: 
-      linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px),
-      linear-gradient(to bottom, hsl(var(--border)) 1px, transparent 1px);
-    background-size: 60px 60px;
-  }
-
-  .geometric-dots {
-    background-image: radial-gradient(circle, hsl(var(--primary) / 0.15) 1px, transparent 1px);
-    background-size: 24px 24px;
-  }
-
-  .diagonal-lines {
-    background-image: repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 10px,
-      hsl(var(--primary) / 0.03) 10px,
-      hsl(var(--primary) / 0.03) 20px
+  .gradient-soft {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--primary) / 0.08) 0%,
+      hsl(var(--accent) / 0.06) 50%,
+      hsl(var(--primary) / 0.04) 100%
     );
+  }
+
+  .gradient-warm {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--peach)) 0%,
+      hsl(var(--background)) 100%
+    );
+  }
+
+  .blob-shape {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+
+  .organic-border {
+    border-radius: 2rem 1rem 2rem 1rem;
   }
 }
