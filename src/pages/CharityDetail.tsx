@@ -8,9 +8,13 @@ import {
   Globe, 
   Building2,
   ArrowLeft,
-  Loader2
+  Loader2,
+  Check,
+  X,
+  Info
 } from "lucide-react";
 import { useState } from "react";
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -221,9 +225,157 @@ const CharityDetail = () => {
             </p>
           </CardContent>
         </Card>
+
+        {/* Financial Transparency Section */}
+        <Card className="mb-10">
+          <CardContent className="p-6 md:p-8">
+            <h2 className="font-display text-xl font-semibold text-foreground mb-6">
+              Financial Transparency
+            </h2>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Expense Breakdown Chart */}
+              <div>
+                <h3 className="font-medium text-foreground mb-4">Expense Breakdown</h3>
+                {charity.program_expense_percentage !== null ? (
+                  <>
+                    <div className="h-64 w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={[
+                              { name: "Program", value: Number(charity.program_expense_percentage) || 0, color: "hsl(142, 76%, 36%)" },
+                              { name: "Admin", value: Number(charity.admin_expense_percentage) || 0, color: "hsl(45, 93%, 47%)" },
+                              { name: "Fundraising", value: Number(charity.fundraising_expense_percentage) || 0, color: "hsl(25, 95%, 53%)" },
+                            ]}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={60}
+                            outerRadius={90}
+                            paddingAngle={2}
+                            dataKey="value"
+                          >
+                            <Cell fill="hsl(142, 76%, 36%)" />
+                            <Cell fill="hsl(45, 93%, 47%)" />
+                            <Cell fill="hsl(25, 95%, 53%)" />
+                          </Pie>
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+
+                    {/* Percentage Labels */}
+                    <div className="flex justify-center gap-6 mt-4">
+                      <div className="flex items-center gap-2">
+                        <div className="h-3 w-3 rounded-full" style={{ backgroundColor: "hsl(142, 76%, 36%)" }} />
+                        <span className="text-sm text-muted-foreground">
+                          Program: <span className="font-semibold text-foreground">{charity.program_expense_percentage}%</span>
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="h-3 w-3 rounded-full" style={{ backgroundColor: "hsl(45, 93%, 47%)" }} />
+                        <span className="text-sm text-muted-foreground">
+                          Admin: <span className="font-semibold text-foreground">{charity.admin_expense_percentage}%</span>
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="h-3 w-3 rounded-full" style={{ backgroundColor: "hsl(25, 95%, 53%)" }} />
+                        <span className="text-sm text-muted-foreground">
+                          Fundraising: <span className="font-semibold text-foreground">{charity.fundraising_expense_percentage}%</span>
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center h-64 text-muted-foreground">
+                    <p>Financial data not available</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Transparency Checklist */}
+              <div>
+                <h3 className="font-medium text-foreground mb-4">Transparency Checklist</h3>
+                <div className="space-y-3">
+                  <TransparencyItem
+                    label="Form 990 Filed"
+                    checked={charity.complete_990_filed}
+                    description="Annual tax return filed with the IRS"
+                  />
+                  <TransparencyItem
+                    label="Annual Report Available"
+                    checked={!!charity.annual_report_url}
+                    description="Publicly accessible annual report"
+                    link={charity.annual_report_url}
+                  />
+                  <TransparencyItem
+                    label="Financials Published"
+                    checked={charity.financials_published}
+                    description="Financial statements publicly available"
+                  />
+                  <TransparencyItem
+                    label="Independent Audit"
+                    checked={charity.complete_990_filed && charity.financials_published}
+                    description="Audited by independent third party"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Data Source Note */}
+            <div className="mt-8 pt-6 border-t border-border">
+              <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                <Info className="h-4 w-4 mt-0.5 shrink-0" />
+                <p>
+                  Financial data sourced from IRS Form 990 filings and charity self-reported information. 
+                  Last updated based on most recent available fiscal year data. For the most current information, 
+                  please visit the organization's official website.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </Layout>
   );
 };
+
+interface TransparencyItemProps {
+  label: string;
+  checked: boolean;
+  description: string;
+  link?: string | null;
+}
+
+function TransparencyItem({ label, checked, description, link }: TransparencyItemProps) {
+  return (
+    <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+      <div
+        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
+          checked ? "bg-primary/20 text-primary" : "bg-muted-foreground/20 text-muted-foreground"
+        }`}
+      >
+        {checked ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <p className={`font-medium ${checked ? "text-foreground" : "text-muted-foreground"}`}>
+            {label}
+          </p>
+          {link && (
+            <a
+              href={link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline text-sm"
+            >
+              View →
+            </a>
+          )}
+        </div>
+        <p className="text-sm text-muted-foreground">{description}</p>
+      </div>
+    </div>
+  );
+}
 
 export default CharityDetail;
