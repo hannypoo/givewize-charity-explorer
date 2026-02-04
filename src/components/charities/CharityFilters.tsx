@@ -1,6 +1,7 @@
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -32,7 +33,6 @@ const categories = [
 ];
 
 const geographicScopes = [
-  { value: "all", label: "All Scopes" },
   { value: "local", label: "Local" },
   { value: "national", label: "National" },
   { value: "global", label: "Global" },
@@ -43,8 +43,10 @@ interface CharityFiltersProps {
   onSearchChange: (value: string) => void;
   selectedCategory: string;
   onCategoryChange: (value: string) => void;
-  selectedScope: string;
-  onScopeChange: (value: string) => void;
+  selectedScopes: string[];
+  onScopeToggle: (value: string) => void;
+  onClearFilters: () => void;
+  hasActiveFilters: boolean;
 }
 
 export function CharityFilters({
@@ -52,36 +54,42 @@ export function CharityFilters({
   onSearchChange,
   selectedCategory,
   onCategoryChange,
-  selectedScope,
-  onScopeChange,
+  selectedScopes,
+  onScopeToggle,
+  onClearFilters,
+  hasActiveFilters,
 }: CharityFiltersProps) {
   return (
     <div className="space-y-6">
       {/* Search */}
       <div className="space-y-2">
-        <Label htmlFor="search">Search by Name</Label>
+        <Label htmlFor="search" className="text-[#1F2937] font-medium">Search</Label>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9CA3AF]" />
           <Input
             id="search"
             placeholder="Search charities..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-9"
+            className="pl-9 bg-white border-gray-200 focus:border-[#4A90D9] focus:ring-[#4A90D9]"
           />
         </div>
       </div>
 
       {/* Category Filter */}
       <div className="space-y-2">
-        <Label>Category</Label>
+        <Label className="text-[#1F2937] font-medium">Category</Label>
         <Select value={selectedCategory} onValueChange={onCategoryChange}>
-          <SelectTrigger className="w-full bg-background">
+          <SelectTrigger className="w-full bg-white border-gray-200">
             <SelectValue placeholder="Select category" />
           </SelectTrigger>
-          <SelectContent className="bg-popover z-50">
+          <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
             {categories.map((category) => (
-              <SelectItem key={category.value} value={category.value}>
+              <SelectItem 
+                key={category.value} 
+                value={category.value}
+                className="hover:bg-[#F8FAFC]"
+              >
                 {category.label}
               </SelectItem>
             ))}
@@ -89,22 +97,38 @@ export function CharityFilters({
         </Select>
       </div>
 
-      {/* Geographic Scope Filter */}
-      <div className="space-y-2">
-        <Label>Geographic Scope</Label>
-        <Select value={selectedScope} onValueChange={onScopeChange}>
-          <SelectTrigger className="w-full bg-background">
-            <SelectValue placeholder="Select scope" />
-          </SelectTrigger>
-          <SelectContent className="bg-popover z-50">
-            {geographicScopes.map((scope) => (
-              <SelectItem key={scope.value} value={scope.value}>
+      {/* Geographic Scope Filter - Checkboxes */}
+      <div className="space-y-3">
+        <Label className="text-[#1F2937] font-medium">Geographic Scope</Label>
+        <div className="space-y-2">
+          {geographicScopes.map((scope) => (
+            <div key={scope.value} className="flex items-center space-x-2">
+              <Checkbox
+                id={`scope-${scope.value}`}
+                checked={selectedScopes.includes(scope.value)}
+                onCheckedChange={() => onScopeToggle(scope.value)}
+                className="border-gray-300 data-[state=checked]:bg-[#4A90D9] data-[state=checked]:border-[#4A90D9]"
+              />
+              <label
+                htmlFor={`scope-${scope.value}`}
+                className="text-sm text-[#6B7280] cursor-pointer"
+              >
                 {scope.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+              </label>
+            </div>
+          ))}
+        </div>
       </div>
+
+      {/* Clear Filters */}
+      {hasActiveFilters && (
+        <button
+          onClick={onClearFilters}
+          className="text-sm text-[#4A90D9] hover:underline font-medium"
+        >
+          Clear all filters
+        </button>
+      )}
     </div>
   );
 }
