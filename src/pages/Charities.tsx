@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Filter } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Filter, Loader2 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { CharityFilters } from "@/components/charities/CharityFilters";
 import { CharityGrid } from "@/components/charities/CharityGrid";
@@ -14,9 +15,30 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { mockCharities } from "@/data/mockCharities";
+import { supabase } from "@/integrations/supabase/client";
 
-const ITEMS_PER_PAGE = 9;
+const ITEMS_PER_PAGE = 12;
+
+const categoryLabels: Record<string, string> = {
+  "rare-diseases": "Rare Diseases",
+  "medical-health": "Medical & Health",
+  "education": "Education",
+  "hunger-food-security": "Hunger & Food Security",
+  "animal-welfare": "Animal Welfare",
+  "child-welfare": "Child Welfare",
+  "environment-climate": "Environment & Climate",
+  "emergency-relief": "Emergency Relief",
+  "housing-homelessness": "Housing & Homelessness",
+  "mental-health": "Mental Health",
+  "veterans": "Veterans",
+  "arts-culture": "Arts & Culture",
+  "human-rights": "Human Rights",
+  "disability-services": "Disability Services",
+  "senior-services": "Senior Services",
+  "community-development": "Community Development",
+  "faith-based": "Faith-Based",
+  "international-development": "International Development",
+};
 
 const Charities = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -30,23 +52,47 @@ const Charities = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
-  // Filter charities based on current filters
+  // Fetch charities from database
+  const { data: charities = [], isLoading } = useQuery({
+    queryKey: ["charities"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("charities")
+        .select("id, name, primary_category, geographic_scope, mission_statement, logo_url")
+        .order("name");
+      
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Transform and filter charities
   const filteredCharities = useMemo(() => {
-    return mockCharities.filter((charity) => {
-      const matchesSearch =
-        searchQuery === "" ||
-        charity.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        charity.mission.toLowerCase().includes(searchQuery.toLowerCase());
+    return charities
+      .map((charity) => ({
+        id: charity.id,
+        name: charity.name,
+        category: charity.primary_category,
+        categoryLabel: categoryLabels[charity.primary_category] || charity.primary_category,
+        geographicScope: charity.geographic_scope as "local" | "national" | "global",
+        mission: charity.mission_statement || "",
+        logoUrl: charity.logo_url,
+      }))
+      .filter((charity) => {
+        const matchesSearch =
+          searchQuery === "" ||
+          charity.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          charity.mission.toLowerCase().includes(searchQuery.toLowerCase());
 
-      const matchesCategory =
-        selectedCategory === "all" || charity.category === selectedCategory;
+        const matchesCategory =
+          selectedCategory === "all" || charity.category === selectedCategory;
 
-      const matchesScope =
-        selectedScopes.length === 0 || selectedScopes.includes(charity.geographicScope);
+        const matchesScope =
+          selectedScopes.length === 0 || selectedScopes.includes(charity.geographicScope);
 
-      return matchesSearch && matchesCategory && matchesScope;
-    });
-  }, [searchQuery, selectedCategory, selectedScopes]);
+        return matchesSearch && matchesCategory && matchesScope;
+      });
+  }, [charities, searchQuery, selectedCategory, selectedScopes]);
 
   // Paginate results
   const totalPages = Math.ceil(filteredCharities.length / ITEMS_PER_PAGE);
@@ -166,40 +212,49 @@ const Charities = () => {
                 </p>
               </div>
 
-              {/* Charity Grid */}
-              <CharityGrid charities={paginatedCharities} />
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="mt-8">
-                  <Pagination>
-                    <PaginationContent>
-                      <PaginationItem>
-                        <PaginationPrevious
-                          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                          className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                        />
-                      </PaginationItem>
-                      {[...Array(totalPages)].map((_, i) => (
-                        <PaginationItem key={i + 1}>
-                          <PaginationLink
-                            onClick={() => setCurrentPage(i + 1)}
-                            isActive={currentPage === i + 1}
-                            className="cursor-pointer"
-                          >
-                            {i + 1}
-                          </PaginationLink>
-                        </PaginationItem>
-                      ))}
-                      <PaginationItem>
-                        <PaginationNext
-                          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                          className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                        />
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
+              {/* Loading State */}
+              {isLoading ? (
+                <div className="flex items-center justify-center py-20">
+                  <Loader2 className="h-8 w-8 animate-spin text-[#4A90D9]" />
                 </div>
+              ) : (
+                <>
+                  {/* Charity Grid */}
+                  <CharityGrid charities={paginatedCharities} />
+
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="mt-8">
+                      <Pagination>
+                        <PaginationContent>
+                          <PaginationItem>
+                            <PaginationPrevious
+                              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                              className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                            />
+                          </PaginationItem>
+                          {[...Array(Math.min(totalPages, 5))].map((_, i) => (
+                            <PaginationItem key={i + 1}>
+                              <PaginationLink
+                                onClick={() => setCurrentPage(i + 1)}
+                                isActive={currentPage === i + 1}
+                                className="cursor-pointer"
+                              >
+                                {i + 1}
+                              </PaginationLink>
+                            </PaginationItem>
+                          ))}
+                          <PaginationItem>
+                            <PaginationNext
+                              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                              className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                            />
+                          </PaginationItem>
+                        </PaginationContent>
+                      </Pagination>
+                    </div>
+                  )}
+                </>
               )}
             </main>
           </div>
