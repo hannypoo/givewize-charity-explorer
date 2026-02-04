@@ -73,17 +73,18 @@ export default {
           DEFAULT: "hsl(var(--error))",
           foreground: "hsl(var(--error-foreground))",
         },
-        // Teal + Coral tokens
-        teal: {
-          DEFAULT: "hsl(var(--teal))",
-          light: "hsl(var(--teal-light))",
-          dark: "hsl(var(--teal-dark))",
+        // Blue + Orange tokens
+        blue: {
+          DEFAULT: "hsl(var(--blue))",
+          light: "hsl(var(--blue-light))",
+          dark: "hsl(var(--blue-dark))",
         },
-        coral: {
-          DEFAULT: "hsl(var(--coral))",
-          light: "hsl(var(--coral-light))",
-          dark: "hsl(var(--coral-dark))",
+        orange: {
+          DEFAULT: "hsl(var(--orange))",
+          light: "hsl(var(--orange-light))",
+          dark: "hsl(var(--orange-dark))",
         },
+        peach: "hsl(var(--peach))",
       },
       borderRadius: {
         lg: "var(--radius)",
