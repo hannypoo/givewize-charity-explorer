@@ -82,8 +82,8 @@ export function CategoriesSection() {
           {categories.map((category) => (
             <Link
               key={category.slug}
-              to={`/explore?category=${category.slug}`}
-              className="group relative flex flex-col items-center rounded-xl border border-border bg-card p-5 md:p-6 text-center transition-all hover:shadow-lg hover:border-primary/30 hover:-translate-y-1"
+              to={`/charities?category=${category.slug}`}
+              className="group relative flex flex-col items-center rounded-xl border border-border bg-card p-5 md:p-6 text-center transition-all hover:shadow-soft hover:border-primary/30 hover:-translate-y-1"
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary mb-3">
                 <category.icon className="h-6 w-6" />

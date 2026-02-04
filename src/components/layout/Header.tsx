@@ -46,7 +46,7 @@ export function Header() {
           <Button variant="ghost" size="sm" asChild>
             <Link to="/auth">Sign In</Link>
           </Button>
-          <Button size="sm" className="bg-accent hover:bg-accent/90" asChild>
+          <Button size="sm" className="shadow-soft" asChild>
             <Link to="/quiz">Take the Quiz</Link>
           </Button>
         </div>
@@ -88,7 +88,7 @@ export function Header() {
                   Sign In
                 </Link>
               </Button>
-              <Button className="bg-accent hover:bg-accent/90" asChild>
+              <Button className="shadow-soft" asChild>
                 <Link to="/quiz" onClick={() => setIsMobileMenuOpen(false)}>
                   Take the Quiz
                 </Link>

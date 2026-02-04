@@ -52,7 +52,7 @@ export function HowItWorksSection() {
                 </div>
                 
                 {/* Icon */}
-                <div className={`flex h-16 w-16 items-center justify-center rounded-2xl ${step.color} shadow-lg mb-6`}>
+                <div className={`flex h-16 w-16 items-center justify-center rounded-2xl ${step.color} shadow-soft mb-6`}>
                   <step.icon className="h-8 w-8" />
                 </div>
                 
@@ -70,7 +70,7 @@ export function HowItWorksSection() {
 
         {/* CTA */}
         <div className="mt-16 text-center">
-          <Button size="lg" className="bg-accent hover:bg-accent/90" asChild>
+          <Button size="lg" className="shadow-soft" asChild>
             <Link to="/quiz">
               Get Started
               <ArrowRight className="ml-2 h-5 w-5" />

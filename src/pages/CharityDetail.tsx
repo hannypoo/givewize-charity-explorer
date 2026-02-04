@@ -247,9 +247,9 @@ const CharityDetail = () => {
                         <PieChart>
                           <Pie
                             data={[
-                              { name: "Program", value: Number(charity.program_expense_percentage) || 0, color: "hsl(142, 76%, 36%)" },
-                              { name: "Admin", value: Number(charity.admin_expense_percentage) || 0, color: "hsl(45, 93%, 47%)" },
-                              { name: "Fundraising", value: Number(charity.fundraising_expense_percentage) || 0, color: "hsl(25, 95%, 53%)" },
+                              { name: "Program", value: Number(charity.program_expense_percentage) || 0 },
+                              { name: "Admin", value: Number(charity.admin_expense_percentage) || 0 },
+                              { name: "Fundraising", value: Number(charity.fundraising_expense_percentage) || 0 },
                             ]}
                             cx="50%"
                             cy="50%"
@@ -258,9 +258,9 @@ const CharityDetail = () => {
                             paddingAngle={2}
                             dataKey="value"
                           >
-                            <Cell fill="hsl(142, 76%, 36%)" />
-                            <Cell fill="hsl(45, 93%, 47%)" />
-                            <Cell fill="hsl(25, 95%, 53%)" />
+                            <Cell fill="hsl(142, 71%, 45%)" />
+                            <Cell fill="hsl(38, 92%, 50%)" />
+                            <Cell fill="hsl(0, 84%, 60%)" />
                           </Pie>
                         </PieChart>
                       </ResponsiveContainer>
@@ -269,19 +269,19 @@ const CharityDetail = () => {
                     {/* Percentage Labels */}
                     <div className="flex flex-wrap justify-center gap-4 md:gap-6 mt-4">
                       <div className="flex items-center gap-2">
-                        <div className="h-3 w-3 rounded-full" style={{ backgroundColor: "hsl(142, 76%, 36%)" }} />
+                        <div className="h-3 w-3 rounded-full bg-success" />
                         <span className="text-sm text-muted-foreground">
                           Program: <span className="font-semibold text-foreground">{charity.program_expense_percentage}%</span>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="h-3 w-3 rounded-full" style={{ backgroundColor: "hsl(45, 93%, 47%)" }} />
+                        <div className="h-3 w-3 rounded-full bg-warning" />
                         <span className="text-sm text-muted-foreground">
                           Admin: <span className="font-semibold text-foreground">{charity.admin_expense_percentage ?? "—"}%</span>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="h-3 w-3 rounded-full" style={{ backgroundColor: "hsl(25, 95%, 53%)" }} />
+                        <div className="h-3 w-3 rounded-full bg-error" />
                         <span className="text-sm text-muted-foreground">
                           Fundraising: <span className="font-semibold text-foreground">{charity.fundraising_expense_percentage ?? "—"}%</span>
                         </span>
