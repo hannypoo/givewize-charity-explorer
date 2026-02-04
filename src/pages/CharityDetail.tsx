@@ -14,7 +14,9 @@ import {
   Info,
   Users,
   Target,
-  TrendingUp
+  TrendingUp,
+  Star,
+  Shield
 } from "lucide-react";
 import { useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
@@ -228,6 +230,113 @@ const CharityDetail = () => {
               <p className="font-display text-lg font-bold text-[#1a365d] line-clamp-1">
                 {location || "N/A"}
               </p>
+            </div>
+          </div>
+
+          {/* Ratings Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            {/* GiveWiZe Score Card */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-6">
+                <Shield className="h-5 w-5 text-[#4A90D9]" />
+                <h2 className="font-display text-lg font-semibold text-[#1a365d]">
+                  GiveWiZe Score
+                </h2>
+              </div>
+
+              {charity.score_overall !== null ? (
+                <div className="flex flex-col items-center">
+                  {/* Circular Progress */}
+                  <div className="relative h-32 w-32 mb-6">
+                    <svg className="h-32 w-32 -rotate-90" viewBox="0 0 120 120">
+                      <circle
+                        cx="60"
+                        cy="60"
+                        r="52"
+                        fill="none"
+                        stroke="#E5E7EB"
+                        strokeWidth="12"
+                      />
+                      <circle
+                        cx="60"
+                        cy="60"
+                        r="52"
+                        fill="none"
+                        stroke="#4A90D9"
+                        strokeWidth="12"
+                        strokeDasharray={`${(Number(charity.score_overall) / 5) * 327} 327`}
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-3xl font-bold text-[#1a365d]">
+                        {Number(charity.score_overall).toFixed(1)}
+                      </span>
+                      <span className="text-xs text-[#9CA3AF]">out of 5</span>
+                    </div>
+                  </div>
+
+                  {/* Sub-scores */}
+                  <div className="w-full space-y-3">
+                    <SubScore label="Financial Efficiency" value={charity.score_financial_efficiency} />
+                    <SubScore label="Transparency" value={charity.score_transparency} />
+                    <SubScore label="Longevity" value={charity.score_longevity} />
+                    <SubScore label="Impact" value={charity.score_impact} />
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#F1F5F9] text-[#9CA3AF]">
+                    Rating Pending
+                  </span>
+                  <p className="text-sm text-[#9CA3AF] mt-2 text-center">
+                    We're still gathering data for this charity
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Community Rating Card */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-6">
+                <Star className="h-5 w-5 text-[#4A90D9]" />
+                <h2 className="font-display text-lg font-semibold text-[#1a365d]">
+                  Community Rating
+                </h2>
+              </div>
+
+              {charity.community_rating_average !== null ? (
+                <div className="flex flex-col items-center py-4">
+                  {/* Star Display */}
+                  <div className="flex items-center gap-1 mb-3">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={`h-8 w-8 ${
+                          star <= Math.round(Number(charity.community_rating_average))
+                            ? "fill-[#FBBF24] text-[#FBBF24]"
+                            : "text-[#E5E7EB]"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <p className="text-3xl font-bold text-[#1a365d] mb-1">
+                    {Number(charity.community_rating_average).toFixed(1)}
+                  </p>
+                  <p className="text-sm text-[#9CA3AF]">
+                    Based on {charity.community_rating_count || 0} reviews
+                  </p>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#F1F5F9] text-[#9CA3AF]">
+                    Rating Pending
+                  </span>
+                  <p className="text-sm text-[#9CA3AF] mt-2 text-center">
+                    No community reviews yet
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -489,6 +598,34 @@ function TransparencyItem({ label, status, description, link }: TransparencyItem
         </div>
         <p className={`text-sm ${isPending ? "text-[#9CA3AF]" : "text-[#6B7280]"}`}>{description}</p>
       </div>
+    </div>
+  );
+}
+
+interface SubScoreProps {
+  label: string;
+  value: number | null;
+}
+
+function SubScore({ label, value }: SubScoreProps) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-sm text-[#6B7280]">{label}</span>
+      {value !== null ? (
+        <div className="flex items-center gap-2">
+          <div className="w-24 h-2 bg-[#E5E7EB] rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-[#4A90D9] rounded-full"
+              style={{ width: `${(Number(value) / 5) * 100}%` }}
+            />
+          </div>
+          <span className="text-sm font-medium text-[#1F2937] w-8 text-right">
+            {Number(value).toFixed(1)}
+          </span>
+        </div>
+      ) : (
+        <span className="text-xs text-[#9CA3AF] italic">Pending</span>
+      )}
     </div>
   );
 }
