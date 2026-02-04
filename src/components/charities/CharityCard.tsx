@@ -28,35 +28,38 @@ function getScopeLabel(scope: string): string {
 export function CharityCard({ charity }: CharityCardProps) {
   return (
     <Link to={`/charities/${charity.id}`}>
-      <div className="group h-full bg-card rounded-xl p-5 border border-border transition-all hover:shadow-soft hover:border-primary/30">
+      <div className="group h-full bg-card border-2 border-border hover:border-primary transition-all p-5 relative">
+        {/* Corner accent on hover */}
+        <div className="absolute top-0 right-0 w-0 h-0 bg-coral transition-all group-hover:w-4 group-hover:h-4" />
+        
         {/* Top row */}
         <div className="flex items-start justify-between mb-4">
-          {/* Logo */}
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary">
+          {/* Logo in geometric box */}
+          <div className="w-12 h-12 bg-primary/10 border border-primary/30 flex items-center justify-center group-hover:bg-primary group-hover:border-primary transition-all">
             {charity.logoUrl ? (
               <img
                 src={charity.logoUrl}
                 alt={`${charity.name} logo`}
-                className="h-8 w-8 object-contain rounded"
+                className="h-8 w-8 object-contain"
               />
             ) : (
-              <Building2 className="h-5 w-5 text-primary" />
+              <Building2 className="h-5 w-5 text-primary group-hover:text-primary-foreground transition-colors" />
             )}
           </div>
           
-          {/* Scope badge */}
-          <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
+          {/* Scope */}
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
             {getScopeLabel(charity.geographicScope)}
           </span>
         </div>
 
         {/* Name */}
-        <h3 className="font-medium text-foreground line-clamp-1 group-hover:text-primary transition-colors mb-1">
+        <h3 className="font-bold text-foreground line-clamp-1 group-hover:text-primary transition-colors mb-1">
           {charity.name}
         </h3>
 
         {/* Category */}
-        <span className="text-xs text-primary font-medium">
+        <span className="text-xs font-semibold text-coral">
           {charity.categoryLabel}
         </span>
 
@@ -66,8 +69,8 @@ export function CharityCard({ charity }: CharityCardProps) {
         </p>
 
         {/* Hover link */}
-        <div className="mt-4 flex items-center text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-          <span>View details</span>
+        <div className="mt-4 flex items-center text-xs font-semibold text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+          <span>VIEW DETAILS</span>
           <ArrowRight className="ml-1 h-3 w-3" />
         </div>
       </div>
