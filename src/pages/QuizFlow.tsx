@@ -7,82 +7,112 @@ import { Button } from "@/components/ui/button";
 interface QuizQuestion {
   id: string;
   question: string;
+  subtitle?: string;
   options: {
     id: string;
     label: string;
-    description?: string;
   }[];
   multiSelect?: boolean;
+  maxSelections?: number;
 }
 
 const quizQuestions: QuizQuestion[] = [
   {
-    id: "cause",
-    question: "What cause matters most to you?",
+    id: "causes",
+    question: "What causes matter most to you?",
+    subtitle: "Select up to 3",
+    multiSelect: true,
+    maxSelections: 3,
     options: [
-      { id: "health", label: "Health & Medical", description: "Fighting diseases and improving healthcare" },
-      { id: "education", label: "Education", description: "Empowering through learning and opportunity" },
-      { id: "environment", label: "Environment", description: "Protecting our planet and wildlife" },
-      { id: "hunger", label: "Hunger & Poverty", description: "Providing food and fighting poverty" },
-      { id: "children", label: "Children & Youth", description: "Supporting the next generation" },
-      { id: "animals", label: "Animal Welfare", description: "Protecting and caring for animals" },
+      { id: "rare-diseases", label: "Rare Diseases" },
+      { id: "medical-health", label: "Medical & Health" },
+      { id: "education", label: "Education" },
+      { id: "hunger-food-security", label: "Hunger & Food Security" },
+      { id: "animal-welfare", label: "Animal Welfare" },
+      { id: "child-welfare", label: "Children & Youth" },
+      { id: "environment-climate", label: "Environment & Climate" },
+      { id: "emergency-relief", label: "Emergency Relief" },
+      { id: "disability-services", label: "Disability Rights" },
+      { id: "human-rights", label: "Human Rights" },
     ],
   },
   {
-    id: "scope",
-    question: "Where do you want your donation to have impact?",
+    id: "geographic",
+    question: "What geographic impact do you prefer?",
     options: [
-      { id: "local", label: "Local Community", description: "Making a difference close to home" },
-      { id: "national", label: "National", description: "Supporting causes across the country" },
-      { id: "global", label: "Global", description: "Helping communities worldwide" },
+      { id: "local", label: "Local" },
+      { id: "national", label: "National" },
+      { id: "global", label: "Global" },
+      { id: "no-preference", label: "No preference" },
     ],
   },
   {
-    id: "priority",
-    question: "What's most important to you in a charity?",
+    id: "personal",
+    question: "Have you been personally affected by...",
+    subtitle: "Select all that apply",
+    multiSelect: true,
     options: [
-      { id: "efficiency", label: "Financial Efficiency", description: "Most of my donation goes to programs" },
-      { id: "transparency", label: "Transparency", description: "Clear reporting and accountability" },
-      { id: "impact", label: "Measurable Impact", description: "Proven results and outcomes" },
-      { id: "longevity", label: "Track Record", description: "Years of experience and stability" },
-    ],
-  },
-  {
-    id: "involvement",
-    question: "How would you like to be involved?",
-    options: [
-      { id: "donate", label: "One-time Donation", description: "Make a single contribution" },
-      { id: "monthly", label: "Monthly Giving", description: "Ongoing support with recurring gifts" },
-      { id: "volunteer", label: "Volunteer Time", description: "Hands-on involvement" },
-      { id: "advocate", label: "Spread Awareness", description: "Share and advocate for the cause" },
-    ],
-  },
-  {
-    id: "amount",
-    question: "What's your typical donation range?",
-    options: [
-      { id: "small", label: "Under $50", description: "Every bit helps" },
-      { id: "medium", label: "$50 - $250", description: "Meaningful contribution" },
-      { id: "large", label: "$250 - $1,000", description: "Significant support" },
-      { id: "major", label: "$1,000+", description: "Major gift" },
+      { id: "medical-condition", label: "A medical condition" },
+      { id: "rare-disease", label: "A rare disease" },
+      { id: "food-insecurity", label: "Food insecurity" },
+      { id: "natural-disaster", label: "A natural disaster" },
+      { id: "none", label: "None of the above" },
     ],
   },
 ];
 
+type Answers = Record<string, string | string[]>;
+
 const QuizFlow = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [answers, setAnswers] = useState<Answers>({});
 
   const currentQuestion = quizQuestions[currentStep];
   const totalSteps = quizQuestions.length;
   const progress = ((currentStep + 1) / totalSteps) * 100;
 
   const handleSelectAnswer = (optionId: string) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [currentQuestion.id]: optionId,
-    }));
+    if (currentQuestion.multiSelect) {
+      const currentSelections = (answers[currentQuestion.id] as string[]) || [];
+      
+      // Handle "None" option - clears other selections
+      if (optionId === "none") {
+        setAnswers((prev) => ({
+          ...prev,
+          [currentQuestion.id]: ["none"],
+        }));
+        return;
+      }
+
+      // If clicking on an already selected item, remove it
+      if (currentSelections.includes(optionId)) {
+        setAnswers((prev) => ({
+          ...prev,
+          [currentQuestion.id]: currentSelections.filter((id) => id !== optionId),
+        }));
+        return;
+      }
+
+      // Remove "none" if selecting something else
+      const withoutNone = currentSelections.filter((id) => id !== "none");
+
+      // Check max selections
+      if (currentQuestion.maxSelections && withoutNone.length >= currentQuestion.maxSelections) {
+        return; // Don't add more
+      }
+
+      setAnswers((prev) => ({
+        ...prev,
+        [currentQuestion.id]: [...withoutNone, optionId],
+      }));
+    } else {
+      // Single select
+      setAnswers((prev) => ({
+        ...prev,
+        [currentQuestion.id]: optionId,
+      }));
+    }
   };
 
   const handleNext = () => {
@@ -103,8 +133,21 @@ const QuizFlow = () => {
     }
   };
 
-  const selectedAnswer = answers[currentQuestion.id];
-  const canProceed = !!selectedAnswer;
+  const currentAnswer = answers[currentQuestion.id];
+  const canProceed = currentQuestion.multiSelect
+    ? Array.isArray(currentAnswer) && currentAnswer.length > 0
+    : !!currentAnswer;
+
+  const isSelected = (optionId: string) => {
+    if (currentQuestion.multiSelect) {
+      return Array.isArray(currentAnswer) && currentAnswer.includes(optionId);
+    }
+    return currentAnswer === optionId;
+  };
+
+  const selectionCount = currentQuestion.multiSelect && Array.isArray(currentAnswer) 
+    ? currentAnswer.filter(id => id !== "none").length 
+    : 0;
 
   return (
     <Layout>
@@ -126,36 +169,57 @@ const QuizFlow = () => {
 
           {/* Question */}
           <div className="bg-white rounded-xl p-6 md:p-8 shadow-sm mb-6">
-            <h2 className="font-display text-2xl md:text-3xl font-bold text-[#1a365d] mb-8 text-center">
+            <h2 className="font-display text-2xl md:text-3xl font-bold text-[#1a365d] mb-2 text-center">
               {currentQuestion.question}
             </h2>
+            {currentQuestion.subtitle && (
+              <p className="text-[#6B7280] text-center mb-2">
+                {currentQuestion.subtitle}
+              </p>
+            )}
+            {currentQuestion.maxSelections && (
+              <p className="text-sm text-[#9CA3AF] text-center mb-6">
+                {selectionCount} of {currentQuestion.maxSelections} selected
+              </p>
+            )}
+            {!currentQuestion.maxSelections && currentQuestion.subtitle && (
+              <div className="mb-6" />
+            )}
 
             {/* Answer Options as Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className={`grid gap-3 ${
+              currentQuestion.options.length <= 4 
+                ? "grid-cols-1 sm:grid-cols-2" 
+                : "grid-cols-2 sm:grid-cols-3"
+            }`}>
               {currentQuestion.options.map((option) => {
-                const isSelected = selectedAnswer === option.id;
+                const selected = isSelected(option.id);
+                const atMax = currentQuestion.maxSelections 
+                  && selectionCount >= currentQuestion.maxSelections 
+                  && !selected;
+                
                 return (
                   <button
                     key={option.id}
                     onClick={() => handleSelectAnswer(option.id)}
-                    className={`relative p-5 rounded-xl border-2 text-left transition-all duration-200 ${
-                      isSelected
+                    disabled={atMax}
+                    className={`relative p-4 rounded-xl border-2 text-left transition-all duration-200 ${
+                      selected
                         ? "border-[#4A90D9] bg-[#4A90D9]/5"
+                        : atMax
+                        ? "border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed"
                         : "border-gray-200 bg-white hover:border-[#4A90D9]/50 hover:shadow-sm"
                     }`}
                   >
                     {/* Selected checkmark */}
-                    {isSelected && (
-                      <div className="absolute top-3 right-3 h-6 w-6 rounded-full bg-[#4A90D9] flex items-center justify-center">
-                        <Check className="h-4 w-4 text-white" />
+                    {selected && (
+                      <div className="absolute top-2 right-2 h-5 w-5 rounded-full bg-[#4A90D9] flex items-center justify-center">
+                        <Check className="h-3 w-3 text-white" />
                       </div>
                     )}
-                    <h3 className={`font-semibold mb-1 pr-8 ${isSelected ? "text-[#4A90D9]" : "text-[#1F2937]"}`}>
+                    <span className={`font-medium text-sm ${selected ? "text-[#4A90D9]" : "text-[#1F2937]"}`}>
                       {option.label}
-                    </h3>
-                    {option.description && (
-                      <p className="text-sm text-[#6B7280]">{option.description}</p>
-                    )}
+                    </span>
                   </button>
                 );
               })}
