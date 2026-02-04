@@ -8,12 +8,14 @@ interface QuizQuestion {
   id: string;
   question: string;
   subtitle?: string;
-  options: {
+  type?: "cards" | "scale";
+  options?: {
     id: string;
     label: string;
   }[];
   multiSelect?: boolean;
   maxSelections?: number;
+  scaleLabels?: { low: string; high: string };
 }
 
 const quizQuestions: QuizQuestion[] = [
@@ -21,6 +23,7 @@ const quizQuestions: QuizQuestion[] = [
     id: "causes",
     question: "What causes matter most to you?",
     subtitle: "Select up to 3",
+    type: "cards",
     multiSelect: true,
     maxSelections: 3,
     options: [
@@ -39,6 +42,7 @@ const quizQuestions: QuizQuestion[] = [
   {
     id: "geographic",
     question: "What geographic impact do you prefer?",
+    type: "cards",
     options: [
       { id: "local", label: "Local" },
       { id: "national", label: "National" },
@@ -50,6 +54,7 @@ const quizQuestions: QuizQuestion[] = [
     id: "personal",
     question: "Have you been personally affected by...",
     subtitle: "Select all that apply",
+    type: "cards",
     multiSelect: true,
     options: [
       { id: "medical-condition", label: "A medical condition" },
@@ -59,9 +64,38 @@ const quizQuestions: QuizQuestion[] = [
       { id: "none", label: "None of the above" },
     ],
   },
+  {
+    id: "efficiency",
+    question: "How important is financial efficiency to you?",
+    subtitle: "How much of each dollar goes directly to programs",
+    type: "scale",
+    scaleLabels: { low: "Not important", high: "Very important" },
+  },
+  {
+    id: "age",
+    question: "What's your organization age preference?",
+    type: "cards",
+    options: [
+      { id: "established", label: "Established (10+ years)" },
+      { id: "growing", label: "Growing (5-10 years)" },
+      { id: "new", label: "New (under 5 years)" },
+      { id: "no-preference", label: "No preference" },
+    ],
+  },
+  {
+    id: "transparency",
+    question: "What transparency matters most to you?",
+    type: "cards",
+    options: [
+      { id: "financial", label: "Financial reports" },
+      { id: "impact", label: "Impact metrics" },
+      { id: "programs", label: "Program updates" },
+      { id: "all", label: "All equally important" },
+    ],
+  },
 ];
 
-type Answers = Record<string, string | string[]>;
+type Answers = Record<string, string | string[] | number>;
 
 const QuizFlow = () => {
   const navigate = useNavigate();
@@ -115,6 +149,13 @@ const QuizFlow = () => {
     }
   };
 
+  const handleScaleSelect = (value: number) => {
+    setAnswers((prev) => ({
+      ...prev,
+      [currentQuestion.id]: value,
+    }));
+  };
+
   const handleNext = () => {
     if (currentStep < totalSteps - 1) {
       setCurrentStep((prev) => prev + 1);
@@ -134,9 +175,16 @@ const QuizFlow = () => {
   };
 
   const currentAnswer = answers[currentQuestion.id];
-  const canProceed = currentQuestion.multiSelect
-    ? Array.isArray(currentAnswer) && currentAnswer.length > 0
-    : !!currentAnswer;
+  
+  const canProceed = () => {
+    if (currentQuestion.type === "scale") {
+      return typeof currentAnswer === "number";
+    }
+    if (currentQuestion.multiSelect) {
+      return Array.isArray(currentAnswer) && currentAnswer.length > 0;
+    }
+    return !!currentAnswer;
+  };
 
   const isSelected = (optionId: string) => {
     if (currentQuestion.multiSelect) {
@@ -185,45 +233,80 @@ const QuizFlow = () => {
             {!currentQuestion.maxSelections && currentQuestion.subtitle && (
               <div className="mb-6" />
             )}
+            {!currentQuestion.subtitle && !currentQuestion.maxSelections && (
+              <div className="mb-6" />
+            )}
 
-            {/* Answer Options as Cards */}
-            <div className={`grid gap-3 ${
-              currentQuestion.options.length <= 4 
-                ? "grid-cols-1 sm:grid-cols-2" 
-                : "grid-cols-2 sm:grid-cols-3"
-            }`}>
-              {currentQuestion.options.map((option) => {
-                const selected = isSelected(option.id);
-                const atMax = currentQuestion.maxSelections 
-                  && selectionCount >= currentQuestion.maxSelections 
-                  && !selected;
-                
-                return (
-                  <button
-                    key={option.id}
-                    onClick={() => handleSelectAnswer(option.id)}
-                    disabled={atMax}
-                    className={`relative p-4 rounded-xl border-2 text-left transition-all duration-200 ${
-                      selected
-                        ? "border-[#4A90D9] bg-[#4A90D9]/5"
-                        : atMax
-                        ? "border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed"
-                        : "border-gray-200 bg-white hover:border-[#4A90D9]/50 hover:shadow-sm"
-                    }`}
-                  >
-                    {/* Selected checkmark */}
-                    {selected && (
-                      <div className="absolute top-2 right-2 h-5 w-5 rounded-full bg-[#4A90D9] flex items-center justify-center">
-                        <Check className="h-3 w-3 text-white" />
-                      </div>
-                    )}
-                    <span className={`font-medium text-sm ${selected ? "text-[#4A90D9]" : "text-[#1F2937]"}`}>
-                      {option.label}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+            {/* Scale Type Question */}
+            {currentQuestion.type === "scale" && (
+              <div className="py-4">
+                <div className="flex justify-between gap-2 mb-4">
+                  {[1, 2, 3, 4, 5].map((value) => {
+                    const isActive = currentAnswer === value;
+                    return (
+                      <button
+                        key={value}
+                        onClick={() => handleScaleSelect(value)}
+                        className={`flex-1 py-4 rounded-xl border-2 font-bold text-lg transition-all duration-200 ${
+                          isActive
+                            ? "border-[#4A90D9] bg-[#4A90D9] text-white"
+                            : "border-gray-200 bg-white text-[#1F2937] hover:border-[#4A90D9]/50"
+                        }`}
+                      >
+                        {value}
+                      </button>
+                    );
+                  })}
+                </div>
+                {currentQuestion.scaleLabels && (
+                  <div className="flex justify-between text-sm text-[#6B7280]">
+                    <span>{currentQuestion.scaleLabels.low}</span>
+                    <span>{currentQuestion.scaleLabels.high}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Card Type Question */}
+            {(currentQuestion.type === "cards" || !currentQuestion.type) && currentQuestion.options && (
+              <div className={`grid gap-3 ${
+                currentQuestion.options.length <= 4 
+                  ? "grid-cols-1 sm:grid-cols-2" 
+                  : "grid-cols-2 sm:grid-cols-3"
+              }`}>
+                {currentQuestion.options.map((option) => {
+                  const selected = isSelected(option.id);
+                  const atMax = currentQuestion.maxSelections 
+                    && selectionCount >= currentQuestion.maxSelections 
+                    && !selected;
+                  
+                  return (
+                    <button
+                      key={option.id}
+                      onClick={() => handleSelectAnswer(option.id)}
+                      disabled={atMax}
+                      className={`relative p-4 rounded-xl border-2 text-left transition-all duration-200 ${
+                        selected
+                          ? "border-[#4A90D9] bg-[#4A90D9]/5"
+                          : atMax
+                          ? "border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed"
+                          : "border-gray-200 bg-white hover:border-[#4A90D9]/50 hover:shadow-sm"
+                      }`}
+                    >
+                      {/* Selected checkmark */}
+                      {selected && (
+                        <div className="absolute top-2 right-2 h-5 w-5 rounded-full bg-[#4A90D9] flex items-center justify-center">
+                          <Check className="h-3 w-3 text-white" />
+                        </div>
+                      )}
+                      <span className={`font-medium text-sm ${selected ? "text-[#4A90D9]" : "text-[#1F2937]"}`}>
+                        {option.label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Navigation Buttons */}
@@ -239,7 +322,7 @@ const QuizFlow = () => {
 
             <Button
               onClick={handleNext}
-              disabled={!canProceed}
+              disabled={!canProceed()}
               className="bg-[#4A90D9] hover:bg-[#3d7fc4] text-white px-8 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {currentStep === totalSteps - 1 ? "See Results" : "Next"}
