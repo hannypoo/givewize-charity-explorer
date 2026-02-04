@@ -1,37 +1,27 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import givewizeIcon from "@/assets/givewize-icon.jpg";
 
 export function HeroSection() {
   return (
-    <section className="relative bg-background py-20 md:py-28 lg:py-36">
-      {/* Decorative elements */}
+    <section className="relative bg-background py-24 md:py-32 lg:py-40">
+      {/* Subtle decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 right-[15%] h-64 w-64 rounded-full bg-primary/5 blur-3xl" />
-        <div className="absolute bottom-10 left-[10%] h-48 w-48 rounded-full bg-primary/5 blur-3xl" />
+        <div className="absolute top-20 right-[15%] h-72 w-72 rounded-full bg-primary/[0.03] blur-3xl" />
+        <div className="absolute bottom-10 left-[10%] h-56 w-56 rounded-full bg-primary/[0.03] blur-3xl" />
       </div>
 
       <div className="container relative">
-        <div className="mx-auto max-w-3xl text-center">
-          {/* Decorative icon */}
-          <div className="mb-8 inline-flex items-center justify-center">
-            <img 
-              src={givewizeIcon} 
-              alt="GiveWiZe" 
-              className="h-20 w-20 object-contain"
-            />
-          </div>
-
+        <div className="mx-auto max-w-2xl text-center">
           {/* Headline */}
-          <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl leading-tight">
+          <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl leading-[1.1]">
             Give With Confidence.
             <br />
             Give With Purpose.
           </h1>
 
           {/* Subheadline */}
-          <p className="mt-6 text-lg text-muted-foreground md:text-xl max-w-xl mx-auto leading-relaxed">
+          <p className="mt-6 text-lg text-muted-foreground md:text-xl leading-relaxed">
             Find vetted charities matched to your values—with complete financial transparency.
           </p>
 
