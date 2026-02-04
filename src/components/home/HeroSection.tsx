@@ -34,14 +34,14 @@ export function HeroSection() {
 
           {/* CTAs */}
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button size="lg" className="bg-accent hover:bg-accent/90 text-lg px-8" asChild>
+            <Button size="lg" className="text-lg px-8 shadow-soft" asChild>
               <Link to="/quiz">
                 Take the Quiz
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="text-lg px-8" asChild>
-              <Link to="/explore">Explore Charities</Link>
+              <Link to="/charities">Explore Charities</Link>
             </Button>
           </div>
 
@@ -66,7 +66,7 @@ interface StatCardProps {
 
 function StatCard({ icon: Icon, value, label }: StatCardProps) {
   return (
-    <div className="flex flex-col items-center gap-2 rounded-xl bg-card/60 backdrop-blur p-4 border border-border/50">
+    <div className="flex flex-col items-center gap-2 rounded-xl bg-card shadow-card p-4 border border-border/50">
       <Icon className="h-5 w-5 text-primary" />
       <span className="font-display text-2xl font-bold text-foreground">{value}</span>
       <span className="text-xs text-muted-foreground text-center">{label}</span>
