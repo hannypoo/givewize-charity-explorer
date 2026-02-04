@@ -28,11 +28,11 @@ function getScopeLabel(scope: string): string {
 export function CharityCard({ charity }: CharityCardProps) {
   return (
     <Link to={`/charities/${charity.id}`}>
-      <div className="group h-full bg-card rounded-2xl p-6 shadow-card transition-all duration-300 hover:shadow-elevated hover:-translate-y-2 border border-border hover:border-gold/30 ring-1 ring-transparent hover:ring-gold/10">
-        {/* Top row with logo and scope */}
+      <div className="group h-full bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-card transition-all duration-300 hover:shadow-elevated hover:-translate-y-2 border border-border/50 hover:border-rose/30 ring-1 ring-transparent hover:ring-rose/10">
+        {/* Top row with logo and rating */}
         <div className="flex items-start justify-between mb-4">
-          {/* Logo with navy background */}
-          <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-navy to-navy-dark ring-2 ring-gold/20 group-hover:ring-gold/40 transition-all shadow-navy">
+          {/* Logo with plum gradient background */}
+          <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-plum to-plum-dark ring-2 ring-rose/20 group-hover:ring-rose/40 transition-all shadow-plum">
             {charity.logoUrl ? (
               <img
                 src={charity.logoUrl}
@@ -40,19 +40,19 @@ export function CharityCard({ charity }: CharityCardProps) {
                 className="h-10 w-10 object-contain rounded-lg"
               />
             ) : (
-              <Building2 className="h-7 w-7 text-gold" />
+              <Building2 className="h-7 w-7 text-rose" />
             )}
           </div>
           
           {/* Rating badge */}
-          <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-gold/10 text-gold text-xs font-semibold">
-            <Star className="h-3 w-3 fill-gold" />
+          <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-rose/10 text-rose text-xs font-semibold">
+            <Star className="h-3 w-3 fill-rose" />
             <span>A+</span>
           </div>
         </div>
 
         {/* Name */}
-        <h3 className="font-bold text-foreground text-lg leading-tight line-clamp-1 group-hover:text-navy transition-colors mb-2">
+        <h3 className="font-bold text-foreground text-lg leading-tight line-clamp-1 group-hover:text-plum transition-colors mb-2">
           {charity.name}
         </h3>
 
@@ -72,7 +72,7 @@ export function CharityCard({ charity }: CharityCardProps) {
         </p>
 
         {/* Hover indicator */}
-        <div className="mt-4 flex items-center text-xs font-medium text-gold opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="mt-4 flex items-center text-xs font-medium text-rose opacity-0 group-hover:opacity-100 transition-opacity">
           <span>Learn more</span>
           <svg className="ml-1 h-3 w-3 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
