@@ -17,20 +17,24 @@ const categories = [
 
 export function CategoriesSection() {
   return (
-    <section className="py-16 md:py-24 relative overflow-hidden section-gradient-blue">
+    <section className="py-16 md:py-24 relative overflow-hidden bg-categories">
+      {/* Light orbs */}
+      <div className="absolute top-0 right-[20%] w-64 h-64 bg-white/10 rounded-full blur-[80px]" />
+      <div className="absolute bottom-0 left-[10%] w-72 h-72 bg-white/5 rounded-full blur-[100px]" />
+
       <div className="container relative">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-10 gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 glass rounded-full px-4 py-1.5 mb-4">
-              <span className="text-xs font-semibold text-primary">Categories</span>
+            <div className="inline-flex items-center gap-2 glass-dark rounded-full px-4 py-1.5 mb-4">
+              <span className="text-xs font-semibold text-white/80">Categories</span>
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">
+            <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
               Browse by cause
             </h2>
           </div>
           <Link 
             to="/charities" 
-            className="group inline-flex items-center text-sm font-semibold text-primary hover:text-blue-light transition-colors"
+            className="group inline-flex items-center text-sm font-semibold text-white/80 hover:text-white transition-colors"
           >
             View All
             <ArrowRight className="ml-1.5 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -42,16 +46,16 @@ export function CategoriesSection() {
             <Link
               key={category.slug}
               to={`/charities?category=${category.slug}`}
-              className="group glass rounded-2xl p-5 hover:glass-strong hover:-translate-y-1 transition-all duration-300"
+              className="group glass-dark rounded-2xl p-5 hover:bg-white/20 hover:-translate-y-1 transition-all duration-300"
             >
-              <div className="w-12 h-12 rounded-xl gradient-blue flex items-center justify-center mb-4 glow-blue group-hover:scale-105 transition-transform duration-300">
-                <category.icon className="h-5 w-5 text-primary-foreground" />
+              <div className="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center mb-4 group-hover:bg-white/25 transition-colors duration-300">
+                <category.icon className="h-5 w-5 text-white" />
               </div>
               
-              <h3 className="font-semibold text-foreground text-sm mb-1">
+              <h3 className="font-semibold text-white text-sm mb-1">
                 {category.name}
               </h3>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs text-white/50">
                 {category.count} charities
               </span>
             </Link>

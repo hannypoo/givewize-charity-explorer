@@ -28,9 +28,7 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full">
       <div 
         className={`absolute inset-0 transition-all duration-300 ${
-          isScrolled 
-            ? "glass-strong" 
-            : "bg-transparent"
+          isScrolled ? "glass-nav" : "bg-transparent"
         }`} 
       />
       
@@ -44,7 +42,7 @@ export function Header() {
               className="h-full w-full object-contain rounded-lg"
             />
           </div>
-          <span className="font-bold text-xl text-foreground tracking-tight">
+          <span className="font-bold text-xl text-white tracking-tight">
             GiveWiZe
           </span>
         </Link>
@@ -55,8 +53,8 @@ export function Header() {
             <NavLink
               key={link.to}
               to={link.to}
-              className="px-4 py-2 text-sm font-medium text-foreground/60 rounded-xl transition-all hover:text-foreground hover:bg-foreground/5"
-              activeClassName="text-primary bg-primary/5 font-semibold"
+              className="px-4 py-2 text-sm font-medium text-white/70 rounded-xl transition-all hover:text-white hover:bg-white/10"
+              activeClassName="text-white bg-white/15 font-semibold"
             >
               {link.label}
             </NavLink>
@@ -68,14 +66,14 @@ export function Header() {
           <Button 
             variant="ghost" 
             size="sm" 
-            className="text-foreground/60 font-medium rounded-xl hover:text-foreground hover:bg-foreground/5"
+            className="text-white/70 font-medium rounded-xl hover:text-white hover:bg-white/10"
             asChild
           >
             <Link to="/auth">Sign in</Link>
           </Button>
           <Button 
             size="sm" 
-            className="gradient-blue text-primary-foreground font-semibold rounded-xl glow-blue hover:scale-[1.02] transition-all duration-300"
+            className="gradient-orange text-accent-foreground font-semibold rounded-xl glow-orange hover:scale-[1.02] transition-all duration-300"
             asChild
           >
             <Link to="/quiz" className="flex items-center gap-1.5">
@@ -89,7 +87,7 @@ export function Header() {
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden text-foreground rounded-xl"
+          className="md:hidden text-white rounded-xl hover:bg-white/10"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
         >
@@ -100,7 +98,7 @@ export function Header() {
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div 
-          className="fixed inset-0 top-16 z-40 bg-foreground/10 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 top-16 z-40 bg-black/20 backdrop-blur-sm md:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
@@ -134,7 +132,7 @@ export function Header() {
               </Link>
             </Button>
             <Button 
-              className="w-full gradient-blue text-primary-foreground font-semibold rounded-xl glow-blue"
+              className="w-full gradient-orange text-accent-foreground font-semibold rounded-xl glow-orange"
               asChild
             >
               <Link to="/quiz" onClick={() => setIsMobileMenuOpen(false)}>
