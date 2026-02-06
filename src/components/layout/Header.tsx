@@ -42,7 +42,7 @@ export function Header() {
               className="h-full w-full object-contain rounded-lg"
             />
           </div>
-          <span className="font-bold text-xl text-white tracking-tight">
+          <span className={`font-bold text-xl tracking-tight transition-colors duration-300 ${isScrolled ? "text-foreground" : "text-white"}`}>
             GiveWiZe
           </span>
         </Link>
@@ -53,8 +53,12 @@ export function Header() {
             <NavLink
               key={link.to}
               to={link.to}
-              className="px-4 py-2 text-sm font-medium text-white/70 rounded-xl transition-all hover:text-white hover:bg-white/10"
-              activeClassName="text-white bg-white/15 font-semibold"
+              className={`px-4 py-2 text-sm font-medium rounded-xl transition-all ${
+                isScrolled 
+                  ? "text-foreground/60 hover:text-foreground hover:bg-foreground/5" 
+                  : "text-white/70 hover:text-white hover:bg-white/10"
+              }`}
+              activeClassName={isScrolled ? "text-primary bg-primary/5 font-semibold" : "text-white bg-white/15 font-semibold"}
             >
               {link.label}
             </NavLink>
@@ -66,7 +70,11 @@ export function Header() {
           <Button 
             variant="ghost" 
             size="sm" 
-            className="text-white/70 font-medium rounded-xl hover:text-white hover:bg-white/10"
+            className={`font-medium rounded-xl transition-colors duration-300 ${
+              isScrolled 
+                ? "text-foreground/60 hover:text-foreground hover:bg-foreground/5" 
+                : "text-white/70 hover:text-white hover:bg-white/10"
+            }`}
             asChild
           >
             <Link to="/auth">Sign in</Link>
