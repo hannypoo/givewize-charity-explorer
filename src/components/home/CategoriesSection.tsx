@@ -18,13 +18,13 @@ const categories = [
 export function CategoriesSection() {
   return (
     <section className="py-16 md:py-24 relative overflow-hidden">
-      {/* Background accent */}
-      <div className="absolute inset-0 bg-gradient-to-b from-secondary/50 to-background" />
+      {/* Mesh gradient background */}
+      <div className="absolute inset-0 mesh-gradient-alt" />
       
       <div className="container relative">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-10 gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 bg-primary/10 rounded-full px-4 py-1.5 mb-4">
+            <div className="inline-flex items-center gap-2 glass-accent rounded-full px-4 py-1.5 mb-4">
               <span className="text-xs font-semibold text-primary">Categories</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">
@@ -33,7 +33,7 @@ export function CategoriesSection() {
           </div>
           <Link 
             to="/charities" 
-            className="group inline-flex items-center text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
+            className="group inline-flex items-center text-sm font-semibold text-primary hover:text-blue-light transition-colors"
           >
             View All
             <ArrowRight className="ml-1.5 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -45,9 +45,9 @@ export function CategoriesSection() {
             <Link
               key={category.slug}
               to={`/charities?category=${category.slug}`}
-              className="group glass rounded-2xl p-5 hover:shadow-glass-lg hover:-translate-y-1 transition-all duration-300"
+              className="group glass-card rounded-2xl p-5 hover:glass-strong hover:-translate-y-1 transition-all duration-300"
             >
-              <div className="w-12 h-12 rounded-xl gradient-blue flex items-center justify-center mb-4 shadow-glow group-hover:scale-105 transition-transform duration-300">
+              <div className="w-12 h-12 rounded-xl gradient-blue flex items-center justify-center mb-4 glow-blue group-hover:scale-105 transition-transform duration-300">
                 <category.icon className="h-5 w-5 text-primary-foreground" />
               </div>
               

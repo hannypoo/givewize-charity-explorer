@@ -30,14 +30,14 @@ export function Header() {
         className={`absolute inset-0 transition-all duration-300 ${
           isScrolled 
             ? "glass-strong shadow-glass" 
-            : "bg-background/80 backdrop-blur-sm"
+            : "bg-transparent"
         }`} 
       />
       
       <div className="container relative flex h-16 items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="relative h-10 w-10 rounded-xl gradient-blue p-1 shadow-glow group-hover:shadow-lg transition-all duration-300">
+          <div className="relative h-10 w-10 rounded-xl gradient-blue p-1 glow-blue group-hover:scale-105 transition-all duration-300">
             <img 
               src={givewizeIcon} 
               alt="GiveWiZe" 
@@ -55,8 +55,8 @@ export function Header() {
             <NavLink
               key={link.to}
               to={link.to}
-              className="px-4 py-2 text-sm font-medium text-foreground/70 rounded-xl transition-all hover:text-foreground hover:bg-secondary"
-              activeClassName="text-primary bg-primary/5 font-semibold"
+              className="px-4 py-2 text-sm font-medium text-foreground/60 rounded-xl transition-all hover:text-foreground hover:bg-white/5"
+              activeClassName="text-foreground bg-white/10"
             >
               {link.label}
             </NavLink>
@@ -68,14 +68,14 @@ export function Header() {
           <Button 
             variant="ghost" 
             size="sm" 
-            className="text-foreground/70 font-medium rounded-xl hover:text-foreground hover:bg-secondary"
+            className="text-foreground/60 font-medium rounded-xl hover:text-foreground hover:bg-white/5"
             asChild
           >
             <Link to="/auth">Sign in</Link>
           </Button>
           <Button 
             size="sm" 
-            className="gradient-blue text-primary-foreground font-semibold rounded-xl shadow-glow hover:shadow-lg hover:scale-[1.02] transition-all duration-300"
+            className="gradient-blue text-primary-foreground font-semibold rounded-xl glow-blue hover:scale-[1.02] transition-all duration-300"
             asChild
           >
             <Link to="/quiz" className="flex items-center gap-1.5">
@@ -89,7 +89,7 @@ export function Header() {
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden text-foreground rounded-xl"
+          className="md:hidden text-foreground rounded-xl hover:bg-white/5"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
         >
@@ -100,7 +100,7 @@ export function Header() {
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div 
-          className="fixed inset-0 top-16 z-40 bg-foreground/10 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 top-16 z-40 bg-background/60 backdrop-blur-sm md:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
@@ -116,17 +116,17 @@ export function Header() {
             <NavLink
               key={link.to}
               to={link.to}
-              className="px-4 py-3 text-sm font-medium text-foreground/70 rounded-xl transition-all hover:text-foreground hover:bg-secondary"
-              activeClassName="text-primary bg-primary/5 font-semibold"
+              className="px-4 py-3 text-sm font-medium text-foreground/60 rounded-xl transition-all hover:text-foreground hover:bg-white/5"
+              activeClassName="text-foreground bg-white/10"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {link.label}
             </NavLink>
           ))}
-          <div className="mt-6 pt-6 border-t border-border flex flex-col gap-3">
+          <div className="mt-6 pt-6 border-t border-white/10 flex flex-col gap-3">
             <Button 
               variant="outline" 
-              className="w-full rounded-xl font-medium"
+              className="w-full rounded-xl font-medium glass border-white/10 text-foreground"
               asChild
             >
               <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
@@ -134,7 +134,7 @@ export function Header() {
               </Link>
             </Button>
             <Button 
-              className="w-full gradient-blue text-primary-foreground font-semibold rounded-xl shadow-glow"
+              className="w-full gradient-blue text-primary-foreground font-semibold rounded-xl glow-blue"
               asChild
             >
               <Link to="/quiz" onClick={() => setIsMobileMenuOpen(false)}>

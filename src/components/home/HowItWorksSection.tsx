@@ -26,11 +26,15 @@ const steps = [
 export function HowItWorksSection() {
   return (
     <section className="py-16 md:py-24 relative overflow-hidden">
+      {/* Background glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-primary/15 rounded-full blur-[120px]" />
+      <div className="absolute bottom-0 right-[20%] w-64 h-64 bg-accent/15 rounded-full blur-[80px]" />
+
       <div className="container relative">
         {/* Section Header */}
         <div className="text-center mb-14">
-          <div className="inline-flex items-center gap-2 bg-accent/15 rounded-full px-4 py-1.5 mb-4">
-            <span className="text-xs font-semibold text-accent-foreground">How it works</span>
+          <div className="inline-flex items-center gap-2 glass-accent rounded-full px-4 py-1.5 mb-4">
+            <span className="text-xs font-semibold text-accent">How it works</span>
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">
             Three simple steps
@@ -44,18 +48,18 @@ export function HowItWorksSection() {
               {/* Connector */}
               {index < steps.length - 1 && (
                 <div className="hidden md:block absolute top-12 left-[calc(100%+0.25rem)] w-[calc(100%-3.5rem)] h-px">
-                  <div className="w-full h-full border-t-2 border-dashed border-primary/20" />
+                  <div className="w-full h-full border-t border-dashed border-white/15" />
                 </div>
               )}
               
-              <div className="glass rounded-2xl p-6 hover:shadow-glass-lg hover:-translate-y-1 transition-all duration-300 text-center">
+              <div className="glass-card rounded-2xl p-6 hover:glass-strong hover:-translate-y-1 transition-all duration-300 text-center">
                 {/* Step number */}
-                <div className="inline-flex items-center justify-center w-8 h-8 rounded-full gradient-orange text-accent-foreground text-sm font-bold mb-4 shadow-glow-orange">
+                <div className="inline-flex items-center justify-center w-8 h-8 rounded-full gradient-orange text-accent-foreground text-sm font-bold mb-4 glow-orange">
                   {step.number}
                 </div>
                 
                 {/* Icon */}
-                <div className="w-14 h-14 rounded-2xl gradient-blue flex items-center justify-center mx-auto mb-4 shadow-glow">
+                <div className="w-14 h-14 rounded-2xl gradient-blue flex items-center justify-center mx-auto mb-4 glow-blue">
                   <step.icon className="h-6 w-6 text-primary-foreground" />
                 </div>
                 
@@ -74,7 +78,7 @@ export function HowItWorksSection() {
         <div className="text-center">
           <Button 
             size="lg" 
-            className="gradient-orange text-accent-foreground font-semibold rounded-2xl shadow-glow-orange hover:shadow-lg hover:scale-[1.02] transition-all duration-300 px-10 py-6 text-base"
+            className="gradient-orange text-accent-foreground font-semibold rounded-2xl glow-orange hover:scale-[1.02] transition-all duration-300 px-10 py-6 text-base"
             asChild
           >
             <Link to="/quiz">
