@@ -1,14 +1,7 @@
 import { Link } from "react-router-dom";
 import { 
-  Dna, 
-  HeartPulse, 
-  GraduationCap, 
-  Utensils,
-  PawPrint,
-  Baby,
-  Leaf, 
-  Siren,
-  ArrowRight
+  Dna, HeartPulse, GraduationCap, Utensils,
+  PawPrint, Baby, Leaf, Siren, ArrowRight
 } from "lucide-react";
 
 const categories = [
@@ -24,48 +17,44 @@ const categories = [
 
 export function CategoriesSection() {
   return (
-    <section className="py-16 md:py-24 bg-secondary relative overflow-hidden">
-      {/* Zigzag top border */}
-      <div className="absolute top-0 left-0 right-0 h-4 zigzag-border" />
+    <section className="py-16 md:py-24 relative overflow-hidden">
+      {/* Background accent */}
+      <div className="absolute inset-0 bg-gradient-to-b from-secondary/50 to-background" />
       
       <div className="container relative">
-        {/* Section Header - Brutalist */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-10 gap-4">
           <div>
-            <div className="inline-block bg-accent border-3 border-foreground px-3 py-1 mb-4 -rotate-1 brutal-shadow-sm">
-              <span className="text-xs font-black uppercase">Categories</span>
+            <div className="inline-flex items-center gap-2 bg-primary/10 rounded-full px-4 py-1.5 mb-4">
+              <span className="text-xs font-semibold text-primary">Categories</span>
             </div>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground uppercase tracking-tight">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">
               Browse by cause
             </h2>
           </div>
           <Link 
             to="/charities" 
-            className="group inline-flex items-center text-sm font-black text-foreground uppercase hover:text-primary transition-colors"
+            className="group inline-flex items-center text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
           >
             View All
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="ml-1.5 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
-        {/* Brutalist grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {categories.map((category, index) => (
+          {categories.map((category) => (
             <Link
               key={category.slug}
               to={`/charities?category=${category.slug}`}
-              className="group relative bg-card border-3 border-foreground hover:bg-accent transition-all brutal-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none p-5"
-              style={{ transform: `rotate(${index % 2 === 0 ? '-1' : '1'}deg)` }}
+              className="group glass rounded-2xl p-5 hover:shadow-glass-lg hover:-translate-y-1 transition-all duration-300"
             >
-              {/* Icon box */}
-              <div className="w-12 h-12 bg-primary border-3 border-foreground flex items-center justify-center mb-4 group-hover:bg-foreground transition-colors">
+              <div className="w-12 h-12 rounded-xl gradient-blue flex items-center justify-center mb-4 shadow-glow group-hover:scale-105 transition-transform duration-300">
                 <category.icon className="h-5 w-5 text-primary-foreground" />
               </div>
               
-              <h3 className="font-black text-foreground text-sm uppercase group-hover:text-accent-foreground transition-colors">
+              <h3 className="font-semibold text-foreground text-sm mb-1">
                 {category.name}
               </h3>
-              <span className="text-xs font-bold text-muted-foreground mt-1 block group-hover:text-accent-foreground/80 transition-colors">
+              <span className="text-xs text-muted-foreground">
                 {category.count} charities
               </span>
             </Link>
