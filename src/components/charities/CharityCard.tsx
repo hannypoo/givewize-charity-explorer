@@ -28,14 +28,14 @@ function getScopeLabel(scope: string): string {
 export function CharityCard({ charity }: CharityCardProps) {
   return (
     <Link to={`/charities/${charity.id}`}>
-      <div className="group h-full glass rounded-2xl hover:shadow-glass-lg transition-all duration-300 p-5 relative overflow-hidden hover:-translate-y-1">
-        {/* Subtle gradient accent on hover */}
+      <div className="group h-full glass-card rounded-2xl hover:glass-strong transition-all duration-300 p-5 relative overflow-hidden hover:-translate-y-1">
+        {/* Hover glow */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
         
         <div className="relative">
           {/* Top row */}
           <div className="flex items-start justify-between mb-4">
-            <div className="w-12 h-12 rounded-xl gradient-blue flex items-center justify-center shadow-glow">
+            <div className="w-12 h-12 rounded-xl gradient-blue flex items-center justify-center glow-blue">
               {charity.logoUrl ? (
                 <img
                   src={charity.logoUrl}
@@ -47,7 +47,7 @@ export function CharityCard({ charity }: CharityCardProps) {
               )}
             </div>
             
-            <span className="text-xs font-semibold bg-accent/15 text-accent-foreground rounded-full px-3 py-1">
+            <span className="text-xs font-semibold bg-accent/20 text-accent rounded-full px-3 py-1">
               {getScopeLabel(charity.geographicScope)}
             </span>
           </div>
