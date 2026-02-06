@@ -1,126 +1,92 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Zap, Star, Eye } from "lucide-react";
+import { ArrowRight, Sparkles, Shield, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import givewizeIcon from "@/assets/givewize-icon.jpg";
 
 export function HeroSection() {
   return (
-    <section className="relative py-16 md:py-24 lg:py-32 overflow-hidden">
-      {/* Marquee stripe accent */}
-      <div className="absolute top-0 left-0 right-0 h-3 marquee-stripe" />
+    <section className="relative py-20 md:py-28 lg:py-36 overflow-hidden">
+      {/* Gradient background */}
+      <div className="absolute inset-0 gradient-hero" />
       
+      {/* Decorative blobs */}
+      <div className="absolute top-20 -left-32 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse-glow" />
+      <div className="absolute bottom-20 -right-32 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl" />
+
       <div className="container relative">
-        {/* Asymmetric layout */}
-        <div className="grid lg:grid-cols-12 gap-8 items-start">
-          {/* Main content - takes more space */}
-          <div className="lg:col-span-7 pt-8">
-            {/* Brutalist badge */}
-            <div className="inline-block bg-accent border-3 border-foreground px-4 py-2 brutal-shadow mb-8 -rotate-1">
-              <span className="text-sm font-black uppercase tracking-wider text-accent-foreground">
-                ★ 10,000+ Donors Trust Us ★
-              </span>
-            </div>
-
-            {/* MASSIVE headline */}
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground uppercase leading-[0.9] mb-6 tracking-tight">
-              Give
-              <span className="block text-primary">With</span>
-              <span className="block relative">
-                Purpose
-                <div className="absolute -bottom-2 left-0 w-full h-4 bg-accent -rotate-1" />
-              </span>
-            </h1>
-
-            {/* Subheadline in a box */}
-            <div className="bg-secondary border-3 border-foreground p-4 brutal-shadow max-w-md mb-8 rotate-1">
-              <p className="text-lg font-bold text-foreground">
-                Find vetted charities. Complete transparency. Zero BS.
-              </p>
-            </div>
-
-            {/* Brutalist CTAs */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-10">
-              <Button 
-                size="lg" 
-                className="group text-base px-8 py-6 bg-primary hover:bg-primary border-3 border-foreground text-primary-foreground font-black uppercase tracking-wide brutal-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
-                asChild
-              >
-                <Link to="/quiz">
-                  Find Your Cause
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="text-base px-8 py-6 bg-background border-3 border-foreground text-foreground font-black uppercase tracking-wide brutal-shadow hover:bg-accent hover:text-accent-foreground hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
-                asChild
-              >
-                <Link to="/charities">Explore</Link>
-              </Button>
-            </div>
-
-            {/* Raw stats */}
-            <div className="flex flex-wrap gap-4">
-              <div className="bg-foreground text-background px-4 py-2 border-3 border-foreground">
-                <span className="font-black text-xl">71</span>
-                <span className="text-sm ml-1">CHARITIES</span>
-              </div>
-              <div className="bg-accent text-accent-foreground px-4 py-2 border-3 border-foreground">
-                <span className="font-black text-xl">100%</span>
-                <span className="text-sm ml-1">VETTED</span>
-              </div>
-              <div className="bg-primary text-primary-foreground px-4 py-2 border-3 border-foreground">
-                <span className="font-black text-xl">A+</span>
-                <span className="text-sm ml-1">RATED</span>
-              </div>
-            </div>
+        <div className="max-w-3xl mx-auto text-center">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 glass rounded-full px-5 py-2 mb-8 glow-soft">
+            <Sparkles className="h-4 w-4 text-accent" />
+            <span className="text-sm font-semibold text-foreground/80">
+              Trusted by 10,000+ donors worldwide
+            </span>
           </div>
 
-          {/* Right side - Brutalist card stack */}
-          <div className="lg:col-span-5 hidden lg:block">
-            <div className="relative mt-12">
-              {/* Stacked cards effect */}
-              <div className="absolute top-4 left-4 w-full h-full bg-accent border-3 border-foreground" />
-              <div className="absolute top-2 left-2 w-full h-full bg-primary border-3 border-foreground" />
-              
-              {/* Main card */}
-              <div className="relative bg-card border-3 border-foreground p-8">
-                {/* Corner label */}
-                <div className="absolute -top-4 -right-4 bg-accent border-3 border-foreground px-3 py-1 rotate-6">
-                  <span className="text-xs font-black uppercase">Featured</span>
-                </div>
+          {/* Headline */}
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-tight mb-6 tracking-tight">
+            Give with
+            <span className="relative mx-3">
+              <span className="relative z-10 text-primary">confidence</span>
+              <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 200 12" fill="none">
+                <path d="M2 8C40 2 80 2 100 6C120 10 160 4 198 8" stroke="hsl(25, 95%, 60%)" strokeWidth="3" strokeLinecap="round" />
+              </svg>
+            </span>
+          </h1>
 
-                {/* Logo */}
-                <div className="w-32 h-32 mx-auto border-3 border-foreground p-2 mb-6 bg-background brutal-shadow">
-                  <img 
-                    src={givewizeIcon} 
-                    alt="GiveWiZe" 
-                    className="w-full h-full object-contain"
-                  />
-                </div>
+          <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto mb-10 leading-relaxed">
+            Discover vetted charities matched to your values. Transparent financials, real impact tracking, zero guesswork.
+          </p>
 
-                <h3 className="text-center font-black text-2xl uppercase mb-4">GiveWiZe</h3>
+          {/* CTAs */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-14">
+            <Button
+              size="lg"
+              className="text-base px-8 py-6 gradient-blue text-primary-foreground font-semibold rounded-2xl shadow-glow hover:shadow-lg hover:scale-[1.02] transition-all duration-300"
+              asChild
+            >
+              <Link to="/quiz">
+                Find Your Cause
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="text-base px-8 py-6 glass font-semibold rounded-2xl hover:bg-secondary transition-all duration-300"
+              asChild
+            >
+              <Link to="/charities">Explore Charities</Link>
+            </Button>
+          </div>
 
-                {/* Stats grid */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-secondary border-3 border-foreground p-3 text-center brutal-shadow-sm">
-                    <Zap className="h-5 w-5 mx-auto mb-1" />
-                    <div className="text-xs font-bold uppercase">AI Match</div>
-                  </div>
-                  <div className="bg-secondary border-3 border-foreground p-3 text-center brutal-shadow-sm">
-                    <Star className="h-5 w-5 mx-auto mb-1" />
-                    <div className="text-xs font-bold uppercase">Top Rated</div>
-                  </div>
-                  <div className="bg-secondary border-3 border-foreground p-3 text-center brutal-shadow-sm">
-                    <Eye className="h-5 w-5 mx-auto mb-1" />
-                    <div className="text-xs font-bold uppercase">Transparent</div>
-                  </div>
-                  <div className="bg-accent border-3 border-foreground p-3 text-center brutal-shadow-sm">
-                    <span className="text-lg font-black">71</span>
-                    <div className="text-xs font-bold uppercase">Causes</div>
-                  </div>
-                </div>
+          {/* Glass stat cards */}
+          <div className="flex flex-wrap justify-center gap-4">
+            <div className="glass rounded-2xl px-6 py-4 flex items-center gap-3 glow-soft">
+              <div className="w-10 h-10 rounded-xl gradient-blue flex items-center justify-center">
+                <Shield className="h-5 w-5 text-primary-foreground" />
+              </div>
+              <div className="text-left">
+                <div className="text-xl font-bold text-foreground">71</div>
+                <div className="text-xs text-muted-foreground">Vetted Charities</div>
+              </div>
+            </div>
+            <div className="glass rounded-2xl px-6 py-4 flex items-center gap-3 glow-soft">
+              <div className="w-10 h-10 rounded-xl gradient-orange flex items-center justify-center">
+                <TrendingUp className="h-5 w-5 text-accent-foreground" />
+              </div>
+              <div className="text-left">
+                <div className="text-xl font-bold text-foreground">100%</div>
+                <div className="text-xs text-muted-foreground">Transparent</div>
+              </div>
+            </div>
+            <div className="glass rounded-2xl px-6 py-4 flex items-center gap-3 glow-soft">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Sparkles className="h-5 w-5 text-primary" />
+              </div>
+              <div className="text-left">
+                <div className="text-xl font-bold text-foreground">A+</div>
+                <div className="text-xs text-muted-foreground">Top Rated</div>
               </div>
             </div>
           </div>
