@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export function HeroSection() {
   return (
-    <section className="relative py-20 md:py-28 lg:py-36 overflow-hidden bg-hero">
+    <section className="relative pt-28 md:pt-36 lg:pt-44 pb-20 md:pb-28 lg:pb-36 -mt-16 overflow-hidden bg-hero">
       {/* Soft light orbs for depth */}
       <div className="absolute top-10 left-[10%] w-80 h-80 bg-white/10 rounded-full blur-[100px]" />
       <div className="absolute bottom-10 right-[15%] w-72 h-72 bg-orange/15 rounded-full blur-[100px]" />
