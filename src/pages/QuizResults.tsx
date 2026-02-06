@@ -14,7 +14,7 @@ const mockMatchedCharities = [
     whyMatch: "Matches your interest in rare diseases and preference for established organizations with strong financial transparency.",
   },
   {
-    id: "2", 
+    id: "2",
     name: "Children's Health Initiative",
     category: "Child Welfare",
     matchPercent: 91,
@@ -50,71 +50,65 @@ const mockMatchedCharities = [
 const QuizResults = () => {
   return (
     <Layout>
-      <div className="bg-[#F8FAFC] min-h-[calc(100vh-4rem)]">
+      <div className="bg-secondary min-h-[calc(100vh-4rem)]">
         <div className="container max-w-3xl py-10 md:py-14">
           {/* Header */}
           <div className="text-center mb-10">
-            <h1 className="font-display text-3xl md:text-4xl font-bold text-[#1a365d] mb-3">
+            <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">
               Your Top Charity Matches
             </h1>
-            <p className="text-lg text-[#6B7280]">
+            <p className="text-lg text-muted-foreground">
               Based on your quiz responses, here are charities that align with your values.
             </p>
           </div>
 
           {/* Matched Charity Cards */}
           <div className="space-y-5 mb-10">
-            {mockMatchedCharities.map((charity, index) => (
+            {mockMatchedCharities.map((charity) => (
               <div
                 key={charity.id}
-                className="bg-white rounded-xl p-5 md:p-6 shadow-sm border border-gray-100"
+                className="bg-card rounded-xl p-5 md:p-6 shadow-soft border border-border"
               >
                 <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-                  {/* Logo Placeholder */}
-                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-[#F1F5F9]">
-                    <Building2 className="h-8 w-8 text-[#9CA3AF]" />
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-muted">
+                    <Building2 className="h-8 w-8 text-muted-foreground" />
                   </div>
 
-                  {/* Content */}
                   <div className="flex-1 min-w-0">
-                    {/* Top row: Name + Match Badge */}
                     <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
                       <div>
-                        <h3 className="font-semibold text-lg text-[#1a365d]">
+                        <h3 className="font-semibold text-lg text-foreground">
                           {charity.name}
                         </h3>
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#4A90D9]/10 text-[#4A90D9]">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
                           {charity.category}
                         </span>
                       </div>
-                      <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#22C55E]/10">
-                        <span className="text-lg font-bold text-[#22C55E]">
+                      <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-success/10">
+                        <span className="text-lg font-bold text-success">
                           {charity.matchPercent}%
                         </span>
-                        <span className="text-xs text-[#22C55E] font-medium">match</span>
+                        <span className="text-xs text-success font-medium">match</span>
                       </div>
                     </div>
 
-                    {/* Mission */}
-                    <p className="text-sm text-[#6B7280] mb-3 line-clamp-2">
+                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
                       {charity.mission}
                     </p>
 
-                    {/* Why This Match */}
-                    <div className="bg-[#F8FAFC] rounded-lg p-3 mb-4">
-                      <p className="text-xs text-[#9CA3AF] uppercase tracking-wide font-medium mb-1">
+                    <div className="bg-secondary rounded-lg p-3 mb-4">
+                      <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium mb-1">
                         Why this match
                       </p>
-                      <p className="text-sm text-[#6B7280]">
+                      <p className="text-sm text-muted-foreground">
                         {charity.whyMatch}
                       </p>
                     </div>
 
-                    {/* View Profile Button */}
                     <Button
                       variant="outline"
                       size="sm"
-                      className="border-[#4A90D9] text-[#4A90D9] hover:bg-[#4A90D9]/5"
+                      className="border-primary text-primary hover:bg-primary/5"
                       asChild
                     >
                       <Link to={`/charities/${charity.id}`}>
@@ -132,7 +126,7 @@ const QuizResults = () => {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button
               size="lg"
-              className="bg-[#4A90D9] hover:bg-[#3d7fc4] text-white px-8"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-8"
               asChild
             >
               <Link to="/charities">
@@ -143,7 +137,7 @@ const QuizResults = () => {
             <Button
               variant="outline"
               size="lg"
-              className="border-gray-300 text-[#6B7280] hover:text-[#1F2937] hover:border-gray-400"
+              className="border-border text-muted-foreground hover:text-foreground hover:border-foreground/20"
               asChild
             >
               <Link to="/quiz/start">

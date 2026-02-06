@@ -39,13 +39,10 @@ const categoryLabels: Record<string, string> = {
   "international-development": "International Development",
 };
 
-// Load charities from static JSON
 const staticCharities = getTransformedCharities();
 
 const Charities = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  
-  // Get initial values from URL params
   const initialCategory = searchParams.get("category") || "all";
   
   const [searchQuery, setSearchQuery] = useState("");
@@ -54,7 +51,6 @@ const Charities = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
-  // Transform and filter charities from static data
   const filteredCharities = useMemo(() => {
     return staticCharities
       .map((charity, index) => ({
@@ -71,25 +67,20 @@ const Charities = () => {
           searchQuery === "" ||
           charity.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           charity.mission.toLowerCase().includes(searchQuery.toLowerCase());
-
         const matchesCategory =
           selectedCategory === "all" || charity.category === selectedCategory;
-
         const matchesScope =
           selectedScopes.length === 0 || selectedScopes.includes(charity.geographicScope);
-
         return matchesSearch && matchesCategory && matchesScope;
       });
   }, [searchQuery, selectedCategory, selectedScopes]);
 
-  // Paginate results
   const totalPages = Math.ceil(filteredCharities.length / ITEMS_PER_PAGE);
   const paginatedCharities = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
     return filteredCharities.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredCharities, currentPage]);
 
-  // Reset to page 1 when filters change
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
     setCurrentPage(1);
@@ -98,7 +89,6 @@ const Charities = () => {
   const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);
     setCurrentPage(1);
-    // Update URL params
     if (value === "all") {
       searchParams.delete("category");
     } else {
@@ -109,9 +99,7 @@ const Charities = () => {
 
   const handleScopeToggle = (value: string) => {
     setSelectedScopes((prev) =>
-      prev.includes(value)
-        ? prev.filter((s) => s !== value)
-        : [...prev, value]
+      prev.includes(value) ? prev.filter((s) => s !== value) : [...prev, value]
     );
     setCurrentPage(1);
   };
@@ -143,24 +131,24 @@ const Charities = () => {
   return (
     <Layout>
       {/* Page Header */}
-      <div className="bg-white border-b border-gray-100 py-10 md:py-14">
+      <div className="bg-card border-b border-border py-10 md:py-14">
         <div className="container">
-          <h1 className="font-display text-3xl font-bold text-[#1a365d] md:text-4xl">
+          <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl">
             Explore Charities
           </h1>
-          <p className="mt-2 text-[#6B7280]">
+          <p className="mt-2 text-muted-foreground">
             Discover vetted organizations making a real impact
           </p>
         </div>
       </div>
 
-      <div className="bg-[#F8FAFC] min-h-screen">
+      <div className="bg-secondary min-h-screen">
         <div className="container py-8">
           <div className="flex gap-8">
             {/* Desktop Sidebar */}
             <aside className="hidden lg:block w-64 shrink-0">
-              <div className="sticky top-24 rounded-xl bg-white p-6 shadow-sm">
-                <h2 className="font-semibold text-[#1a365d] mb-6">Filters</h2>
+              <div className="sticky top-24 rounded-xl bg-card p-6 shadow-soft">
+                <h2 className="font-semibold text-foreground mb-6">Filters</h2>
                 {FiltersContent}
               </div>
             </aside>
@@ -169,24 +157,24 @@ const Charities = () => {
             <main className="flex-1 min-w-0">
               {/* Mobile Filter Button */}
               <div className="lg:hidden mb-6 flex items-center justify-between">
-                <p className="text-sm text-[#6B7280]">
+                <p className="text-sm text-muted-foreground">
                   {filteredCharities.length} charities found
                 </p>
                 <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
                   <SheetTrigger asChild>
-                    <Button variant="outline" size="sm" className="border-gray-200">
+                    <Button variant="outline" size="sm" className="border-border">
                       <Filter className="mr-2 h-4 w-4" />
                       Filters
                       {hasActiveFilters && (
-                        <span className="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#4A90D9] text-xs text-white">
+                        <span className="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
                           !
                         </span>
                       )}
                     </Button>
                   </SheetTrigger>
-                  <SheetContent side="left" className="w-80 bg-white">
+                  <SheetContent side="left" className="w-80 bg-card">
                     <SheetHeader>
-                      <SheetTitle className="text-[#1a365d]">Filters</SheetTitle>
+                      <SheetTitle className="text-foreground">Filters</SheetTitle>
                     </SheetHeader>
                     <div className="mt-6">{FiltersContent}</div>
                   </SheetContent>
@@ -195,15 +183,13 @@ const Charities = () => {
 
               {/* Results count (desktop) */}
               <div className="hidden lg:block mb-6">
-                <p className="text-sm text-[#6B7280]">
+                <p className="text-sm text-muted-foreground">
                   Showing {paginatedCharities.length} of {filteredCharities.length} charities
                 </p>
               </div>
 
-              {/* Charity Grid */}
               <CharityGrid charities={paginatedCharities} />
 
-              {/* Pagination */}
               {totalPages > 1 && (
                 <div className="mt-8">
                   <Pagination>
