@@ -17,14 +17,11 @@ const categories = [
 
 export function CategoriesSection() {
   return (
-    <section className="py-16 md:py-24 relative overflow-hidden">
-      {/* Mesh gradient background */}
-      <div className="absolute inset-0 mesh-gradient-alt" />
-      
+    <section className="py-16 md:py-24 relative overflow-hidden section-gradient-blue">
       <div className="container relative">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-10 gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 glass-accent rounded-full px-4 py-1.5 mb-4">
+            <div className="inline-flex items-center gap-2 glass rounded-full px-4 py-1.5 mb-4">
               <span className="text-xs font-semibold text-primary">Categories</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">
@@ -45,7 +42,7 @@ export function CategoriesSection() {
             <Link
               key={category.slug}
               to={`/charities?category=${category.slug}`}
-              className="group glass-card rounded-2xl p-5 hover:glass-strong hover:-translate-y-1 transition-all duration-300"
+              className="group glass rounded-2xl p-5 hover:glass-strong hover:-translate-y-1 transition-all duration-300"
             >
               <div className="w-12 h-12 rounded-xl gradient-blue flex items-center justify-center mb-4 glow-blue group-hover:scale-105 transition-transform duration-300">
                 <category.icon className="h-5 w-5 text-primary-foreground" />

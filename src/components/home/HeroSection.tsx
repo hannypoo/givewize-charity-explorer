@@ -4,21 +4,18 @@ import { Button } from "@/components/ui/button";
 
 export function HeroSection() {
   return (
-    <section className="relative py-20 md:py-28 lg:py-36 overflow-hidden">
-      {/* Mesh gradient background */}
-      <div className="absolute inset-0 mesh-gradient" />
-      
-      {/* Animated orbs */}
-      <div className="absolute top-10 left-[10%] w-72 h-72 bg-primary/30 rounded-full blur-[100px] animate-pulse-glow" />
-      <div className="absolute bottom-10 right-[10%] w-80 h-80 bg-accent/25 rounded-full blur-[100px] animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
-      <div className="absolute top-1/2 left-1/3 w-96 h-96 bg-blue-glow/15 rounded-full blur-[120px]" />
+    <section className="relative py-20 md:py-28 lg:py-36 overflow-hidden section-gradient-warm">
+      {/* Soft decorative orbs */}
+      <div className="absolute top-10 left-[15%] w-80 h-80 bg-primary/10 rounded-full blur-[100px]" />
+      <div className="absolute bottom-10 right-[10%] w-72 h-72 bg-accent/12 rounded-full blur-[100px]" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-glow/5 rounded-full blur-[120px]" />
 
       <div className="container relative">
         <div className="max-w-3xl mx-auto text-center">
           {/* Glass badge */}
-          <div className="inline-flex items-center gap-2 glass-accent rounded-full px-5 py-2.5 mb-8">
+          <div className="inline-flex items-center gap-2 glass rounded-full px-5 py-2.5 mb-8">
             <Sparkles className="h-4 w-4 text-accent" />
-            <span className="text-sm font-medium text-foreground/80">
+            <span className="text-sm font-medium text-foreground/70">
               Trusted by 10,000+ donors worldwide
             </span>
           </div>
@@ -27,9 +24,9 @@ export function HeroSection() {
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-tight mb-6 tracking-tight">
             Give with
             <span className="relative mx-3">
-              <span className="relative z-10 bg-gradient-to-r from-primary to-blue-glow bg-clip-text text-transparent">confidence</span>
+              <span className="relative z-10 bg-gradient-to-r from-primary to-blue-light bg-clip-text text-transparent">confidence</span>
               <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 200 12" fill="none">
-                <path d="M2 8C40 2 80 2 100 6C120 10 160 4 198 8" stroke="hsl(25, 95%, 60%)" strokeWidth="3" strokeLinecap="round" />
+                <path d="M2 8C40 2 80 2 100 6C120 10 160 4 198 8" stroke="hsl(25, 95%, 58%)" strokeWidth="3" strokeLinecap="round" />
               </svg>
             </span>
           </h1>
@@ -53,7 +50,7 @@ export function HeroSection() {
             <Button
               size="lg"
               variant="outline"
-              className="text-base px-8 py-6 glass-accent font-semibold rounded-2xl text-foreground hover:bg-white/10 transition-all duration-300 border-white/10"
+              className="text-base px-8 py-6 glass font-semibold rounded-2xl text-foreground hover:shadow-lg transition-all duration-300"
               asChild
             >
               <Link to="/charities">Explore Charities</Link>
@@ -81,7 +78,7 @@ export function HeroSection() {
               </div>
             </div>
             <div className="glass-strong rounded-2xl px-6 py-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Sparkles className="h-5 w-5 text-primary" />
               </div>
               <div className="text-left">
