@@ -2,128 +2,128 @@
 @tailwind components;
 @tailwind utilities;
 
-/* GiveWiZe Design System - Rich Blue + Warm Orange, Glassmorphism
-   Frosted glass over vibrant gradient backgrounds
+/* GiveWiZe Design System - Rich Blue + Warm Orange, Glassmorphism (Light & Warm)
+   Warm bright backgrounds with frosted glass cards over colorful gradient sections
 */
 
 @layer base {
   :root {
-    --background: 225 25% 12%;
-    --foreground: 210 20% 95%;
+    /* Warm cream background */
+    --background: 35 40% 98%;
+    --foreground: 220 30% 15%;
 
-    --card: 225 25% 15%;
-    --card-foreground: 210 20% 95%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 30% 15%;
 
-    --popover: 225 25% 15%;
-    --popover-foreground: 210 20% 95%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 30% 15%;
 
     /* Rich blue primary */
-    --primary: 220 70% 55%;
+    --primary: 220 72% 50%;
     --primary-foreground: 0 0% 100%;
 
-    /* Muted blue */
-    --secondary: 225 20% 20%;
-    --secondary-foreground: 210 20% 85%;
+    /* Light warm tint */
+    --secondary: 30 30% 95%;
+    --secondary-foreground: 220 50% 35%;
 
-    /* Dark muted */
-    --muted: 225 15% 18%;
-    --muted-foreground: 220 15% 60%;
+    /* Warm muted */
+    --muted: 30 15% 92%;
+    --muted-foreground: 220 12% 45%;
 
     /* Warm orange accent */
-    --accent: 25 95% 60%;
+    --accent: 25 95% 58%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 80% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Subtle borders for glass */
-    --border: 220 20% 25%;
-    --input: 225 15% 22%;
-    --ring: 220 70% 55%;
+    /* Soft borders */
+    --border: 220 15% 88%;
+    --input: 220 12% 90%;
+    --ring: 220 72% 50%;
 
     --radius: 16px;
 
     /* Sidebar */
-    --sidebar-background: 225 30% 10%;
+    --sidebar-background: 220 35% 14%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 25 95% 60%;
+    --sidebar-primary: 25 95% 58%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 225 25% 16%;
+    --sidebar-accent: 220 30% 20%;
     --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 225 20% 18%;
-    --sidebar-ring: 25 95% 60%;
+    --sidebar-border: 220 25% 22%;
+    --sidebar-ring: 25 95% 58%;
 
     /* Semantic */
-    --success: 155 55% 45%;
+    --success: 155 55% 40%;
     --success-foreground: 0 0% 100%;
     --warning: 40 95% 55%;
-    --warning-foreground: 225 25% 12%;
+    --warning-foreground: 220 30% 15%;
     --error: 0 80% 55%;
     --error-foreground: 0 0% 100%;
 
     /* Custom tokens */
-    --blue-deep: 220 70% 55%;
-    --blue-light: 215 80% 65%;
-    --blue-glow: 220 90% 70%;
-    --orange: 25 95% 60%;
-    --orange-light: 28 90% 72%;
-    --orange-dark: 22 95% 48%;
-    --peach: 20 80% 92%;
+    --blue-deep: 220 72% 50%;
+    --blue-light: 215 80% 62%;
+    --blue-glow: 220 90% 68%;
+    --orange: 25 95% 58%;
+    --orange-light: 28 90% 70%;
+    --orange-dark: 22 95% 46%;
+    --peach: 25 60% 93%;
   }
 
   .dark {
-    /* Same as root since this is a dark-first glassmorphism design */
-    --background: 225 25% 8%;
+    --background: 220 30% 8%;
     --foreground: 210 20% 95%;
 
-    --card: 225 25% 12%;
+    --card: 220 28% 12%;
     --card-foreground: 210 20% 95%;
 
-    --popover: 225 25% 12%;
+    --popover: 220 28% 12%;
     --popover-foreground: 210 20% 95%;
 
-    --primary: 215 75% 60%;
+    --primary: 215 75% 58%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 225 20% 16%;
-    --secondary-foreground: 215 60% 70%;
+    --secondary: 220 22% 16%;
+    --secondary-foreground: 215 55% 70%;
 
-    --muted: 225 18% 14%;
-    --muted-foreground: 220 15% 55%;
+    --muted: 220 18% 14%;
+    --muted-foreground: 220 12% 55%;
 
-    --accent: 25 90% 58%;
+    --accent: 25 90% 56%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 75% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 20% 20%;
-    --input: 225 20% 18%;
-    --ring: 215 75% 60%;
+    --border: 220 18% 22%;
+    --input: 220 18% 18%;
+    --ring: 215 75% 58%;
 
-    --sidebar-background: 225 35% 6%;
+    --sidebar-background: 220 35% 6%;
     --sidebar-foreground: 210 20% 95%;
-    --sidebar-primary: 25 90% 58%;
+    --sidebar-primary: 25 90% 56%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 225 28% 12%;
+    --sidebar-accent: 220 28% 12%;
     --sidebar-accent-foreground: 210 20% 95%;
-    --sidebar-border: 225 22% 14%;
-    --sidebar-ring: 25 90% 58%;
+    --sidebar-border: 220 22% 14%;
+    --sidebar-ring: 25 90% 56%;
 
     --success: 155 50% 45%;
     --success-foreground: 0 0% 100%;
     --warning: 40 90% 55%;
-    --warning-foreground: 225 25% 8%;
+    --warning-foreground: 220 30% 8%;
     --error: 0 75% 55%;
     --error-foreground: 0 0% 100%;
 
-    --blue-deep: 215 75% 60%;
-    --blue-light: 215 70% 70%;
-    --blue-glow: 215 85% 75%;
-    --orange: 25 90% 58%;
-    --orange-light: 28 85% 68%;
-    --orange-dark: 22 90% 45%;
-    --peach: 20 30% 18%;
+    --blue-deep: 215 75% 58%;
+    --blue-light: 215 70% 68%;
+    --blue-glow: 215 85% 72%;
+    --orange: 25 90% 56%;
+    --orange-light: 28 85% 66%;
+    --orange-dark: 22 90% 44%;
+    --peach: 25 30% 18%;
   }
 }
 
@@ -137,46 +137,49 @@
   }
 }
 
-/* Glassmorphism utilities */
+/* Glassmorphism utilities — light mode */
 @layer utilities {
   .glass {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.55);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.06);
   }
 
   .glass-strong {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(40px);
     -webkit-backdrop-filter: blur(40px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.08);
   }
 
   .glass-card {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.05);
   }
 
   .glass-accent {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.5);
   }
 
   .glow-blue {
-    box-shadow: 0 0 60px -15px hsl(var(--blue-glow) / 0.5);
+    box-shadow: 0 4px 30px -6px hsl(var(--blue-glow) / 0.4);
   }
 
   .glow-orange {
-    box-shadow: 0 0 60px -15px hsl(var(--orange) / 0.5);
+    box-shadow: 0 4px 30px -6px hsl(var(--orange) / 0.4);
   }
 
   .glow-soft {
-    box-shadow: 0 8px 32px -8px hsl(var(--primary) / 0.2);
+    box-shadow: 0 4px 24px -6px hsl(var(--primary) / 0.15);
   }
 
   .gradient-blue {
@@ -187,17 +190,26 @@
     background: linear-gradient(135deg, hsl(var(--orange)), hsl(var(--orange-light)));
   }
 
-  .mesh-gradient {
+  /* Warm colorful section backgrounds that make glass visible */
+  .section-gradient-warm {
     background: 
-      radial-gradient(ellipse at 20% 50%, hsl(var(--blue-deep) / 0.4) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 20%, hsl(var(--orange) / 0.25) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 80%, hsl(var(--blue-light) / 0.3) 0%, transparent 50%);
+      radial-gradient(ellipse at 20% 0%, hsl(var(--blue-deep) / 0.12) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 100%, hsl(var(--orange) / 0.1) 0%, transparent 60%),
+      hsl(var(--background));
   }
 
-  .mesh-gradient-alt {
+  .section-gradient-blue {
     background: 
-      radial-gradient(ellipse at 70% 30%, hsl(var(--orange) / 0.3) 0%, transparent 50%),
-      radial-gradient(ellipse at 30% 70%, hsl(var(--blue-deep) / 0.35) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 50%, hsl(var(--blue-light) / 0.15) 0%, transparent 60%);
+      radial-gradient(ellipse at 30% 50%, hsl(var(--blue-deep) / 0.1) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 20%, hsl(var(--blue-light) / 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 90% 80%, hsl(var(--orange) / 0.06) 0%, transparent 50%),
+      hsl(var(--peach) / 0.3);
+  }
+
+  .section-gradient-peach {
+    background: 
+      radial-gradient(ellipse at 60% 30%, hsl(var(--orange) / 0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 20% 70%, hsl(var(--blue-deep) / 0.08) 0%, transparent 50%),
+      hsl(var(--peach) / 0.5);
   }
 }

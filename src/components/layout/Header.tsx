@@ -29,7 +29,7 @@ export function Header() {
       <div 
         className={`absolute inset-0 transition-all duration-300 ${
           isScrolled 
-            ? "glass-strong shadow-glass" 
+            ? "glass-strong" 
             : "bg-transparent"
         }`} 
       />
@@ -55,8 +55,8 @@ export function Header() {
             <NavLink
               key={link.to}
               to={link.to}
-              className="px-4 py-2 text-sm font-medium text-foreground/60 rounded-xl transition-all hover:text-foreground hover:bg-white/5"
-              activeClassName="text-foreground bg-white/10"
+              className="px-4 py-2 text-sm font-medium text-foreground/60 rounded-xl transition-all hover:text-foreground hover:bg-foreground/5"
+              activeClassName="text-primary bg-primary/5 font-semibold"
             >
               {link.label}
             </NavLink>
@@ -68,7 +68,7 @@ export function Header() {
           <Button 
             variant="ghost" 
             size="sm" 
-            className="text-foreground/60 font-medium rounded-xl hover:text-foreground hover:bg-white/5"
+            className="text-foreground/60 font-medium rounded-xl hover:text-foreground hover:bg-foreground/5"
             asChild
           >
             <Link to="/auth">Sign in</Link>
@@ -89,7 +89,7 @@ export function Header() {
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden text-foreground rounded-xl hover:bg-white/5"
+          className="md:hidden text-foreground rounded-xl"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
         >
@@ -100,14 +100,14 @@ export function Header() {
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div 
-          className="fixed inset-0 top-16 z-40 bg-background/60 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 top-16 z-40 bg-foreground/10 backdrop-blur-sm md:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
 
       {/* Mobile Menu */}
       <div
-        className={`fixed top-16 right-0 z-50 h-[calc(100vh-4rem)] w-72 glass-strong shadow-glass-lg transform transition-transform duration-300 ease-out md:hidden ${
+        className={`fixed top-16 right-0 z-50 h-[calc(100vh-4rem)] w-72 glass-strong transform transition-transform duration-300 ease-out md:hidden ${
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -116,17 +116,17 @@ export function Header() {
             <NavLink
               key={link.to}
               to={link.to}
-              className="px-4 py-3 text-sm font-medium text-foreground/60 rounded-xl transition-all hover:text-foreground hover:bg-white/5"
-              activeClassName="text-foreground bg-white/10"
+              className="px-4 py-3 text-sm font-medium text-foreground/60 rounded-xl transition-all hover:text-foreground hover:bg-foreground/5"
+              activeClassName="text-primary bg-primary/5 font-semibold"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {link.label}
             </NavLink>
           ))}
-          <div className="mt-6 pt-6 border-t border-white/10 flex flex-col gap-3">
+          <div className="mt-6 pt-6 border-t border-border flex flex-col gap-3">
             <Button 
               variant="outline" 
-              className="w-full rounded-xl font-medium glass border-white/10 text-foreground"
+              className="w-full rounded-xl font-medium"
               asChild
             >
               <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
