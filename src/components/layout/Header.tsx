@@ -43,7 +43,7 @@ export function Header() {
             />
           </div>
           <span className={`font-bold text-xl tracking-tight transition-colors duration-300 ${isScrolled ? "text-foreground" : "text-white"}`}>
-            GiveWiZe
+            GiveWi<span className="text-primary">Z</span>e
           </span>
         </Link>
 
