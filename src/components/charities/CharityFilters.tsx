@@ -63,32 +63,32 @@ export function CharityFilters({
     <div className="space-y-6">
       {/* Search */}
       <div className="space-y-2">
-        <Label htmlFor="search" className="text-[#1F2937] font-medium">Search</Label>
+        <Label htmlFor="search" className="text-foreground font-medium">Search</Label>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9CA3AF]" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             id="search"
             placeholder="Search charities..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-9 bg-white border-gray-200 focus:border-[#4A90D9] focus:ring-[#4A90D9]"
+            className="pl-9 bg-card border-border focus:border-primary focus:ring-primary"
           />
         </div>
       </div>
 
       {/* Category Filter */}
       <div className="space-y-2">
-        <Label className="text-[#1F2937] font-medium">Category</Label>
+        <Label className="text-foreground font-medium">Category</Label>
         <Select value={selectedCategory} onValueChange={onCategoryChange}>
-          <SelectTrigger className="w-full bg-white border-gray-200">
+          <SelectTrigger className="w-full bg-card border-border">
             <SelectValue placeholder="Select category" />
           </SelectTrigger>
-          <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
+          <SelectContent className="bg-card border border-border shadow-lg z-50">
             {categories.map((category) => (
               <SelectItem 
                 key={category.value} 
                 value={category.value}
-                className="hover:bg-[#F8FAFC]"
+                className="hover:bg-secondary"
               >
                 {category.label}
               </SelectItem>
@@ -97,9 +97,9 @@ export function CharityFilters({
         </Select>
       </div>
 
-      {/* Geographic Scope Filter - Checkboxes */}
+      {/* Geographic Scope Filter */}
       <div className="space-y-3">
-        <Label className="text-[#1F2937] font-medium">Geographic Scope</Label>
+        <Label className="text-foreground font-medium">Geographic Scope</Label>
         <div className="space-y-2">
           {geographicScopes.map((scope) => (
             <div key={scope.value} className="flex items-center space-x-2">
@@ -107,11 +107,11 @@ export function CharityFilters({
                 id={`scope-${scope.value}`}
                 checked={selectedScopes.includes(scope.value)}
                 onCheckedChange={() => onScopeToggle(scope.value)}
-                className="border-gray-300 data-[state=checked]:bg-[#4A90D9] data-[state=checked]:border-[#4A90D9]"
+                className="border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary"
               />
               <label
                 htmlFor={`scope-${scope.value}`}
-                className="text-sm text-[#6B7280] cursor-pointer"
+                className="text-sm text-muted-foreground cursor-pointer"
               >
                 {scope.label}
               </label>
@@ -124,7 +124,7 @@ export function CharityFilters({
       {hasActiveFilters && (
         <button
           onClick={onClearFilters}
-          className="text-sm text-[#4A90D9] hover:underline font-medium"
+          className="text-sm text-primary hover:underline font-medium"
         >
           Clear all filters
         </button>
