@@ -142,7 +142,7 @@ const Charities = () => {
         </div>
       </div>
 
-      <div className="bg-blue-deep min-h-screen">
+      <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, hsl(28, 80%, 62%) 0%, hsl(220, 72%, 50%) 15%, hsl(220, 72%, 50%) 100%)' }}>
         <div className="container py-8">
           <div className="flex gap-8">
             {/* Desktop Sidebar */}
