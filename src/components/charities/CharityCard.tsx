@@ -28,12 +28,12 @@ function getScopeLabel(scope: string): string {
 export function CharityCard({ charity }: CharityCardProps) {
   return (
     <Link to={`/charities/${charity.id}`}>
-      <div className="group h-full glass rounded-2xl hover:glass-strong transition-all duration-300 p-5 relative overflow-hidden hover:-translate-y-1">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/3 to-accent/3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
+      <div className="group h-full rounded-2xl transition-all duration-300 p-5 relative overflow-hidden hover:-translate-y-1 bg-white/15 backdrop-blur-xl border border-white/20 hover:bg-white/25">
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
         
         <div className="relative">
           <div className="flex items-start justify-between mb-4">
-            <div className="w-12 h-12 rounded-xl gradient-blue flex items-center justify-center glow-blue">
+            <div className="w-12 h-12 rounded-xl bg-white/20 border border-white/20 flex items-center justify-center">
               {charity.logoUrl ? (
                 <img
                   src={charity.logoUrl}
@@ -50,19 +50,19 @@ export function CharityCard({ charity }: CharityCardProps) {
             </span>
           </div>
 
-          <h3 className="font-bold text-foreground line-clamp-1 mb-1">
+          <h3 className="font-bold text-white line-clamp-1 mb-1">
             {charity.name}
           </h3>
 
-          <span className="text-xs font-semibold text-primary">
+          <span className="text-xs font-semibold text-orange-light">
             {charity.categoryLabel}
           </span>
 
-          <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed mt-3">
+          <p className="text-sm text-white/70 line-clamp-2 leading-relaxed mt-3">
             {charity.mission}
           </p>
 
-          <div className="mt-4 flex items-center text-sm font-semibold text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="mt-4 flex items-center text-sm font-semibold text-orange-light opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <span>Learn more →</span>
           </div>
         </div>
