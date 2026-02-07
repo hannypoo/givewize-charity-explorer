@@ -49,7 +49,7 @@ export function HeroSection() {
             <Button
               size="lg"
               variant="outline"
-              className="text-base px-8 py-6 glass-dark font-semibold rounded-2xl text-white hover:bg-white/15 transition-all duration-300 border-white/20"
+              className="text-base px-8 py-6 gradient-orange font-semibold rounded-2xl text-accent-foreground hover:scale-[1.02] transition-all duration-300 glow-orange"
               asChild
             >
               <Link to="/auth">Sign Up</Link>
