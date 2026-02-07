@@ -33,12 +33,12 @@ export function CharityCard({ charity }: CharityCardProps) {
         
         <div className="relative">
           <div className="flex items-start justify-between mb-4">
-            <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center">
+            <div className="w-14 h-14 rounded-xl bg-white flex items-center justify-center">
               {charity.logoUrl ? (
                 <img
                   src={charity.logoUrl}
                   alt={`${charity.name} logo`}
-                  className="h-8 w-8 object-contain rounded-lg"
+                  className="h-10 w-10 object-contain rounded-lg"
                 />
               ) : (
                 <Building2 className="h-5 w-5 text-primary-foreground" />
