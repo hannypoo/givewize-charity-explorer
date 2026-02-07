@@ -131,18 +131,17 @@ const Charities = () => {
   return (
     <Layout>
       {/* Page Header */}
-      <div className="gradient-orange pt-24 pb-10 md:pb-14 -mt-16">
-        <div className="container">
-          <h1 className="font-display text-3xl font-bold text-accent-foreground md:text-4xl">
-            Explore Charities
-          </h1>
-          <p className="mt-2 text-accent-foreground/80">
-            Discover vetted organizations making a real impact
-          </p>
+      <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, hsl(28, 80%, 62%) 0%, hsl(28, 70%, 58%) 10%, hsl(30, 50%, 52%) 20%, hsl(25, 35%, 46%) 30%, hsl(220, 40%, 42%) 42%, hsl(220, 72%, 50%) 55%, hsl(220, 72%, 50%) 100%)' }}>
+        <div className="pt-24 pb-10 md:pb-14 -mt-16">
+          <div className="container">
+            <h1 className="font-display text-3xl font-bold text-accent-foreground md:text-4xl">
+              Explore Charities
+            </h1>
+            <p className="mt-2 text-accent-foreground/80">
+              Discover vetted organizations making a real impact
+            </p>
+          </div>
         </div>
-      </div>
-
-      <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, hsl(28, 80%, 62%) 0%, hsl(27, 60%, 55%) 8%, hsl(240, 30%, 50%) 25%, hsl(220, 72%, 50%) 40%, hsl(220, 72%, 50%) 100%)' }}>
         <div className="container py-8">
           <div className="flex gap-8">
             {/* Desktop Sidebar */}
