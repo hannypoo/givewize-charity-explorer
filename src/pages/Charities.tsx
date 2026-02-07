@@ -131,18 +131,18 @@ const Charities = () => {
   return (
     <Layout>
       {/* Page Header */}
-      <div className="bg-card border-b border-border py-10 md:py-14">
+      <div className="gradient-orange py-10 md:py-14">
         <div className="container">
-          <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl">
+          <h1 className="font-display text-3xl font-bold text-accent-foreground md:text-4xl">
             Explore Charities
           </h1>
-          <p className="mt-2 text-muted-foreground">
+          <p className="mt-2 text-accent-foreground/80">
             Discover vetted organizations making a real impact
           </p>
         </div>
       </div>
 
-      <div className="bg-secondary min-h-screen">
+      <div className="bg-blue-deep min-h-screen">
         <div className="container py-8">
           <div className="flex gap-8">
             {/* Desktop Sidebar */}
@@ -157,7 +157,7 @@ const Charities = () => {
             <main className="flex-1 min-w-0">
               {/* Mobile Filter Button */}
               <div className="lg:hidden mb-6 flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-white/70">
                   {filteredCharities.length} charities found
                 </p>
                 <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
@@ -183,7 +183,7 @@ const Charities = () => {
 
               {/* Results count (desktop) */}
               <div className="hidden lg:block mb-6">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-white/70">
                   Showing {paginatedCharities.length} of {filteredCharities.length} charities
                 </p>
               </div>
