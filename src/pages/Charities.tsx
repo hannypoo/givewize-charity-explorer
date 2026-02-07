@@ -131,7 +131,7 @@ const Charities = () => {
   return (
     <Layout>
       {/* Page Header */}
-      <div className="gradient-orange py-10 md:py-14">
+      <div className="gradient-orange pt-24 pb-10 md:pb-14 -mt-16">
         <div className="container">
           <h1 className="font-display text-3xl font-bold text-accent-foreground md:text-4xl">
             Explore Charities

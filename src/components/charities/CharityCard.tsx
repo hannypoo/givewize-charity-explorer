@@ -33,7 +33,7 @@ export function CharityCard({ charity }: CharityCardProps) {
         
         <div className="relative">
           <div className="flex items-start justify-between mb-4">
-            <div className="w-12 h-12 rounded-xl bg-white/20 border border-white/20 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-transparent flex items-center justify-center">
               {charity.logoUrl ? (
                 <img
                   src={charity.logoUrl}
