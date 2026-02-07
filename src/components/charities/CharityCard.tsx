@@ -45,7 +45,7 @@ export function CharityCard({ charity }: CharityCardProps) {
               )}
             </div>
             
-            <span className="text-xs font-semibold bg-accent/10 text-accent rounded-full px-3 py-1">
+            <span className="text-xs font-semibold text-accent bg-white/80 rounded-full px-3 py-1">
               {getScopeLabel(charity.geographicScope)}
             </span>
           </div>
@@ -54,7 +54,7 @@ export function CharityCard({ charity }: CharityCardProps) {
             {charity.name}
           </h3>
 
-          <span className="text-xs font-semibold text-orange-light">
+          <span className="inline-block text-xs font-semibold text-accent bg-white/80 rounded-full px-3 py-1">
             {charity.categoryLabel}
           </span>
 
