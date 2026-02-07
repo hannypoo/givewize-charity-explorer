@@ -41,10 +41,7 @@ export function HeroSection() {
               className="text-base px-8 py-6 gradient-orange text-accent-foreground font-semibold rounded-2xl glow-orange hover:scale-[1.02] transition-all duration-300"
               asChild
             >
-              <Link to="/quiz">
-                Find Your Cause
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
+              <Link to="/quiz">Find Your Cause</Link>
             </Button>
             <Button
               size="lg"
