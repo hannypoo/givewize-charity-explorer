@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Heart, Shield, Star, Eye, ArrowRight, Target, Users, TrendingUp } from "lucide-react";
+import { Heart, Shield, Star, Eye, Target, Users, TrendingUp } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 
@@ -193,15 +193,11 @@ const About = () => {
                   className="gradient-orange text-accent-foreground font-semibold px-8 rounded-2xl glow-orange hover:scale-[1.02] transition-all duration-300"
                   asChild
                 >
-                  <Link to="/quiz">
-                    Find Your Match
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Link>
+                  <Link to="/quiz">Find Your Match</Link>
                 </Button>
                 <Button
-                  variant="outline"
                   size="lg"
-                  className="border-white/25 text-white hover:bg-white/15 rounded-2xl"
+                  className="gradient-orange text-accent-foreground font-semibold px-8 rounded-2xl glow-orange hover:scale-[1.02] transition-all duration-300"
                   asChild
                 >
                   <Link to="/charities">Explore Charities</Link>
