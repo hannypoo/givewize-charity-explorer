@@ -191,4 +191,20 @@
   .bg-footer {
     background: linear-gradient(180deg, hsl(220 45% 25%) 0%, hsl(220 50% 12%) 100%);
   }
+
+  .bg-quiz {
+    background: linear-gradient(180deg, hsl(220 60% 18%) 0%, hsl(200 55% 30%) 40%, hsl(185 50% 38%) 80%, hsl(175 45% 42%) 100%);
+  }
+
+  .bg-quiz-flow {
+    background: linear-gradient(180deg, hsl(28 75% 58%) 0%, hsl(25 55% 50%) 25%, hsl(220 40% 42%) 55%, hsl(220 65% 38%) 100%);
+  }
+
+  .bg-quiz-results {
+    background: linear-gradient(180deg, hsl(170 45% 35%) 0%, hsl(190 50% 32%) 35%, hsl(210 55% 30%) 65%, hsl(220 55% 22%) 100%);
+  }
+
+  .bg-about {
+    background: linear-gradient(180deg, hsl(220 65% 25%) 0%, hsl(220 60% 35%) 30%, hsl(215 55% 42%) 60%, hsl(25 60% 50%) 100%);
+  }
 }

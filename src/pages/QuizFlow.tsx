@@ -9,10 +9,7 @@ interface QuizQuestion {
   question: string;
   subtitle?: string;
   type?: "cards" | "scale";
-  options?: {
-    id: string;
-    label: string;
-  }[];
+  options?: { id: string; label: string }[];
   multiSelect?: boolean;
   maxSelections?: number;
   scaleLabels?: { low: string; high: string };
@@ -133,11 +130,8 @@ const QuizFlow = () => {
   };
 
   const handleNext = () => {
-    if (currentStep < totalSteps - 1) {
-      setCurrentStep((prev) => prev + 1);
-    } else {
-      navigate("/quiz/results", { state: { answers } });
-    }
+    if (currentStep < totalSteps - 1) setCurrentStep((prev) => prev + 1);
+    else navigate("/quiz/results", { state: { answers } });
   };
 
   const handleBack = () => {
@@ -157,47 +151,50 @@ const QuizFlow = () => {
     return currentAnswer === optionId;
   };
 
-  const selectionCount = currentQuestion.multiSelect && Array.isArray(currentAnswer)
-    ? currentAnswer.filter(id => id !== "none").length
-    : 0;
+  const selectionCount =
+    currentQuestion.multiSelect && Array.isArray(currentAnswer)
+      ? currentAnswer.filter((id) => id !== "none").length
+      : 0;
 
   return (
     <Layout>
-      <div className="bg-secondary min-h-[calc(100vh-4rem)]">
-        <div className="container max-w-2xl py-8 md:py-12">
+      <div className="bg-quiz-flow min-h-[calc(100vh-4rem)] -mt-16 pt-16 relative overflow-hidden">
+        {/* Light orbs */}
+        <div className="absolute top-32 right-[20%] w-72 h-72 bg-white/8 rounded-full blur-[100px]" />
+        <div className="absolute bottom-20 left-[10%] w-64 h-64 bg-white/5 rounded-full blur-[80px]" />
+
+        <div className="container relative max-w-2xl py-8 md:py-12">
           {/* Progress Bar */}
           <div className="mb-8">
-            <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
+            <div className="flex items-center justify-between text-sm text-white/60 mb-2">
               <span>Question {currentStep + 1} of {totalSteps}</span>
               <span>{Math.round(progress)}% complete</span>
             </div>
-            <div className="h-2 bg-muted rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-primary rounded-full transition-all duration-300"
+            <div className="h-2 bg-white/15 rounded-full overflow-hidden">
+              <div
+                className="h-full gradient-orange rounded-full transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
           </div>
 
-          {/* Question */}
-          <div className="bg-card rounded-xl p-6 md:p-8 shadow-soft mb-6">
-            <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-2 text-center">
+          {/* Question Card */}
+          <div className="glass-dark rounded-2xl p-6 md:p-8 mb-6">
+            <h2 className="font-display text-2xl md:text-3xl font-bold text-white mb-2 text-center">
               {currentQuestion.question}
             </h2>
             {currentQuestion.subtitle && (
-              <p className="text-muted-foreground text-center mb-2">
-                {currentQuestion.subtitle}
-              </p>
+              <p className="text-white/60 text-center mb-2">{currentQuestion.subtitle}</p>
             )}
             {currentQuestion.maxSelections && (
-              <p className="text-sm text-muted-foreground text-center mb-6">
+              <p className="text-sm text-white/50 text-center mb-6">
                 {selectionCount} of {currentQuestion.maxSelections} selected
               </p>
             )}
             {!currentQuestion.maxSelections && currentQuestion.subtitle && <div className="mb-6" />}
             {!currentQuestion.subtitle && !currentQuestion.maxSelections && <div className="mb-6" />}
 
-            {/* Scale Type Question */}
+            {/* Scale */}
             {currentQuestion.type === "scale" && (
               <div className="py-4">
                 <div className="flex justify-between gap-2 mb-4">
@@ -209,8 +206,8 @@ const QuizFlow = () => {
                         onClick={() => handleScaleSelect(value)}
                         className={`flex-1 py-4 rounded-xl border-2 font-bold text-lg transition-all duration-200 ${
                           isActive
-                            ? "border-primary bg-primary text-primary-foreground"
-                            : "border-border bg-card text-foreground hover:border-primary/50"
+                            ? "border-orange bg-orange text-accent-foreground"
+                            : "border-white/20 bg-white/10 text-white hover:border-white/40"
                         }`}
                       >
                         {value}
@@ -219,7 +216,7 @@ const QuizFlow = () => {
                   })}
                 </div>
                 {currentQuestion.scaleLabels && (
-                  <div className="flex justify-between text-sm text-muted-foreground">
+                  <div className="flex justify-between text-sm text-white/50">
                     <span>{currentQuestion.scaleLabels.low}</span>
                     <span>{currentQuestion.scaleLabels.high}</span>
                   </div>
@@ -227,40 +224,37 @@ const QuizFlow = () => {
               </div>
             )}
 
-            {/* Card Type Question */}
+            {/* Cards */}
             {(currentQuestion.type === "cards" || !currentQuestion.type) && currentQuestion.options && (
-              <div className={`grid gap-3 ${
-                currentQuestion.options.length <= 4 
-                  ? "grid-cols-1 sm:grid-cols-2" 
-                  : "grid-cols-2 sm:grid-cols-3"
-              }`}>
+              <div
+                className={`grid gap-3 ${
+                  currentQuestion.options.length <= 4 ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-2 sm:grid-cols-3"
+                }`}
+              >
                 {currentQuestion.options.map((option) => {
                   const selected = isSelected(option.id);
-                  const atMax = currentQuestion.maxSelections 
-                    && selectionCount >= currentQuestion.maxSelections 
-                    && !selected;
-                  
+                  const atMax =
+                    currentQuestion.maxSelections && selectionCount >= currentQuestion.maxSelections && !selected;
+
                   return (
                     <button
                       key={option.id}
                       onClick={() => handleSelectAnswer(option.id)}
-                      disabled={atMax}
+                      disabled={!!atMax}
                       className={`relative p-4 rounded-xl border-2 text-left transition-all duration-200 ${
                         selected
-                          ? "border-primary bg-primary/5"
+                          ? "border-orange bg-orange/20 text-white"
                           : atMax
-                          ? "border-border bg-muted opacity-50 cursor-not-allowed"
-                          : "border-border bg-card hover:border-primary/50 hover:shadow-soft"
+                          ? "border-white/10 bg-white/5 opacity-40 cursor-not-allowed"
+                          : "border-white/15 bg-white/10 hover:border-white/30 hover:bg-white/15 text-white"
                       }`}
                     >
                       {selected && (
-                        <div className="absolute top-2 right-2 h-5 w-5 rounded-full bg-primary flex items-center justify-center">
-                          <Check className="h-3 w-3 text-primary-foreground" />
+                        <div className="absolute top-2 right-2 h-5 w-5 rounded-full gradient-orange flex items-center justify-center">
+                          <Check className="h-3 w-3 text-accent-foreground" />
                         </div>
                       )}
-                      <span className={`font-medium text-sm ${selected ? "text-primary" : "text-foreground"}`}>
-                        {option.label}
-                      </span>
+                      <span className="font-medium text-sm">{option.label}</span>
                     </button>
                   );
                 })}
@@ -268,12 +262,12 @@ const QuizFlow = () => {
             )}
           </div>
 
-          {/* Navigation Buttons */}
+          {/* Navigation */}
           <div className="flex items-center justify-between">
             <Button
               variant="ghost"
               onClick={handleBack}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-white/60 hover:text-white hover:bg-white/10"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back
@@ -282,7 +276,7 @@ const QuizFlow = () => {
             <Button
               onClick={handleNext}
               disabled={!canProceed()}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="gradient-orange text-accent-foreground font-semibold px-8 rounded-2xl glow-orange hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {currentStep === totalSteps - 1 ? "See Results" : "Next"}
               <ArrowRight className="ml-2 h-4 w-4" />
