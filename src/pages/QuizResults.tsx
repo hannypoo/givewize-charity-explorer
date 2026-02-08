@@ -3,7 +3,6 @@ import { ArrowRight, Building2, RefreshCw } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 
-// Mock matched charities data
 const mockMatchedCharities = [
   {
     id: "1",
@@ -50,65 +49,70 @@ const mockMatchedCharities = [
 const QuizResults = () => {
   return (
     <Layout>
-      <div className="bg-secondary min-h-[calc(100vh-4rem)]">
-        <div className="container max-w-3xl py-10 md:py-14">
+      <div className="bg-quiz-results min-h-[calc(100vh-4rem)] -mt-16 pt-16 relative overflow-hidden">
+        {/* Light orbs */}
+        <div className="absolute top-24 left-[10%] w-80 h-80 bg-white/8 rounded-full blur-[100px]" />
+        <div className="absolute bottom-32 right-[15%] w-64 h-64 bg-white/5 rounded-full blur-[80px]" />
+
+        <div className="container relative max-w-3xl py-10 md:py-14">
           {/* Header */}
           <div className="text-center mb-10">
-            <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">
+            <div className="inline-flex items-center gap-2 glass-dark rounded-full px-5 py-2.5 mb-6">
+              <span className="text-sm font-medium text-white/80">Your results</span>
+            </div>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 tracking-tight">
               Your Top Charity Matches
             </h1>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-lg text-white/60">
               Based on your quiz responses, here are charities that align with your values.
             </p>
           </div>
 
           {/* Matched Charity Cards */}
-          <div className="space-y-5 mb-10">
+          <div className="space-y-4 mb-10">
             {mockMatchedCharities.map((charity) => (
               <div
                 key={charity.id}
-                className="bg-card rounded-xl p-5 md:p-6 shadow-soft border border-border"
+                className="glass-dark rounded-2xl p-5 md:p-6 hover:bg-white/20 transition-all duration-300"
               >
                 <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-muted">
-                    <Building2 className="h-8 w-8 text-muted-foreground" />
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white/15">
+                    <Building2 className="h-7 w-7 text-white" />
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
                       <div>
-                        <h3 className="font-semibold text-lg text-foreground">
+                        <h3 className="font-semibold text-lg text-white">
                           {charity.name}
                         </h3>
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/15 text-white/80">
                           {charity.category}
                         </span>
                       </div>
-                      <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-success/10">
-                        <span className="text-lg font-bold text-success">
+                      <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/15">
+                        <span className="text-lg font-bold text-orange-light">
                           {charity.matchPercent}%
                         </span>
-                        <span className="text-xs text-success font-medium">match</span>
+                        <span className="text-xs text-white/60 font-medium">match</span>
                       </div>
                     </div>
 
-                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                    <p className="text-sm text-white/50 mb-3 line-clamp-2">
                       {charity.mission}
                     </p>
 
-                    <div className="bg-secondary rounded-lg p-3 mb-4">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium mb-1">
+                    <div className="bg-white/10 rounded-xl p-3 mb-4">
+                      <p className="text-xs text-white/40 uppercase tracking-wide font-medium mb-1">
                         Why this match
                       </p>
-                      <p className="text-sm text-muted-foreground">
-                        {charity.whyMatch}
-                      </p>
+                      <p className="text-sm text-white/60">{charity.whyMatch}</p>
                     </div>
 
                     <Button
                       variant="outline"
                       size="sm"
-                      className="border-primary text-primary hover:bg-primary/5"
+                      className="border-white/25 text-white hover:bg-white/15 rounded-xl"
                       asChild
                     >
                       <Link to={`/charities/${charity.id}`}>
@@ -126,7 +130,7 @@ const QuizResults = () => {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button
               size="lg"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-8"
+              className="gradient-orange text-accent-foreground font-semibold px-8 rounded-2xl glow-orange hover:scale-[1.02] transition-all duration-300"
               asChild
             >
               <Link to="/charities">
@@ -137,7 +141,7 @@ const QuizResults = () => {
             <Button
               variant="outline"
               size="lg"
-              className="border-border text-muted-foreground hover:text-foreground hover:border-foreground/20"
+              className="border-white/25 text-white hover:bg-white/15 rounded-2xl"
               asChild
             >
               <Link to="/quiz/start">
