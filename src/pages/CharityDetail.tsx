@@ -1,6 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { 
+import {
   Heart, ExternalLink, MapPin, Calendar, Globe, Building2,
   ArrowLeft, Loader2, Check, X, Info, Users, Target, TrendingUp, Star, Shield
 } from "lucide-react";
@@ -9,6 +9,8 @@ import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { CommunityRatingAgent } from "@/components/charities/CommunityRatingAgent";
+import { getDonorReviews } from "@/data/sampleDonorReviews";
 
 const categoryLabels: Record<string, string> = {
   "rare-diseases": "Rare Diseases", "medical-health": "Medical & Health",
@@ -210,32 +212,14 @@ const CharityDetail = () => {
               )}
             </div>
 
-            {/* Community Rating Card */}
-            <div className="bg-card rounded-xl p-6 shadow-soft">
-              <div className="flex items-center gap-2 mb-6">
-                <Star className="h-5 w-5 text-primary" />
-                <h2 className="font-display text-lg font-semibold text-foreground">Community Rating</h2>
-              </div>
-              {charity.community_rating_average !== null ? (
-                <div className="flex flex-col items-center py-4">
-                  <div className="flex items-center gap-1 mb-3">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star key={star} className={`h-8 w-8 ${
-                        star <= Math.round(Number(charity.community_rating_average))
-                          ? "fill-warning text-warning" : "text-muted"
-                      }`} />
-                    ))}
-                  </div>
-                  <p className="text-3xl font-bold text-foreground mb-1">{Number(charity.community_rating_average).toFixed(1)}</p>
-                  <p className="text-sm text-muted-foreground">Based on {charity.community_rating_count || 0} reviews</p>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-8">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-muted text-muted-foreground">Rating Pending</span>
-                  <p className="text-sm text-muted-foreground mt-2 text-center">No community reviews yet</p>
-                </div>
-              )}
-            </div>
+            {/* Community Rating Agent */}
+            <CommunityRatingAgent
+              charity={charity}
+              donorReviews={getDonorReviews(charity.id)}
+              onDonorReviewSubmit={(review) => {
+                console.log("New donor review submitted:", review);
+              }}
+            />
           </div>
 
           {/* Financial Transparency Section */}
