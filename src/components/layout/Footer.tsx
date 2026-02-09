@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import givewizeIcon from "@/assets/givewize-icon.jpg";
 
 const navLinks = [
@@ -9,6 +11,15 @@ const navLinks = [
 ];
 
 export function Footer() {
+  const { data: charityCount } = useQuery({
+    queryKey: ["footer-charity-count"],
+    queryFn: async () => {
+      const { count } = await supabase.from("charities").select("*", { count: "exact", head: true });
+      return count || 71;
+    },
+    staleTime: 10 * 60 * 1000,
+  });
+
   return (
     <footer className="relative overflow-hidden bg-footer">
       <div className="container relative py-12">
@@ -24,7 +35,7 @@ export function Footer() {
                 />
               </div>
               <span className="font-bold text-xl text-white">
-                GiveWiZe
+                GiveWi<span className="text-orange-light">Z</span>e
               </span>
             </Link>
             <p className="text-sm text-white/50 text-center md:text-left">
@@ -52,7 +63,7 @@ export function Footer() {
           <div className="flex justify-center md:justify-end">
             <div className="flex gap-3">
               <div className="glass-dark rounded-2xl p-5 text-center">
-                <div className="text-2xl font-bold text-white">71</div>
+                <div className="text-2xl font-bold text-white">{charityCount ?? 71}</div>
                 <div className="text-xs text-white/50">Charities</div>
               </div>
               <div className="glass-dark rounded-2xl p-5 text-center">
