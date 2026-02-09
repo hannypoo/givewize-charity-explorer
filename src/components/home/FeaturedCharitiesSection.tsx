@@ -72,13 +72,14 @@ export function FeaturedCharitiesSection() {
 
         {isLoading ? <FeaturedSkeleton /> : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {charities.map((charity) => {
+          {charities.map((charity, i) => {
             const combined = getCombinedRating(charity);
             return (
               <Link
                 key={charity.id}
                 to={`/charities/${charity.id}`}
-                className="group glass-dark rounded-2xl p-5 hover:bg-white/20 hover:-translate-y-1 transition-all duration-300"
+                className="group glass-dark rounded-2xl p-5 hover:bg-white/20 hover:-translate-y-1 transition-all duration-300 animate-fade-in-up opacity-0"
+                style={{ animationDelay: `${i * 80}ms`, animationFillMode: "forwards" }}
               >
                 <div className="flex items-start gap-3 mb-3">
                   <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center shrink-0">

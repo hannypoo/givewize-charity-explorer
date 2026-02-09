@@ -44,7 +44,7 @@ export function HowItWorksSection() {
         {/* Steps */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-14">
           {steps.map((step, index) => (
-            <div key={step.title} className="relative group">
+            <div key={step.title} className="relative group animate-fade-in-up opacity-0" style={{ animationDelay: `${index * 120}ms`, animationFillMode: "forwards" }}>
               {/* Connector */}
               {index < steps.length - 1 && (
                 <div className="hidden md:block absolute top-12 left-[calc(100%+0.25rem)] w-[calc(100%-3.5rem)] h-px">

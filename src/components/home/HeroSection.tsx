@@ -73,33 +73,25 @@ export function HeroSection() {
 
           {/* Glass stat cards */}
           <div className="flex flex-wrap justify-center gap-4">
-            <div className="glass-dark rounded-2xl px-6 py-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center">
-                <Shield className="h-5 w-5 text-white" />
+            {[
+              { icon: <Shield className="h-5 w-5 text-white" />, value: String(charityCount), label: "Vetted Charities", iconBg: "bg-white/15" },
+              { icon: <TrendingUp className="h-5 w-5 text-white" />, value: "18", label: "Cause Categories", iconBg: "gradient-orange glow-orange" },
+              { icon: <Sparkles className="h-5 w-5 text-orange-light" />, value: `${topRatedCount}+`, label: "Top Rated (4+)", iconBg: "bg-white/15" },
+            ].map((stat, i) => (
+              <div
+                key={stat.label}
+                className="glass-dark rounded-2xl px-6 py-4 flex items-center gap-3 animate-fade-in-up opacity-0"
+                style={{ animationDelay: `${500 + i * 100}ms`, animationFillMode: "forwards" }}
+              >
+                <div className={`w-10 h-10 rounded-xl ${stat.iconBg} flex items-center justify-center`}>
+                  {stat.icon}
+                </div>
+                <div className="text-left">
+                  <div className="text-xl font-bold text-white">{stat.value}</div>
+                  <div className="text-xs text-white/60">{stat.label}</div>
+                </div>
               </div>
-              <div className="text-left">
-                <div className="text-xl font-bold text-white">{charityCount}</div>
-                <div className="text-xs text-white/60">Vetted Charities</div>
-              </div>
-            </div>
-            <div className="glass-dark rounded-2xl px-6 py-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl gradient-orange flex items-center justify-center glow-orange">
-                <TrendingUp className="h-5 w-5 text-white" />
-              </div>
-              <div className="text-left">
-                <div className="text-xl font-bold text-white">18</div>
-                <div className="text-xs text-white/60">Cause Categories</div>
-              </div>
-            </div>
-            <div className="glass-dark rounded-2xl px-6 py-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center">
-                <Sparkles className="h-5 w-5 text-orange-light" />
-              </div>
-              <div className="text-left">
-                <div className="text-xl font-bold text-white">{topRatedCount}+</div>
-                <div className="text-xs text-white/60">Top Rated (4+)</div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>

@@ -42,10 +42,11 @@ export function TestimonialsSection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {testimonials.map((t) => (
+          {testimonials.map((t, i) => (
             <div
               key={t.name}
-              className="glass-dark rounded-2xl p-6 hover:bg-white/20 hover:-translate-y-1 transition-all duration-300"
+              className="glass-dark rounded-2xl p-6 hover:bg-white/20 hover:-translate-y-1 transition-all duration-300 animate-fade-in-up opacity-0"
+              style={{ animationDelay: `${i * 100}ms`, animationFillMode: "forwards" }}
             >
               <Quote className="h-8 w-8 text-orange-light/40 mb-4" />
 
