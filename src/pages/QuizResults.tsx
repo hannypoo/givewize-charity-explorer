@@ -1,52 +1,45 @@
-import { Link } from "react-router-dom";
-import { ArrowRight, Building2, RefreshCw } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { ArrowRight, Building2, RefreshCw, Loader2 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
-
-const mockMatchedCharities = [
-  {
-    id: "1",
-    name: "National Rare Disease Foundation",
-    category: "Rare Diseases",
-    matchPercent: 96,
-    mission: "Advancing research and providing support for families affected by rare genetic disorders through groundbreaking medical research and community programs.",
-    whyMatch: "Matches your interest in rare diseases and preference for established organizations with strong financial transparency.",
-  },
-  {
-    id: "2",
-    name: "Children's Health Initiative",
-    category: "Child Welfare",
-    matchPercent: 91,
-    mission: "Ensuring every child has access to quality healthcare, nutrition, and developmental support regardless of their family's economic situation.",
-    whyMatch: "Aligns with your focus on children's causes and preference for organizations with high program spending ratios.",
-  },
-  {
-    id: "3",
-    name: "Global Medical Relief Fund",
-    category: "Medical & Health",
-    matchPercent: 87,
-    mission: "Providing emergency medical assistance and long-term healthcare solutions to underserved communities worldwide.",
-    whyMatch: "Matches your interest in medical causes and global impact, with excellent transparency scores.",
-  },
-  {
-    id: "4",
-    name: "Education for Tomorrow",
-    category: "Education",
-    matchPercent: 82,
-    mission: "Breaking the cycle of poverty through quality education, scholarships, and mentorship programs for at-risk youth.",
-    whyMatch: "Aligns with your value for impact metrics and preference for organizations with proven outcomes.",
-  },
-  {
-    id: "5",
-    name: "Community Food Network",
-    category: "Hunger & Food Security",
-    matchPercent: 78,
-    mission: "Fighting hunger in local communities through food banks, meal programs, and sustainable food access initiatives.",
-    whyMatch: "Matches your interest in local impact and organizations with strong community ratings.",
-  },
-];
+import { StarRating } from "@/components/charities/StarRating";
+import { matchCharities, type MatchedCharity, type QuizAnswers } from "@/lib/quizMatcher";
+import { getCombinedRating, categoryLabels } from "@/lib/charityUtils";
 
 const QuizResults = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [matches, setMatches] = useState<MatchedCharity[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const rawAnswers = (location.state as { answers?: Record<string, string | string[] | number> })?.answers;
+
+  useEffect(() => {
+    if (!rawAnswers) {
+      navigate("/quiz");
+      return;
+    }
+
+    const quizAnswers: QuizAnswers = {
+      causes: Array.isArray(rawAnswers.causes) ? rawAnswers.causes : undefined,
+      geographic: typeof rawAnswers.geographic === "string" ? rawAnswers.geographic : undefined,
+      personal: Array.isArray(rawAnswers.personal) ? rawAnswers.personal : undefined,
+      efficiency: typeof rawAnswers.efficiency === "number" ? rawAnswers.efficiency : undefined,
+      age: typeof rawAnswers.age === "string" ? rawAnswers.age : undefined,
+      transparency: typeof rawAnswers.transparency === "string" ? rawAnswers.transparency : undefined,
+      engagement: typeof rawAnswers.engagement === "string" ? rawAnswers.engagement : undefined,
+      taxBenefits: typeof rawAnswers.taxBenefits === "number" ? rawAnswers.taxBenefits : undefined,
+      orgSize: typeof rawAnswers.orgSize === "string" ? rawAnswers.orgSize : undefined,
+      keyFactors: Array.isArray(rawAnswers.keyFactors) ? rawAnswers.keyFactors : undefined,
+    };
+
+    matchCharities(quizAnswers).then((results) => {
+      setMatches(results);
+      setIsLoading(false);
+    });
+  }, [rawAnswers, navigate]);
+
   return (
     <Layout>
       <div className="bg-quiz-results min-h-[calc(100vh-4rem)] -mt-16 pt-16 relative overflow-hidden">
@@ -68,88 +61,124 @@ const QuizResults = () => {
             </p>
           </div>
 
-          {/* Matched Charity Cards */}
-          <div className="space-y-4 mb-10">
-            {mockMatchedCharities.map((charity) => (
-              <div
-                key={charity.id}
-                className="glass-dark rounded-2xl p-5 md:p-6 hover:bg-white/20 transition-all duration-300"
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <Loader2 className="h-10 w-10 animate-spin text-white/60 mb-4" />
+              <p className="text-white/60">Finding your best matches...</p>
+            </div>
+          ) : matches.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="text-lg text-white/60 mb-6">No matches found. Try retaking the quiz with different preferences.</p>
+              <Button
+                size="lg"
+                className="gradient-orange text-accent-foreground font-semibold px-8 rounded-2xl"
+                asChild
               >
-                <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white/15">
-                    <Building2 className="h-7 w-7 text-white" />
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
-                      <div>
-                        <h3 className="font-semibold text-lg text-white">
-                          {charity.name}
-                        </h3>
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/15 text-white/80">
-                          {charity.category}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/15">
-                        <span className="text-lg font-bold text-orange-light">
-                          {charity.matchPercent}%
-                        </span>
-                        <span className="text-xs text-white/60 font-medium">match</span>
-                      </div>
-                    </div>
-
-                    <p className="text-sm text-white/50 mb-3 line-clamp-2">
-                      {charity.mission}
-                    </p>
-
-                    <div className="bg-white/10 rounded-xl p-3 mb-4">
-                      <p className="text-xs text-white/40 uppercase tracking-wide font-medium mb-1">
-                        Why this match
-                      </p>
-                      <p className="text-sm text-white/60">{charity.whyMatch}</p>
-                    </div>
-
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="border-white/25 text-white hover:bg-white/15 rounded-xl"
-                      asChild
+                <Link to="/quiz/start">
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Retake Quiz
+                </Link>
+              </Button>
+            </div>
+          ) : (
+            <>
+              {/* Matched Charity Cards */}
+              <div className="space-y-4 mb-10">
+                {matches.map((match) => {
+                  const combined = getCombinedRating(match.charity);
+                  return (
+                    <div
+                      key={match.charity.id}
+                      className="glass-dark rounded-2xl p-5 md:p-6 hover:bg-white/20 transition-all duration-300"
                     >
-                      <Link to={`/charities/${charity.id}`}>
-                        View Profile
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                      <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white/15">
+                          {match.charity.logo_url ? (
+                            <img src={match.charity.logo_url} alt="" className="h-10 w-10 object-contain rounded-lg" />
+                          ) : (
+                            <Building2 className="h-7 w-7 text-white" />
+                          )}
+                        </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button
-              size="lg"
-              className="gradient-orange text-accent-foreground font-semibold px-8 rounded-2xl glow-orange hover:scale-[1.02] transition-all duration-300"
-              asChild
-            >
-              <Link to="/charities">
-                Explore All Charities
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="border-white/25 text-white hover:bg-white/15 rounded-2xl"
-              asChild
-            >
-              <Link to="/quiz/start">
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Retake Quiz
-              </Link>
-            </Button>
-          </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
+                            <div>
+                              <h3 className="font-semibold text-lg text-white">
+                                {match.charity.name}
+                              </h3>
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/15 text-white/80">
+                                {categoryLabels[match.charity.primary_category] || match.charity.primary_category}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/15">
+                              <span className="text-lg font-bold text-orange-light">
+                                {match.matchPercent}%
+                              </span>
+                              <span className="text-xs text-white/60 font-medium">match</span>
+                            </div>
+                          </div>
+
+                          {combined != null && (
+                            <div className="mb-2">
+                              <StarRating rating={combined} size="sm" showValue className="[&_span]:text-white/90 [&_svg]:text-white/30" />
+                            </div>
+                          )}
+
+                          <p className="text-sm text-white/50 mb-3 line-clamp-2">
+                            {match.charity.mission_statement}
+                          </p>
+
+                          <div className="bg-white/10 rounded-xl p-3 mb-4">
+                            <p className="text-xs text-white/40 uppercase tracking-wide font-medium mb-1">
+                              Why this match
+                            </p>
+                            <p className="text-sm text-white/60">{match.whyMatch}</p>
+                          </div>
+
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="border-white/25 text-white hover:bg-white/15 rounded-xl"
+                            asChild
+                          >
+                            <Link to={`/charities/${match.charity.id}`}>
+                              View Profile
+                              <ArrowRight className="ml-2 h-4 w-4" />
+                            </Link>
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Button
+                  size="lg"
+                  className="gradient-orange text-accent-foreground font-semibold px-8 rounded-2xl glow-orange hover:scale-[1.02] transition-all duration-300"
+                  asChild
+                >
+                  <Link to="/charities">
+                    Explore All Charities
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="border-white/25 text-white hover:bg-white/15 rounded-2xl"
+                  asChild
+                >
+                  <Link to="/quiz/start">
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Retake Quiz
+                  </Link>
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </Layout>

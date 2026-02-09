@@ -1,5 +1,8 @@
 import { Link } from "react-router-dom";
 import { Building2 } from "lucide-react";
+import { StarRating } from "./StarRating";
+import { getCombinedRating, categoryLabels, scopeLabels, getKeyStandoutBadge } from "@/lib/charityUtils";
+import type { CharityRow } from "@/hooks/useCharities";
 
 export interface Charity {
   id: string;
@@ -8,29 +11,57 @@ export interface Charity {
   categoryLabel: string;
   geographicScope: "local" | "national" | "global";
   mission: string;
-  rating?: number;
   logoUrl?: string;
+  scoreOverall?: number | null;
+  communityRating?: number | null;
+  programExpensePercentage?: number | null;
+  complete990Filed?: boolean | null;
+  financialsPublished?: boolean | null;
+  ein?: string | null;
 }
 
 interface CharityCardProps {
   charity: Charity;
 }
 
-function getScopeLabel(scope: string): string {
-  const labels: Record<string, string> = {
-    local: "Local",
-    national: "National",
-    global: "Global",
+export function charityRowToCard(row: CharityRow): Charity {
+  return {
+    id: row.id,
+    name: row.name,
+    category: row.primary_category,
+    categoryLabel: categoryLabels[row.primary_category] || row.primary_category,
+    geographicScope: row.geographic_scope,
+    mission: row.mission_statement || "",
+    logoUrl: row.logo_url || undefined,
+    scoreOverall: row.score_overall,
+    communityRating: row.community_rating_average,
+    programExpensePercentage: row.program_expense_percentage,
+    complete990Filed: row.complete_990_filed,
+    financialsPublished: row.financials_published,
+    ein: row.ein,
   };
-  return labels[scope] || scope;
 }
 
 export function CharityCard({ charity }: CharityCardProps) {
+  const combinedRating = getCombinedRating({
+    score_overall: charity.scoreOverall ?? null,
+    community_rating_average: charity.communityRating ?? null,
+  } as any);
+
+  const badge = getKeyStandoutBadge({
+    program_expense_percentage: charity.programExpensePercentage ?? null,
+    score_overall: charity.scoreOverall ?? null,
+    community_rating_average: charity.communityRating ?? null,
+    complete_990_filed: charity.complete990Filed ?? null,
+    financials_published: charity.financialsPublished ?? null,
+    ein: charity.ein ?? null,
+  } as any);
+
   return (
     <Link to={`/charities/${charity.id}`}>
       <div className="group h-full rounded-2xl transition-all duration-300 p-5 relative overflow-hidden hover:-translate-y-1 bg-white/15 backdrop-blur-xl border border-white/20 hover:bg-white/25">
         <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
-        
+
         <div className="relative">
           <div className="flex items-start justify-between mb-4">
             <div className="w-14 h-14 rounded-xl bg-white flex items-center justify-center">
@@ -44,9 +75,9 @@ export function CharityCard({ charity }: CharityCardProps) {
                 <Building2 className="h-5 w-5 text-primary-foreground" />
               )}
             </div>
-            
+
             <span className="text-xs font-semibold text-accent bg-white/80 rounded-full px-3 py-1">
-              {getScopeLabel(charity.geographicScope)}
+              {scopeLabels[charity.geographicScope] || charity.geographicScope}
             </span>
           </div>
 
@@ -54,16 +85,29 @@ export function CharityCard({ charity }: CharityCardProps) {
             {charity.name}
           </h3>
 
-          <span className="inline-block text-xs font-semibold text-accent bg-white/80 rounded-full px-3 py-1">
-            {charity.categoryLabel}
-          </span>
+          <div className="flex items-center gap-2 flex-wrap mb-1">
+            <span className="inline-block text-xs font-semibold text-accent bg-white/80 rounded-full px-3 py-1">
+              {charity.categoryLabel}
+            </span>
+            {badge && (
+              <span className={`inline-block text-xs font-semibold rounded-full px-2.5 py-0.5 ${badge.color}`}>
+                {badge.label}
+              </span>
+            )}
+          </div>
 
-          <p className="text-sm text-white/70 line-clamp-2 leading-relaxed mt-3">
+          {combinedRating != null && (
+            <div className="mt-2">
+              <StarRating rating={combinedRating} size="sm" showValue className="[&_span]:text-white/90 [&_svg]:text-white/30" />
+            </div>
+          )}
+
+          <p className="text-sm text-white/70 line-clamp-2 leading-relaxed mt-2">
             {charity.mission}
           </p>
 
           <div className="mt-4 flex items-center text-sm font-semibold text-orange-light opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <span>Learn more →</span>
+            <span>Learn more &rarr;</span>
           </div>
         </div>
       </div>

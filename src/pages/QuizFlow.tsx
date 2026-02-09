@@ -90,6 +90,52 @@ const quizQuestions: QuizQuestion[] = [
       { id: "all", label: "All equally important" },
     ],
   },
+  // ── 4 New Questions ──────────────────────────────────────
+  {
+    id: "engagement",
+    question: "How do you want to engage?",
+    type: "cards",
+    options: [
+      { id: "donate-once", label: "Donate once" },
+      { id: "recurring", label: "Recurring giving" },
+      { id: "volunteer", label: "Volunteer" },
+      { id: "advocacy", label: "Advocacy" },
+    ],
+  },
+  {
+    id: "taxBenefits",
+    question: "How important are tax benefits?",
+    subtitle: "Getting a tax deduction for your donation",
+    type: "scale",
+    scaleLabels: { low: "Not important", high: "Very important" },
+  },
+  {
+    id: "orgSize",
+    question: "What size organization do you prefer?",
+    type: "cards",
+    options: [
+      { id: "large", label: "Large (100K+ served)" },
+      { id: "medium", label: "Medium" },
+      { id: "small", label: "Small & personal" },
+      { id: "no-preference", label: "No preference" },
+    ],
+  },
+  {
+    id: "keyFactors",
+    question: "Which factors matter most to you?",
+    subtitle: "Select up to 3",
+    type: "cards",
+    multiSelect: true,
+    maxSelections: 3,
+    options: [
+      { id: "high-efficiency", label: "High Efficiency" },
+      { id: "transparency", label: "Transparency" },
+      { id: "community-ratings", label: "Community Ratings" },
+      { id: "annual-reports", label: "Annual Reports" },
+      { id: "established", label: "Established Org" },
+      { id: "global-reach", label: "Global Reach" },
+    ],
+  },
 ];
 
 type Answers = Record<string, string | string[] | number>;

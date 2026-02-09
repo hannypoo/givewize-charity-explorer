@@ -45,7 +45,7 @@ const Quiz = () => {
           <div className="flex flex-wrap justify-center gap-4 mt-12">
             <div className="glass-dark rounded-2xl px-5 py-3 flex items-center gap-3">
               <Clock className="h-4 w-4 text-white/70" />
-              <span className="text-sm text-white/70">Takes ~2 minutes</span>
+              <span className="text-sm text-white/70">Takes ~3 minutes</span>
             </div>
             <div className="glass-dark rounded-2xl px-5 py-3 flex items-center gap-3">
               <CheckCircle className="h-4 w-4 text-white/70" />
