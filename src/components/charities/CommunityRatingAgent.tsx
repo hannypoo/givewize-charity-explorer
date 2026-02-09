@@ -87,32 +87,37 @@ function mapReviewRowToDonorReview(row: CommunityReviewRow): DonorReview {
 }
 
 // ── Source Rating Card ───────────────────────────────────────────────────
-function SourceRatingCard({ source }: { source: SourceRating }) {
+function SourceRatingCard({ source, showNote = false }: { source: SourceRating; showNote?: boolean }) {
   const isAvailable = source.normalizedRating !== null;
   return (
-    <div className={cn("flex items-center gap-3 rounded-lg border p-3 transition-colors", isAvailable ? "border-border bg-card" : "border-border/50 bg-secondary opacity-60")}>
-      <div className="flex-shrink-0">{source.icon}</div>
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1.5">
-          <span className="truncate text-sm font-medium text-foreground">{source.displayName}</span>
-          {!isAvailable && <span className="text-xs italic text-muted-foreground">No data</span>}
-        </div>
-        {isAvailable && (
-          <div className="mt-0.5 flex items-center gap-2">
-            <StarRating rating={source.normalizedRating!} size="sm" />
-            <span className="text-xs text-muted-foreground">
-              {source.ratingScale === "pass_fail" ? `${source.rawRating}/${source.maxRating} standards`
-                : source.ratingScale === "seal" ? `${getGuideStarSealLabel(source.rawRating!)} Seal`
-                : `${source.rawRating}/${source.maxRating}`}
-            </span>
-            {source.reviewCount > 0 && <span className="text-xs text-muted-foreground">({source.reviewCount} reviews)</span>}
+    <div className={cn("rounded-lg border p-3 transition-colors", isAvailable ? "border-border bg-card" : "border-border/50 bg-secondary opacity-60")}>
+      <div className="flex items-center gap-3">
+        <div className="flex-shrink-0">{source.icon}</div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5">
+            <span className="truncate text-sm font-medium text-foreground">{source.displayName}</span>
+            {!isAvailable && <span className="text-xs italic text-muted-foreground">No data</span>}
           </div>
+          {isAvailable && (
+            <div className="mt-0.5 flex items-center gap-2">
+              <StarRating rating={source.normalizedRating!} size="sm" />
+              <span className="text-xs text-muted-foreground">
+                {source.ratingScale === "pass_fail" ? `${source.rawRating}/${source.maxRating} standards`
+                  : source.ratingScale === "seal" ? `${getGuideStarSealLabel(source.rawRating!)} Seal`
+                  : `${source.rawRating}/${source.maxRating}`}
+              </span>
+              {source.reviewCount > 0 && <span className="text-xs text-muted-foreground">({source.reviewCount} reviews)</span>}
+            </div>
+          )}
+        </div>
+        {isAvailable && source.sourceUrl && (
+          <a href={source.sourceUrl} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 text-xs font-medium text-primary hover:underline">
+            <ExternalLink className="h-3.5 w-3.5" />
+          </a>
         )}
       </div>
-      {isAvailable && source.sourceUrl && (
-        <a href={source.sourceUrl} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 text-xs font-medium text-primary hover:underline">
-          <ExternalLink className="h-3.5 w-3.5" />
-        </a>
+      {showNote && source.note && (
+        <p className="mt-2 text-xs text-muted-foreground leading-relaxed pl-8">{source.note}</p>
       )}
     </div>
   );
@@ -402,7 +407,7 @@ export function CommunityRatingAgent({ charity, onDonorReviewSubmit }: Community
         {activeTab === "sources" && (
           <div className="space-y-5">
             <p className="text-sm text-muted-foreground">Community ratings are drawn from the following independent evaluators and review platforms.</p>
-            <div className="space-y-2">{sourceRatings.map((s) => <SourceRatingCard key={s.id} source={s} />)}</div>
+            <div className="space-y-2">{sourceRatings.map((s) => <SourceRatingCard key={s.id} source={s} showNote />)}</div>
             <div className="rounded-xl bg-secondary p-4">
               <h4 className="mb-3 text-sm font-semibold text-foreground">Source Weighting</h4>
               <div className="space-y-2">
