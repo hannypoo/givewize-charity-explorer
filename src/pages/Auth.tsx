@@ -13,7 +13,7 @@ const Auth = () => {
         <div className="absolute bottom-20 left-[15%] w-64 h-64 bg-orange/10 rounded-full blur-[80px]" />
 
         <div className="container relative flex flex-col items-center justify-center py-20 md:py-28">
-          <div className="glass-dark rounded-2xl p-8 md:p-10 max-w-sm w-full text-center">
+          <div className="glass-dark rounded-2xl p-8 md:p-10 max-w-sm w-full text-center animate-fade-in-up" style={{ animationDuration: "0.4s" }}>
             <div className="w-16 h-16 rounded-2xl bg-white/15 flex items-center justify-center mx-auto mb-6">
               <Lock className="h-8 w-8 text-white/60" />
             </div>

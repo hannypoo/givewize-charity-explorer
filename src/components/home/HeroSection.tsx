@@ -8,12 +8,11 @@ export function HeroSection() {
   const { data: stats } = useQuery({
     queryKey: ["hero-stats"],
     queryFn: async () => {
-      const { count } = await supabase.from("charities").select("*", { count: "exact", head: true });
-      const { data: topRated } = await supabase.from("charities").select("community_rating_average").gte("community_rating_average", 4.0);
-      return {
-        total: count || 71,
-        topRatedCount: topRated?.length || 0,
-      };
+      const { data, count } = await supabase
+        .from("charities")
+        .select("community_rating_average", { count: "exact" });
+      const topRatedCount = data?.filter((c) => Number(c.community_rating_average) >= 4.0).length || 0;
+      return { total: count || 71, topRatedCount };
     },
     staleTime: 5 * 60 * 1000,
   });
