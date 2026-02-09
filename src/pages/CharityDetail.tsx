@@ -13,7 +13,7 @@ import { CommunityRatingAgent } from "@/components/charities/CommunityRatingAgen
 import { StarRating } from "@/components/charities/StarRating";
 import { useCharityById } from "@/hooks/useCharities";
 import { useActiveSection } from "@/hooks/useActiveSection";
-import { getCombinedRating, getCategoryGradient, categoryLabels, scopeLabels, computeGivewizeScores } from "@/lib/charityUtils";
+import { getCombinedRating, getCategoryGradient, categoryLabels, scopeLabels, computeGivewizeScores, computeScoreDescriptions } from "@/lib/charityUtils";
 
 const SECTIONS = [
   { id: "overview", label: "Overview" },
@@ -37,6 +37,11 @@ const CharityDetail = () => {
 
   const computedScores = useMemo(
     () => (charity ? computeGivewizeScores(charity) : null),
+    [charity]
+  );
+
+  const scoreDescriptions = useMemo(
+    () => (charity ? computeScoreDescriptions(charity) : null),
     [charity]
   );
 
@@ -169,8 +174,14 @@ const CharityDetail = () => {
                   </div>
                 </div>
                 <p className="text-sm text-muted-foreground mb-1">Year Founded</p>
-                <p className="font-display text-2xl font-bold text-foreground">{charity.year_founded || "N/A"}</p>
-                {age != null && <p className="text-xs text-muted-foreground mt-0.5">{age} years ago</p>}
+                {charity.year_founded ? (
+                  <>
+                    <p className="font-display text-2xl font-bold text-foreground">{charity.year_founded}</p>
+                    {age != null && <p className="text-xs text-muted-foreground mt-0.5">{age} years ago</p>}
+                  </>
+                ) : (
+                  <p className="text-sm text-muted-foreground italic">Still to be Collected</p>
+                )}
               </div>
               <div className="bg-card rounded-xl p-5 shadow-soft">
                 <div className="flex items-center gap-3 mb-2">
@@ -179,9 +190,13 @@ const CharityDetail = () => {
                   </div>
                 </div>
                 <p className="text-sm text-muted-foreground mb-1">People Served</p>
-                <p className="font-display text-2xl font-bold text-foreground">
-                  {charity.people_served_annually ? charity.people_served_annually.toLocaleString() : "N/A"}
-                </p>
+                {charity.people_served_annually ? (
+                  <p className="font-display text-2xl font-bold text-foreground">
+                    {charity.people_served_annually.toLocaleString()}
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground italic">Still to be Collected</p>
+                )}
               </div>
               <div className="bg-card rounded-xl p-5 shadow-soft">
                 <div className="flex items-center gap-3 mb-2">
@@ -190,7 +205,11 @@ const CharityDetail = () => {
                   </div>
                 </div>
                 <p className="text-sm text-muted-foreground mb-1">Location</p>
-                <p className="font-display text-lg font-bold text-foreground line-clamp-1">{location || "N/A"}</p>
+                {location ? (
+                  <p className="font-display text-lg font-bold text-foreground line-clamp-1">{location}</p>
+                ) : (
+                  <p className="text-sm text-muted-foreground italic">Still to be Collected</p>
+                )}
               </div>
             </div>
 
@@ -201,7 +220,7 @@ const CharityDetail = () => {
                 {charity.full_description ? (
                   <p className="text-muted-foreground leading-relaxed">{charity.full_description}</p>
                 ) : (
-                  <p className="text-muted-foreground italic">Information being collected</p>
+                  <p className="text-muted-foreground italic">Still to be Collected</p>
                 )}
               </div>
               {charity.programs_list && charity.programs_list.length > 0 ? (
@@ -219,7 +238,7 @@ const CharityDetail = () => {
               ) : (
                 <div>
                   <h3 className="font-medium text-foreground mb-3">Key Programs</h3>
-                  <p className="text-muted-foreground italic">Information being collected</p>
+                  <p className="text-muted-foreground italic">Still to be Collected</p>
                 </div>
               )}
             </div>
@@ -249,12 +268,20 @@ const CharityDetail = () => {
                         <span className="text-xs text-muted-foreground">out of 5</span>
                       </div>
                     </div>
-                    <div className="w-full space-y-3">
-                      <SubScore label="Financial Efficiency" value={computedScores.financial_efficiency} />
-                      <SubScore label="Transparency" value={computedScores.transparency} />
-                      <SubScore label="Longevity" value={computedScores.longevity} />
-                      <SubScore label="Impact" value={computedScores.impact} />
+                    <div className="w-full space-y-4">
+                      <SubScore label="Financial Efficiency" value={computedScores.financial_efficiency} description={scoreDescriptions?.financial_efficiency} />
+                      <SubScore label="Transparency" value={computedScores.transparency} description={scoreDescriptions?.transparency} />
+                      <SubScore label="Longevity" value={computedScores.longevity} description={scoreDescriptions?.longevity} />
+                      <SubScore label="Impact" value={computedScores.impact} description={scoreDescriptions?.impact} />
                     </div>
+                    {(() => {
+                      const available = [computedScores.financial_efficiency, computedScores.transparency, computedScores.longevity, computedScores.impact].filter(v => v !== null).length;
+                      return available < 4 ? (
+                        <p className="text-xs text-muted-foreground mt-3 text-center italic">
+                          Overall score based on {available} of 4 available data points. Missing data does not penalize the score.
+                        </p>
+                      ) : null;
+                    })()}
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center py-8">
@@ -325,7 +352,7 @@ const CharityDetail = () => {
                       <div className="h-24 w-24 rounded-full bg-muted flex items-center justify-center mb-4">
                         <Globe className="h-10 w-10 text-muted-foreground" />
                       </div>
-                      <p className="text-muted-foreground font-medium">Data pending</p>
+                      <p className="text-muted-foreground font-medium">Still to be Collected</p>
                       <p className="text-sm text-muted-foreground mt-1">Financial breakdown not yet available</p>
                     </div>
                   )}
@@ -364,7 +391,7 @@ const CharityDetail = () => {
                   {charity.target_population ? (
                     <p className="text-muted-foreground">{charity.target_population}</p>
                   ) : (
-                    <p className="text-muted-foreground italic">Information being collected</p>
+                    <p className="text-muted-foreground italic">Still to be Collected</p>
                   )}
                 </div>
                 <div className="bg-secondary rounded-xl p-5">
@@ -377,7 +404,7 @@ const CharityDetail = () => {
                   {charity.people_served_annually ? (
                     <p className="text-2xl font-display font-bold text-foreground">{charity.people_served_annually.toLocaleString()}</p>
                   ) : (
-                    <p className="text-muted-foreground italic">Information being collected</p>
+                    <p className="text-muted-foreground italic">Still to be Collected</p>
                   )}
                 </div>
                 <div className="bg-secondary rounded-xl p-5">
@@ -387,7 +414,7 @@ const CharityDetail = () => {
                     </div>
                     <h4 className="font-medium text-foreground">Measurable Outcomes</h4>
                   </div>
-                  <p className="text-muted-foreground italic">Information being collected</p>
+                  <p className="text-muted-foreground italic">Still to be Collected</p>
                 </div>
               </div>
             </div>
@@ -425,7 +452,7 @@ function TransparencyItem({ label, status, description, link }: { label: string;
         <div className="flex items-center gap-2">
           <p className={`font-medium ${isPending ? "text-muted-foreground" : isChecked ? "text-foreground" : "text-muted-foreground"}`}>
             {label}
-            {isPending && <span className="ml-2 text-xs font-normal text-muted-foreground">(Data pending)</span>}
+            {isPending && <span className="ml-2 text-xs font-normal text-amber-600 italic">(Still to be Collected)</span>}
           </p>
           {link && !isPending && (
             <a href={link} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-sm">View &rarr;</a>
@@ -437,20 +464,27 @@ function TransparencyItem({ label, status, description, link }: { label: string;
   );
 }
 
-function SubScore({ label, value }: { label: string; value: number | null }) {
+function SubScore({ label, value, description }: { label: string; value: number | null; description?: string | null }) {
   return (
-    <div className="flex items-center justify-between">
-      <span className="text-sm text-muted-foreground">{label}</span>
-      {value !== null ? (
-        <div className="flex items-center gap-2">
-          <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
-            <div className="h-full bg-primary rounded-full" style={{ width: `${(Number(value) / 5) * 100}%` }} />
+    <div>
+      <div className="flex items-center justify-between">
+        <span className="text-sm text-muted-foreground font-medium">{label}</span>
+        {value !== null ? (
+          <div className="flex items-center gap-2">
+            <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
+              <div className="h-full bg-primary rounded-full" style={{ width: `${(Number(value) / 5) * 100}%` }} />
+            </div>
+            <span className="text-sm font-medium text-foreground w-8 text-right">{Number(value).toFixed(1)}</span>
           </div>
-          <span className="text-sm font-medium text-foreground w-8 text-right">{Number(value).toFixed(1)}</span>
-        </div>
-      ) : (
-        <span className="text-xs text-muted-foreground italic">Pending</span>
-      )}
+        ) : (
+          <span className="text-xs text-amber-600 italic">Still to be Collected</span>
+        )}
+      </div>
+      {description ? (
+        <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{description}</p>
+      ) : value === null ? (
+        <p className="text-xs text-muted-foreground mt-1 italic">This data point has not been scored yet and does not affect the overall rating.</p>
+      ) : null}
     </div>
   );
 }

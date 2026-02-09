@@ -32,7 +32,9 @@ export function StarRating({
   className,
 }: StarRatingProps) {
   const [hoverRating, setHoverRating] = useState(0);
-  const displayRating = interactive && hoverRating > 0 ? hoverRating : rating;
+  const rawRating = interactive && hoverRating > 0 ? hoverRating : rating;
+  // Round to 1 decimal so star fills match the displayed text value
+  const displayRating = Math.round(rawRating * 10) / 10;
 
   return (
     <div className={cn("flex items-center gap-1", className)}>

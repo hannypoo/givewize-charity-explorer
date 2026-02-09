@@ -16,7 +16,10 @@ export type Database = {
     Tables: {
       charities: {
         Row: {
+          accepts_direct_donation: boolean | null
           admin_expense_percentage: number | null
+          allows_donation_tracking: boolean | null
+          allows_donor_recipient_contact: boolean | null
           annual_report_url: string | null
           city: string | null
           community_rating_average: number | null
@@ -34,6 +37,7 @@ export type Database = {
           logo_url: string | null
           mission_statement: string | null
           name: string
+          offers_donor_perks: boolean | null
           people_served_annually: number | null
           primary_category: Database["public"]["Enums"]["cause_category"]
           program_expense_percentage: number | null
@@ -50,7 +54,10 @@ export type Database = {
           year_founded: number | null
         }
         Insert: {
+          accepts_direct_donation?: boolean | null
           admin_expense_percentage?: number | null
+          allows_donation_tracking?: boolean | null
+          allows_donor_recipient_contact?: boolean | null
           annual_report_url?: string | null
           city?: string | null
           community_rating_average?: number | null
@@ -68,6 +75,7 @@ export type Database = {
           logo_url?: string | null
           mission_statement?: string | null
           name: string
+          offers_donor_perks?: boolean | null
           people_served_annually?: number | null
           primary_category: Database["public"]["Enums"]["cause_category"]
           program_expense_percentage?: number | null
@@ -84,7 +92,10 @@ export type Database = {
           year_founded?: number | null
         }
         Update: {
+          accepts_direct_donation?: boolean | null
           admin_expense_percentage?: number | null
+          allows_donation_tracking?: boolean | null
+          allows_donor_recipient_contact?: boolean | null
           annual_report_url?: string | null
           city?: string | null
           community_rating_average?: number | null
@@ -102,6 +113,7 @@ export type Database = {
           logo_url?: string | null
           mission_statement?: string | null
           name?: string
+          offers_donor_perks?: boolean | null
           people_served_annually?: number | null
           primary_category?: Database["public"]["Enums"]["cause_category"]
           program_expense_percentage?: number | null

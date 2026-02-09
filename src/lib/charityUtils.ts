@@ -4,16 +4,23 @@ type Charity = Tables<"charities">;
 
 // ── Compute GiveWiZe scores client-side from raw data ─────────────────
 export interface ComputedScores {
-  financial_efficiency: number;
+  financial_efficiency: number | null;
   transparency: number;
-  longevity: number;
-  impact: number;
+  longevity: number | null;
+  impact: number | null;
   overall: number;
 }
 
+export interface ScoreDescriptions {
+  financial_efficiency: string | null;
+  transparency: string;
+  longevity: string | null;
+  impact: string | null;
+}
+
 export function computeGivewizeScores(charity: Charity): ComputedScores {
-  // Financial Efficiency (0-5)
-  let fe = 2.5;
+  // Financial Efficiency (0-5) — null if no program expense data
+  let fe: number | null = null;
   if (charity.program_expense_percentage != null) {
     const pep = charity.program_expense_percentage;
     if (pep >= 90) fe = 5.0;
@@ -26,7 +33,7 @@ export function computeGivewizeScores(charity: Charity): ComputedScores {
     else fe = 1.5;
   }
 
-  // Transparency (0-5)
+  // Transparency (0-5) — always computable from checklist
   let tp = 0;
   const validEin = charity.ein && !charity.ein.includes("verify") && !charity.ein.includes("contact");
   if (validEin) tp += 1.0;
@@ -36,8 +43,8 @@ export function computeGivewizeScores(charity: Charity): ComputedScores {
   if (charity.program_expense_percentage != null) tp += 0.75;
   tp = Math.min(5, tp);
 
-  // Longevity (0-5)
-  let lg = 2.5;
+  // Longevity (0-5) — null if no founding year
+  let lg: number | null = null;
   if (charity.year_founded) {
     const age = new Date().getFullYear() - charity.year_founded;
     if (age >= 50) lg = 5.0;
@@ -48,8 +55,8 @@ export function computeGivewizeScores(charity: Charity): ComputedScores {
     else lg = 2.0;
   }
 
-  // Impact (0-5)
-  let imp = 2.0;
+  // Impact (0-5) — null if no people served data
+  let imp: number | null = null;
   if (charity.people_served_annually != null) {
     const ps = charity.people_served_annually;
     if (ps >= 1000000) imp = 5.0;
@@ -59,20 +66,82 @@ export function computeGivewizeScores(charity: Charity): ComputedScores {
     else if (ps >= 1000) imp = 3.0;
     else if (ps >= 100) imp = 2.5;
     else imp = 2.0;
+    if (charity.programs_list && charity.programs_list.length >= 8) imp = Math.min(5, imp + 0.5);
+    else if (charity.programs_list && charity.programs_list.length >= 4) imp = Math.min(5, imp + 0.25);
   }
-  if (charity.programs_list && charity.programs_list.length >= 8) imp = Math.min(5, imp + 0.5);
-  else if (charity.programs_list && charity.programs_list.length >= 4) imp = Math.min(5, imp + 0.25);
 
-  // Overall: weighted average (Financial 35%, Transparency 25%, Impact 25%, Longevity 15%)
-  const overall = fe * 0.35 + tp * 0.25 + imp * 0.25 + lg * 0.15;
+  // Overall: weighted average of available components only
+  const components: { score: number; weight: number }[] = [];
+  if (fe != null) components.push({ score: fe, weight: 0.35 });
+  components.push({ score: tp, weight: 0.25 });
+  if (imp != null) components.push({ score: imp, weight: 0.25 });
+  if (lg != null) components.push({ score: lg, weight: 0.15 });
+
+  const totalWeight = components.reduce((sum, c) => sum + c.weight, 0);
+  const overall = components.reduce((sum, c) => sum + c.score * c.weight, 0) / totalWeight;
 
   return {
-    financial_efficiency: Math.round(fe * 10) / 10,
+    financial_efficiency: fe != null ? Math.round(fe * 10) / 10 : null,
     transparency: Math.round(tp * 10) / 10,
-    longevity: Math.round(lg * 10) / 10,
-    impact: Math.round(imp * 10) / 10,
+    longevity: lg != null ? Math.round(lg * 10) / 10 : null,
+    impact: imp != null ? Math.round(imp * 10) / 10 : null,
     overall: Math.round(overall * 10) / 10,
   };
+}
+
+export function computeScoreDescriptions(charity: Charity): ScoreDescriptions {
+  // Financial Efficiency description
+  let feDesc: string | null = null;
+  if (charity.program_expense_percentage != null) {
+    const pep = charity.program_expense_percentage;
+    const quality = pep >= 85 ? "excellent" : pep >= 75 ? "good" : pep >= 65 ? "moderate" : "below average";
+    feDesc = `${pep}% of expenses go directly to programs and services`;
+    if (charity.admin_expense_percentage != null) feDesc += `, ${charity.admin_expense_percentage}% to administration`;
+    if (charity.fundraising_expense_percentage != null) feDesc += `, and ${charity.fundraising_expense_percentage}% to fundraising`;
+    feDesc += `. This is considered ${quality} by nonprofit standards (75%+ is typical for well-run organizations).`;
+  }
+
+  // Transparency description
+  const met: string[] = [];
+  const pending: string[] = [];
+  const validEin = charity.ein && !charity.ein.includes("verify") && !charity.ein.includes("contact");
+  if (validEin) met.push("registered EIN");
+  else pending.push("EIN verification");
+  if (charity.complete_990_filed) met.push("Form 990 filed");
+  else pending.push("Form 990 status");
+  if (charity.financials_published) met.push("financials published");
+  else pending.push("financial publication");
+  if (charity.annual_report_url) met.push("annual report available");
+  else pending.push("annual report");
+  if (charity.program_expense_percentage != null) met.push("expense breakdown disclosed");
+  else pending.push("expense breakdown");
+  let tpDesc = `${met.length} of 5 transparency indicators met.`;
+  if (met.length > 0) tpDesc += ` Verified: ${met.join(", ")}.`;
+  if (pending.length > 0) tpDesc += ` Still collecting: ${pending.join(", ")}.`;
+
+  // Longevity description
+  let lgDesc: string | null = null;
+  if (charity.year_founded) {
+    const age = new Date().getFullYear() - charity.year_founded;
+    const maturity = age >= 50 ? "deeply established" : age >= 30 ? "well-established" : age >= 20 ? "established" : age >= 10 ? "growing" : "relatively new";
+    lgDesc = `Founded in ${charity.year_founded}, operating for ${age} years. Considered ${maturity} in the nonprofit sector.`;
+  }
+
+  // Impact description
+  let impDesc: string | null = null;
+  if (charity.people_served_annually != null) {
+    const ps = charity.people_served_annually;
+    const scale = ps >= 1_000_000 ? "massive" : ps >= 100_000 ? "large-scale" : ps >= 10_000 ? "significant" : ps >= 1_000 ? "moderate" : "focused";
+    impDesc = `Serves ${ps.toLocaleString()} people annually, indicating ${scale} reach.`;
+    if (charity.programs_list && charity.programs_list.length > 0) {
+      impDesc += ` Operates ${charity.programs_list.length} distinct program${charity.programs_list.length > 1 ? "s" : ""}.`;
+    }
+    if (charity.target_population) {
+      impDesc += ` Primarily serves ${charity.target_population}.`;
+    }
+  }
+
+  return { financial_efficiency: feDesc, transparency: tpDesc, longevity: lgDesc, impact: impDesc };
 }
 
 export function getGivewizeScore(charity: Charity): number {
