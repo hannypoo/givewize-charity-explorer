@@ -68,6 +68,7 @@ export function CharityCard({ charity }: CharityCardProps) {
                 <img
                   src={charity.logoUrl}
                   alt={`${charity.name} logo`}
+                  loading="lazy"
                   className="h-10 w-10 object-contain rounded-lg"
                 />
               ) : (

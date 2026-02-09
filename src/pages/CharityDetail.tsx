@@ -565,7 +565,7 @@ const CharityDetail = () => {
                       <div className="flex items-center gap-3 mb-3">
                         <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
                           {related.logo_url ? (
-                            <img src={related.logo_url} alt="" className="h-7 w-7 object-contain rounded" />
+                            <img src={related.logo_url} alt="" loading="lazy" className="h-7 w-7 object-contain rounded" />
                           ) : (
                             <Building2 className="h-4 w-4 text-muted-foreground" />
                           )}

@@ -116,7 +116,7 @@ const QuizResults = () => {
                       <div className="flex flex-col sm:flex-row sm:items-start gap-4">
                         <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white/15">
                           {match.charity.logo_url ? (
-                            <img src={match.charity.logo_url} alt="" className="h-10 w-10 object-contain rounded-lg" />
+                            <img src={match.charity.logo_url} alt="" loading="lazy" className="h-10 w-10 object-contain rounded-lg" />
                           ) : (
                             <Building2 className="h-7 w-7 text-white" />
                           )}

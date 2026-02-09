@@ -85,7 +85,8 @@ export function FeaturedCharitiesSection() {
                     {charity.logo_url ? (
                       <img
                         src={charity.logo_url}
-                        alt=""
+                        alt={`${charity.name} logo`}
+                        loading="lazy"
                         className="h-8 w-8 object-contain rounded-lg"
                       />
                     ) : (
