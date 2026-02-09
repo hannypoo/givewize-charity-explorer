@@ -1,14 +1,18 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
-import { useSearchParams } from "react-router-dom";
-import { Filter, ChevronRight, X, ArrowUpDown } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
+import { Filter, ChevronRight, X, ArrowUpDown, Info, Heart, Building2 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { CharityFilters } from "@/components/charities/CharityFilters";
 import { CharityGrid } from "@/components/charities/CharityGrid";
 import { CharityGridSkeleton } from "@/components/charities/CharityCardSkeleton";
 import { charityRowToCard } from "@/components/charities/CharityCard";
-import { getCombinedRating, getGivewizeScore } from "@/lib/charityUtils";
+import { getCombinedRating, getGivewizeScore, categoryLabels } from "@/lib/charityUtils";
+import { StarRating } from "@/components/charities/StarRating";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import type { CharityRow } from "@/hooks/useCharities";
 import {
   Pagination,
   PaginationContent,
@@ -23,6 +27,14 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { categoryHierarchy } from "@/data/categoryHierarchy";
 
 const ITEMS_PER_PAGE = 12;
+
+const ZS_LIST_IDS = [
+  "d2c825ff-6ac3-4ce8-aa18-9d0fd4b51cd6", // Nicolaides-Baraitser Syndrome
+  "2409590d-9630-4137-bb1b-227c7e3cc4a3", // NORD
+  "efe593bf-28dd-42b0-a08f-cc20df79f96c", // CURE Epilepsy
+  "a4ff3f2d-6367-4ebc-a4a6-fb967ed4dc47", // Osteogenesis Imperfecta Foundation
+  "9a171061-36ea-4d16-b55a-9546fc83004a", // DonorsChoose
+];
 
 const categoryLabelMap = new Map(
   categoryHierarchy.flatMap((g) => g.subcategories.map((s) => [s.value, s.label]))
@@ -66,6 +78,17 @@ const Charities = () => {
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const debouncedSearch = useDebounce(searchQuery, 300);
+
+  const { data: zsListCharities = [] } = useQuery({
+    queryKey: ["zs-list"],
+    queryFn: async () => {
+      const { data } = await supabase.from("charities").select("*").in("id", ZS_LIST_IDS);
+      // Preserve the order defined in ZS_LIST_IDS
+      const map = new Map((data || []).map((c) => [c.id, c]));
+      return ZS_LIST_IDS.map((id) => map.get(id)).filter(Boolean) as CharityRow[];
+    },
+    staleTime: 10 * 60 * 1000,
+  });
 
   // Sync all filter state to URL search params
   useEffect(() => {
@@ -229,6 +252,16 @@ const Charities = () => {
             <p className="mt-2 text-accent-foreground/80">
               Discover vetted organizations making a real impact
             </p>
+
+            {/* Scoring disclaimer */}
+            <div className="mt-6 flex items-start gap-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/15 px-4 py-3">
+              <Info className="h-4 w-4 text-white/60 mt-0.5 shrink-0" />
+              <p className="text-sm text-white/70 leading-relaxed">
+                Ratings are based on weighted factors including financial efficiency, transparency, impact, and community input.
+                A score does not dictate a charity's worthiness to receive — it simply provides a breakdown of factors that may
+                be important to donors. Please look into each organization and consider how to Give Wi<span className="text-orange-light font-semibold">Z</span>ely.
+              </p>
+            </div>
           </div>
         </div>
         <div className="container py-8">
@@ -448,6 +481,58 @@ const Charities = () => {
             </main>
           </div>
         </div>
+
+        {/* Z's List */}
+        {zsListCharities.length > 0 && (
+          <div className="container pb-16">
+            <div className="rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 p-6 md:p-8">
+              <div className="flex items-center gap-3 mb-2">
+                <Heart className="h-5 w-5 text-orange-light fill-orange-light" />
+                <h2 className="font-display text-2xl font-bold text-white">Z's List</h2>
+              </div>
+              <p className="text-sm text-white/60 mb-6 max-w-2xl">
+                These charities hold a special place in our hearts. They represent causes that are deeply personal
+                to Z and our family — from rare disease research to education access. We encourage you to learn more
+                about each one.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                {zsListCharities.map((charity, i) => {
+                  const combined = getCombinedRating(charity);
+                  return (
+                    <Link
+                      key={charity.id}
+                      to={`/charities/${charity.id}`}
+                      className="group bg-white/10 rounded-xl p-4 hover:bg-white/20 hover:-translate-y-0.5 transition-all duration-300 animate-fade-in-up opacity-0"
+                      style={{ animationDelay: `${i * 80}ms`, animationFillMode: "forwards" }}
+                    >
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+                          {charity.logo_url ? (
+                            <img src={charity.logo_url} alt="" loading="lazy" className="h-7 w-7 object-contain rounded" />
+                          ) : (
+                            <Building2 className="h-4 w-4 text-white/50" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="font-semibold text-white text-sm line-clamp-2 leading-tight">{charity.name}</h3>
+                        </div>
+                      </div>
+                      <span className="text-xs text-white/40">
+                        {categoryLabels[charity.primary_category] || charity.primary_category}
+                      </span>
+                      {combined != null && (
+                        <StarRating rating={combined} size="sm" showValue className="mt-2 [&_span]:text-white/90 [&_svg]:text-white/30" />
+                      )}
+                      <p className="text-xs text-white/40 line-clamp-2 mt-2 leading-relaxed">
+                        {charity.mission_statement}
+                      </p>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );
