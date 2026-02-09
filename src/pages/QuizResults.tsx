@@ -42,8 +42,7 @@ const QuizResults = () => {
         setMatches(results);
         setIsLoading(false);
       })
-      .catch((err) => {
-        console.error("Quiz matching failed:", err);
+      .catch(() => {
         setError("Something went wrong finding your matches. Please try again.");
         setIsLoading(false);
       });

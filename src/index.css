@@ -127,6 +127,10 @@ html {
   body {
     @apply bg-background text-foreground antialiased;
   }
+  /* Visible focus ring for keyboard navigation */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
 }
 
 /* Glassmorphism utilities */

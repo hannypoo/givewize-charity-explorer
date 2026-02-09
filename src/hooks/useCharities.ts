@@ -25,6 +25,7 @@ const defaultFilters: CharityFilters = {
 export function useCharities(filters: CharityFilters = defaultFilters) {
   return useQuery({
     queryKey: ["charities", filters],
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       let query = supabase.from("charities").select("*");
 

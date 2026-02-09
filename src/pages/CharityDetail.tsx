@@ -188,6 +188,8 @@ const CharityDetail = () => {
                 )}
                 <button
                   onClick={() => setIsFavorited(!isFavorited)}
+                  aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
+                  aria-pressed={isFavorited}
                   className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
                     isFavorited ? "bg-white text-primary" : "border-2 border-white text-white hover:bg-white/10"
                   }`}
@@ -208,6 +210,7 @@ const CharityDetail = () => {
                       toast.success("Link copied to clipboard");
                     }
                   }}
+                  aria-label="Share this charity"
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border-2 border-white text-white hover:bg-white/10 transition-all"
                 >
                   <Share2 className="h-4 w-4" />
