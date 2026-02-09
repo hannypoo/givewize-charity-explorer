@@ -6,7 +6,7 @@ import { CharityFilters } from "@/components/charities/CharityFilters";
 import { CharityGrid } from "@/components/charities/CharityGrid";
 import { CharityGridSkeleton } from "@/components/charities/CharityCardSkeleton";
 import { charityRowToCard } from "@/components/charities/CharityCard";
-import { getCombinedRating } from "@/lib/charityUtils";
+import { getCombinedRating, getGivewizeScore } from "@/lib/charityUtils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -103,8 +103,14 @@ const Charities = () => {
 
   const { data: charities = [], isLoading, error, refetch } = useCharities(filters);
 
+  // Client-side GiveWiZe score filter (score_overall is computed, not stored in DB)
+  const filteredCharities = useMemo(() => {
+    if (minGivewizeScore <= 0) return charities;
+    return charities.filter((c) => getGivewizeScore(c) >= minGivewizeScore);
+  }, [charities, minGivewizeScore]);
+
   const sortedCharities = useMemo(() => {
-    const sorted = [...charities];
+    const sorted = [...filteredCharities];
     switch (sortBy) {
       case "name-asc": sorted.sort((a, b) => a.name.localeCompare(b.name)); break;
       case "name-desc": sorted.sort((a, b) => b.name.localeCompare(a.name)); break;
@@ -112,7 +118,7 @@ const Charities = () => {
       case "newest": sorted.sort((a, b) => (b.year_founded ?? 0) - (a.year_founded ?? 0)); break;
     }
     return sorted;
-  }, [charities, sortBy]);
+  }, [filteredCharities, sortBy]);
 
   const cardCharities = useMemo(
     () => sortedCharities.map(charityRowToCard),

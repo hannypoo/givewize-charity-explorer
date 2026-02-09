@@ -46,10 +46,8 @@ export function useCharities(filters: CharityFilters = defaultFilters) {
         query = query.in("geographic_scope", filters.selectedScopes);
       }
 
-      // Minimum GiveWize score
-      if (filters.minGivewizeScore > 0) {
-        query = query.gte("score_overall", filters.minGivewizeScore);
-      }
+      // Note: minGivewizeScore is filtered client-side in Charities.tsx
+      // because score_overall is computed on the fly, not stored in DB
 
       // Minimum community rating
       if (filters.minCommunityRating > 0) {

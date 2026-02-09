@@ -97,7 +97,7 @@ const CharityDetail = () => {
       if (!charity) return [];
       const { data } = await supabase
         .from("charities")
-        .select("id, name, primary_category, logo_url, mission_statement, community_rating_average, score_overall")
+        .select("*")
         .eq("primary_category", charity.primary_category)
         .neq("id", charity.id)
         .order("community_rating_average", { ascending: false })

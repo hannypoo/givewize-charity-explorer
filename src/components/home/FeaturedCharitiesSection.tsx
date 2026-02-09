@@ -35,7 +35,7 @@ export function FeaturedCharitiesSection() {
     queryFn: async () => {
       const { data } = await supabase
         .from("charities")
-        .select("id, name, primary_category, logo_url, mission_statement, community_rating_average, score_overall, score_financial_efficiency, score_transparency, score_longevity, score_impact")
+        .select("*")
         .order("community_rating_average", { ascending: false })
         .limit(4);
       return (data || []) as CharityRow[];
