@@ -44,7 +44,7 @@ export function CharityCard({ charity }: CharityCardProps) {
 
         <div className="relative">
           <div className="flex items-start justify-between mb-4">
-            <div className="w-14 h-14 rounded-xl bg-white flex items-center justify-center">
+            <div className="w-14 h-14 rounded-xl bg-white flex items-center justify-center group-hover:scale-105 group-hover:shadow-lg transition-all duration-300">
               {charity.logoUrl ? (
                 <img
                   src={charity.logoUrl}

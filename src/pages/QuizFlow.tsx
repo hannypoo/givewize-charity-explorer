@@ -120,7 +120,7 @@ const QuizFlow = () => {
           </div>
 
           {/* Question Card */}
-          <div className="glass-dark rounded-2xl p-6 md:p-8 mb-6">
+          <div key={currentStep} className="glass-dark rounded-2xl p-6 md:p-8 mb-6 animate-fade-in-up" style={{ animationDuration: "0.3s" }}>
             <h2 className="font-display text-2xl md:text-3xl font-bold text-white mb-2 text-center">
               {currentQuestion.question}
             </h2>
