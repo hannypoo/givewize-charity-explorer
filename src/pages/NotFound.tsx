@@ -14,7 +14,7 @@ const NotFound = () => {
         <div className="absolute bottom-20 right-[15%] w-64 h-64 bg-orange/10 rounded-full blur-[80px]" />
 
         <div className="container relative flex flex-col items-center justify-center min-h-[60vh] text-center py-16">
-          <div className="glass-dark rounded-2xl p-8 md:p-12 max-w-lg w-full">
+          <div className="glass-dark rounded-2xl p-8 md:p-12 max-w-lg w-full animate-fade-in-up" style={{ animationDuration: "0.4s" }}>
             <div className="text-8xl font-bold text-white/20 mb-4">404</div>
             <h1 className="text-2xl md:text-3xl font-bold text-white mb-3">
               Page not found

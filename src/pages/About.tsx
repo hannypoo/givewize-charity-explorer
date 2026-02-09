@@ -198,8 +198,9 @@ const About = () => {
                   <Link to="/quiz">Find Your Match</Link>
                 </Button>
                 <Button
+                  variant="outline"
                   size="lg"
-                  className="gradient-orange text-accent-foreground font-semibold px-8 rounded-2xl glow-orange hover:scale-[1.02] transition-all duration-300"
+                  className="border-white/25 text-white hover:bg-white/15 rounded-2xl"
                   asChild
                 >
                   <Link to="/charities">Explore Charities</Link>

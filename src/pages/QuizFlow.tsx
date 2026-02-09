@@ -197,6 +197,8 @@ const QuizFlow = () => {
                       <button
                         key={value}
                         onClick={() => handleScaleSelect(value)}
+                        aria-label={`Rate ${value} out of 5${currentQuestion.scaleLabels ? ` — ${value === 1 ? currentQuestion.scaleLabels.low : value === 5 ? currentQuestion.scaleLabels.high : ""}` : ""}`}
+                        aria-pressed={isActive}
                         className={`flex-1 py-4 rounded-xl border-2 font-bold text-lg transition-all duration-200 ${
                           isActive
                             ? "border-orange bg-orange text-accent-foreground"
@@ -234,6 +236,7 @@ const QuizFlow = () => {
                       key={option.id}
                       onClick={() => handleSelectAnswer(option.id)}
                       disabled={!!atMax}
+                      aria-pressed={selected}
                       className={`relative p-4 rounded-xl border-2 text-left transition-all duration-200 ${
                         selected
                           ? "border-orange bg-orange/20 text-white"
