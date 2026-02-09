@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      charity_requests: {
+        Row: {
+          id: string
+          charity_name: string
+          charity_website: string | null
+          requester_name: string | null
+          requester_email: string
+          reason: string | null
+          status: string
+          admin_notes: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          charity_name: string
+          charity_website?: string | null
+          requester_name?: string | null
+          requester_email: string
+          reason?: string | null
+          status?: string
+          admin_notes?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          charity_name?: string
+          charity_website?: string | null
+          requester_name?: string | null
+          requester_email?: string
+          reason?: string | null
+          status?: string
+          admin_notes?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
       charities: {
         Row: {
           accepts_direct_donation: boolean | null

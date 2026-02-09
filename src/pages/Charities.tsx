@@ -262,6 +262,12 @@ const Charities = () => {
                 be important to donors. Please look into each organization and consider how to Give Wi<span className="text-orange-light font-semibold">Z</span>ely.
               </p>
             </div>
+            <p className="mt-3 text-sm text-white/50">
+              Don't see a charity you're looking for?{" "}
+              <Link to="/request-charity" className="text-orange-light hover:underline font-medium">
+                Request one →
+              </Link>
+            </p>
           </div>
         </div>
         <div className="container py-8">

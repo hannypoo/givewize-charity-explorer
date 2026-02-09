@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { Link } from "react-router-dom";
 import { SearchX } from "lucide-react";
 import { CharityCard, Charity } from "./CharityCard";
 
@@ -17,6 +18,12 @@ export const CharityGrid = memo(function CharityGrid({ charities }: CharityGridP
         <p className="mt-1 text-sm text-white/50 max-w-xs">
           Try adjusting your filters or search terms to discover more organizations.
         </p>
+        <Link
+          to="/request-charity"
+          className="mt-4 text-sm text-orange-light hover:underline font-medium"
+        >
+          Request a Charity →
+        </Link>
       </div>
     );
   }

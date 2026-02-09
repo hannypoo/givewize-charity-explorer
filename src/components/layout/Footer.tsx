@@ -8,6 +8,8 @@ const navLinks = [
   { to: "/charities", label: "Explore" },
   { to: "/quiz", label: "Quiz" },
   { to: "/about", label: "About" },
+  { to: "/faq", label: "FAQ" },
+  { to: "/help", label: "Help" },
 ];
 
 export function Footer() {
@@ -84,6 +86,7 @@ export function Footer() {
           <div className="flex items-center gap-6 text-sm text-white/30">
             <span>Privacy Policy</span>
             <span>Terms of Service</span>
+            <Link to="/faq" className="hover:text-white/50 transition-colors">FAQ</Link>
           </div>
         </div>
       </div>
