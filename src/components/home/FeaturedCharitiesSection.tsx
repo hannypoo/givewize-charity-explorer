@@ -44,27 +44,32 @@ export function FeaturedCharitiesSection() {
     staleTime: 5 * 60 * 1000,
   });
 
-  // Pick top 4 by combined rating, one per category for variety
+  // Pick top 4 by combined rating, rotating categories daily
   const charities = useMemo(() => {
     if (allCharities.length === 0) return [];
-    const ranked = [...allCharities].sort(
-      (a, b) => (getCombinedRating(b) ?? 0) - (getCombinedRating(a) ?? 0)
-    );
-    const picks: CharityRow[] = [];
-    const usedCategories = new Set<string>();
-    // First pass: one per category
-    for (const c of ranked) {
-      if (picks.length >= 4) break;
-      if (!usedCategories.has(c.primary_category)) {
-        picks.push(c);
-        usedCategories.add(c.primary_category);
+
+    // Group by category, pick the best from each
+    const bestByCategory = new Map<string, CharityRow>();
+    for (const c of allCharities) {
+      const existing = bestByCategory.get(c.primary_category);
+      if (!existing || (getCombinedRating(c) ?? 0) > (getCombinedRating(existing) ?? 0)) {
+        bestByCategory.set(c.primary_category, c);
       }
     }
-    // Fill remaining slots if needed
-    for (const c of ranked) {
-      if (picks.length >= 4) break;
-      if (!picks.includes(c)) picks.push(c);
+
+    // Sort categories deterministically, then rotate based on day of year
+    const categories = [...bestByCategory.keys()].sort();
+    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+    const offset = (dayOfYear * 4) % categories.length;
+
+    const picks: CharityRow[] = [];
+    for (let i = 0; i < 4 && i < categories.length; i++) {
+      const cat = categories[(offset + i) % categories.length];
+      picks.push(bestByCategory.get(cat)!);
     }
+
+    // Sort the 4 picks by combined rating descending
+    picks.sort((a, b) => (getCombinedRating(b) ?? 0) - (getCombinedRating(a) ?? 0));
     return picks;
   }, [allCharities]);
 

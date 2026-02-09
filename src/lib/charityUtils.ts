@@ -44,6 +44,7 @@ export function computeGivewizeScores(charity: Charity): ComputedScores {
   tp = Math.min(5, tp);
 
   // Longevity (0-5) — null if no founding year
+  // Floor of 3.0 so newer orgs aren't heavily penalized
   let lg: number | null = null;
   if (charity.year_founded) {
     const age = new Date().getFullYear() - charity.year_founded;
@@ -51,11 +52,11 @@ export function computeGivewizeScores(charity: Charity): ComputedScores {
     else if (age >= 30) lg = 4.5;
     else if (age >= 20) lg = 4.0;
     else if (age >= 10) lg = 3.5;
-    else if (age >= 5) lg = 3.0;
-    else lg = 2.0;
+    else lg = 3.0;
   }
 
-  // Impact (0-5) — null if no people served data
+  // Impact (0-5) — can score from people served OR documented programs
+  // Floor of 3.0 so small focused orgs aren't heavily penalized
   let imp: number | null = null;
   if (charity.people_served_annually != null) {
     const ps = charity.people_served_annually;
@@ -63,19 +64,23 @@ export function computeGivewizeScores(charity: Charity): ComputedScores {
     else if (ps >= 500000) imp = 4.5;
     else if (ps >= 100000) imp = 4.0;
     else if (ps >= 10000) imp = 3.5;
-    else if (ps >= 1000) imp = 3.0;
-    else if (ps >= 100) imp = 2.5;
-    else imp = 2.0;
+    else imp = 3.0;
     if (charity.programs_list && charity.programs_list.length >= 8) imp = Math.min(5, imp + 0.5);
     else if (charity.programs_list && charity.programs_list.length >= 4) imp = Math.min(5, imp + 0.25);
+  } else if (charity.programs_list && charity.programs_list.length > 0) {
+    // No people-served data but has documented programs — give partial credit
+    if (charity.programs_list.length >= 8) imp = 4.0;
+    else if (charity.programs_list.length >= 4) imp = 3.5;
+    else imp = 3.0;
   }
 
   // Overall: weighted average of available components only
+  // Weights: Financial Efficiency 35%, Transparency 30%, Impact 25%, Longevity 10%
   const components: { score: number; weight: number }[] = [];
   if (fe != null) components.push({ score: fe, weight: 0.35 });
-  components.push({ score: tp, weight: 0.25 });
+  components.push({ score: tp, weight: 0.30 });
   if (imp != null) components.push({ score: imp, weight: 0.25 });
-  if (lg != null) components.push({ score: lg, weight: 0.15 });
+  if (lg != null) components.push({ score: lg, weight: 0.10 });
 
   const totalWeight = components.reduce((sum, c) => sum + c.weight, 0);
   const overall = components.reduce((sum, c) => sum + c.score * c.weight, 0) / totalWeight;
@@ -123,7 +128,7 @@ export function computeScoreDescriptions(charity: Charity): ScoreDescriptions {
   let lgDesc: string | null = null;
   if (charity.year_founded) {
     const age = new Date().getFullYear() - charity.year_founded;
-    const maturity = age >= 50 ? "deeply established" : age >= 30 ? "well-established" : age >= 20 ? "established" : age >= 10 ? "growing" : "relatively new";
+    const maturity = age >= 50 ? "deeply established" : age >= 30 ? "well-established" : age >= 20 ? "established" : age >= 10 ? "growing" : "emerging";
     lgDesc = `Founded in ${charity.year_founded}, operating for ${age} years. Considered ${maturity} in the nonprofit sector.`;
   }
 
