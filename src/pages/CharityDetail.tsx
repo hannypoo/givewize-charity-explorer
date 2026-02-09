@@ -13,7 +13,7 @@ import { CommunityRatingAgent } from "@/components/charities/CommunityRatingAgen
 import { StarRating } from "@/components/charities/StarRating";
 import { useCharityById } from "@/hooks/useCharities";
 import { useActiveSection } from "@/hooks/useActiveSection";
-import { getCombinedRating, getCategoryGradient, categoryLabels, scopeLabels } from "@/lib/charityUtils";
+import { getCombinedRating, getCategoryGradient, categoryLabels, scopeLabels, computeGivewizeScores } from "@/lib/charityUtils";
 
 const SECTIONS = [
   { id: "overview", label: "Overview" },
@@ -32,6 +32,11 @@ const CharityDetail = () => {
 
   const combinedRating = useMemo(
     () => (charity ? getCombinedRating(charity) : null),
+    [charity]
+  );
+
+  const computedScores = useMemo(
+    () => (charity ? computeGivewizeScores(charity) : null),
     [charity]
   );
 
@@ -231,24 +236,24 @@ const CharityDetail = () => {
                   <Shield className="h-5 w-5 text-primary" />
                   <h3 className="font-display text-lg font-semibold text-foreground">GiveWiZe Score</h3>
                 </div>
-                {charity.score_overall !== null ? (
+                {computedScores ? (
                   <div className="flex flex-col items-center">
                     <div className="relative h-32 w-32 mb-6">
                       <svg className="h-32 w-32 -rotate-90" viewBox="0 0 120 120">
                         <circle cx="60" cy="60" r="52" fill="none" stroke="hsl(var(--muted))" strokeWidth="12" />
                         <circle cx="60" cy="60" r="52" fill="none" stroke="hsl(var(--primary))" strokeWidth="12"
-                          strokeDasharray={`${(Number(charity.score_overall) / 5) * 327} 327`} strokeLinecap="round" />
+                          strokeDasharray={`${(computedScores.overall / 5) * 327} 327`} strokeLinecap="round" />
                       </svg>
                       <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-3xl font-bold text-foreground">{Number(charity.score_overall).toFixed(1)}</span>
+                        <span className="text-3xl font-bold text-foreground">{computedScores.overall.toFixed(1)}</span>
                         <span className="text-xs text-muted-foreground">out of 5</span>
                       </div>
                     </div>
                     <div className="w-full space-y-3">
-                      <SubScore label="Financial Efficiency" value={charity.score_financial_efficiency} />
-                      <SubScore label="Transparency" value={charity.score_transparency} />
-                      <SubScore label="Longevity" value={charity.score_longevity} />
-                      <SubScore label="Impact" value={charity.score_impact} />
+                      <SubScore label="Financial Efficiency" value={computedScores.financial_efficiency} />
+                      <SubScore label="Transparency" value={computedScores.transparency} />
+                      <SubScore label="Longevity" value={computedScores.longevity} />
+                      <SubScore label="Impact" value={computedScores.impact} />
                     </div>
                   </div>
                 ) : (

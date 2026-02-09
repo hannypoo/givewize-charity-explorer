@@ -12,12 +12,8 @@ export interface Charity {
   geographicScope: "local" | "national" | "global";
   mission: string;
   logoUrl?: string;
-  scoreOverall?: number | null;
-  communityRating?: number | null;
-  programExpensePercentage?: number | null;
-  complete990Filed?: boolean | null;
-  financialsPublished?: boolean | null;
-  ein?: string | null;
+  /** The full Supabase row for accurate score computation */
+  _row: CharityRow;
 }
 
 interface CharityCardProps {
@@ -33,29 +29,13 @@ export function charityRowToCard(row: CharityRow): Charity {
     geographicScope: row.geographic_scope,
     mission: row.mission_statement || "",
     logoUrl: row.logo_url || undefined,
-    scoreOverall: row.score_overall,
-    communityRating: row.community_rating_average,
-    programExpensePercentage: row.program_expense_percentage,
-    complete990Filed: row.complete_990_filed,
-    financialsPublished: row.financials_published,
-    ein: row.ein,
+    _row: row,
   };
 }
 
 export function CharityCard({ charity }: CharityCardProps) {
-  const combinedRating = getCombinedRating({
-    score_overall: charity.scoreOverall ?? null,
-    community_rating_average: charity.communityRating ?? null,
-  } as any);
-
-  const badge = getKeyStandoutBadge({
-    program_expense_percentage: charity.programExpensePercentage ?? null,
-    score_overall: charity.scoreOverall ?? null,
-    community_rating_average: charity.communityRating ?? null,
-    complete_990_filed: charity.complete990Filed ?? null,
-    financials_published: charity.financialsPublished ?? null,
-    ein: charity.ein ?? null,
-  } as any);
+  const combinedRating = getCombinedRating(charity._row);
+  const badge = getKeyStandoutBadge(charity._row);
 
   return (
     <Link to={`/charities/${charity.id}`}>

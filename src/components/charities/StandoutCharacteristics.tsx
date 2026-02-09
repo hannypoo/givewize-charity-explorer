@@ -1,8 +1,10 @@
 import {
   Receipt, TrendingUp, Eye, FileText, Building2,
   Users, Star, Shield, Globe, MapPin, Layers,
+  HeartHandshake, Mail, CreditCard, Gift, Sparkles,
 } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
+import { getGivewizeScore } from "@/lib/charityUtils";
 
 type Charity = Tables<"charities">;
 
@@ -13,8 +15,16 @@ interface Characteristic {
   color: string;
 }
 
+interface SpecialFeature {
+  label: string;
+  description: string;
+  icon: React.ReactNode;
+  available: boolean;
+}
+
 function getCharacteristics(charity: Charity): Characteristic[] {
   const chars: Characteristic[] = [];
+  const givewizeScore = getGivewizeScore(charity);
 
   if (charity.ein) {
     chars.push({
@@ -80,10 +90,10 @@ function getCharacteristics(charity: Charity): Characteristic[] {
     });
   }
 
-  if (charity.score_overall != null && Number(charity.score_overall) >= 4.0) {
+  if (givewizeScore >= 4.0) {
     chars.push({
       label: "High GiveWiZe Score",
-      description: `Scored ${Number(charity.score_overall).toFixed(1)}/5 on the GiveWiZe algorithm.`,
+      description: `Scored ${givewizeScore.toFixed(1)}/5 on the GiveWiZe algorithm.`,
       icon: <Shield className="h-5 w-5" />,
       color: "bg-sky-50 text-sky-700 border-sky-200",
     });
@@ -119,36 +129,93 @@ function getCharacteristics(charity: Charity): Characteristic[] {
   return chars;
 }
 
+function getSpecialFeatures(): SpecialFeature[] {
+  return [
+    {
+      label: "See Donation Impact",
+      description: "Track how your donation is used and see the real-world results of your giving.",
+      icon: <HeartHandshake className="h-5 w-5" />,
+      available: false,
+    },
+    {
+      label: "Donor-Recipient Contact",
+      description: "Stay in touch with the people and communities your donations support.",
+      icon: <Mail className="h-5 w-5" />,
+      available: false,
+    },
+    {
+      label: "Direct Donation",
+      description: "Donate directly to this charity without intermediary fees.",
+      icon: <CreditCard className="h-5 w-5" />,
+      available: false,
+    },
+    {
+      label: "Donor Perks",
+      description: "Receive updates, thank-you gifts, or exclusive content from this charity.",
+      icon: <Gift className="h-5 w-5" />,
+      available: false,
+    },
+  ];
+}
+
 interface StandoutCharacteristicsProps {
   charity: Charity;
 }
 
 export function StandoutCharacteristics({ charity }: StandoutCharacteristicsProps) {
   const characteristics = getCharacteristics(charity);
-
-  if (characteristics.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-muted-foreground">No standout characteristics identified yet.</p>
-        <p className="text-sm text-muted-foreground mt-1">We're still gathering data for this charity.</p>
-      </div>
-    );
-  }
+  const specialFeatures = getSpecialFeatures();
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {characteristics.map((char) => (
-        <div
-          key={char.label}
-          className={`rounded-xl border p-4 transition-all hover:shadow-md ${char.color}`}
-        >
-          <div className="flex items-center gap-3 mb-2">
-            {char.icon}
-            <h3 className="font-semibold text-sm">{char.label}</h3>
-          </div>
-          <p className="text-xs opacity-80 leading-relaxed">{char.description}</p>
+    <div className="space-y-8">
+      {/* Verified Characteristics */}
+      {characteristics.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {characteristics.map((char) => (
+            <div
+              key={char.label}
+              className={`rounded-xl border p-4 transition-all hover:shadow-md ${char.color}`}
+            >
+              <div className="flex items-center gap-3 mb-2">
+                {char.icon}
+                <h3 className="font-semibold text-sm">{char.label}</h3>
+              </div>
+              <p className="text-xs opacity-80 leading-relaxed">{char.description}</p>
+            </div>
+          ))}
         </div>
-      ))}
+      ) : (
+        <div className="text-center py-6">
+          <p className="text-muted-foreground">No standout characteristics identified yet.</p>
+          <p className="text-sm text-muted-foreground mt-1">We're still gathering data for this charity.</p>
+        </div>
+      )}
+
+      {/* Special Features - Coming Soon */}
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <Sparkles className="h-5 w-5 text-primary" />
+          <h3 className="font-display font-semibold text-foreground">Special Features</h3>
+          <span className="text-xs font-medium bg-primary/10 text-primary px-2 py-0.5 rounded-full">Coming Soon</span>
+        </div>
+        <p className="text-sm text-muted-foreground mb-4">
+          GiveWiZe is working to verify and track these special donor experiences for every charity.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {specialFeatures.map((feature) => (
+            <div
+              key={feature.label}
+              className="rounded-xl border border-dashed border-border p-4 bg-muted/30 opacity-75"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <div className="text-muted-foreground">{feature.icon}</div>
+                <h4 className="font-semibold text-sm text-muted-foreground">{feature.label}</h4>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">{feature.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

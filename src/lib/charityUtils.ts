@@ -2,16 +2,92 @@ import type { Tables } from "@/integrations/supabase/types";
 
 type Charity = Tables<"charities">;
 
+// ── Compute GiveWiZe scores client-side from raw data ─────────────────
+export interface ComputedScores {
+  financial_efficiency: number;
+  transparency: number;
+  longevity: number;
+  impact: number;
+  overall: number;
+}
+
+export function computeGivewizeScores(charity: Charity): ComputedScores {
+  // Financial Efficiency (0-5)
+  let fe = 2.5;
+  if (charity.program_expense_percentage != null) {
+    const pep = charity.program_expense_percentage;
+    if (pep >= 90) fe = 5.0;
+    else if (pep >= 85) fe = 4.5;
+    else if (pep >= 80) fe = 4.0;
+    else if (pep >= 75) fe = 3.5;
+    else if (pep >= 70) fe = 3.0;
+    else if (pep >= 60) fe = 2.5;
+    else if (pep >= 50) fe = 2.0;
+    else fe = 1.5;
+  }
+
+  // Transparency (0-5)
+  let tp = 0;
+  const validEin = charity.ein && !charity.ein.includes("verify") && !charity.ein.includes("contact");
+  if (validEin) tp += 1.0;
+  if (charity.complete_990_filed) tp += 1.0;
+  if (charity.financials_published) tp += 1.0;
+  if (charity.annual_report_url) tp += 1.25;
+  if (charity.program_expense_percentage != null) tp += 0.75;
+  tp = Math.min(5, tp);
+
+  // Longevity (0-5)
+  let lg = 2.5;
+  if (charity.year_founded) {
+    const age = new Date().getFullYear() - charity.year_founded;
+    if (age >= 50) lg = 5.0;
+    else if (age >= 30) lg = 4.5;
+    else if (age >= 20) lg = 4.0;
+    else if (age >= 10) lg = 3.5;
+    else if (age >= 5) lg = 3.0;
+    else lg = 2.0;
+  }
+
+  // Impact (0-5)
+  let imp = 2.0;
+  if (charity.people_served_annually != null) {
+    const ps = charity.people_served_annually;
+    if (ps >= 1000000) imp = 5.0;
+    else if (ps >= 500000) imp = 4.5;
+    else if (ps >= 100000) imp = 4.0;
+    else if (ps >= 10000) imp = 3.5;
+    else if (ps >= 1000) imp = 3.0;
+    else if (ps >= 100) imp = 2.5;
+    else imp = 2.0;
+  }
+  if (charity.programs_list && charity.programs_list.length >= 8) imp = Math.min(5, imp + 0.5);
+  else if (charity.programs_list && charity.programs_list.length >= 4) imp = Math.min(5, imp + 0.25);
+
+  // Overall: weighted average (Financial 35%, Transparency 25%, Impact 25%, Longevity 15%)
+  const overall = fe * 0.35 + tp * 0.25 + imp * 0.25 + lg * 0.15;
+
+  return {
+    financial_efficiency: Math.round(fe * 10) / 10,
+    transparency: Math.round(tp * 10) / 10,
+    longevity: Math.round(lg * 10) / 10,
+    impact: Math.round(imp * 10) / 10,
+    overall: Math.round(overall * 10) / 10,
+  };
+}
+
+export function getGivewizeScore(charity: Charity): number {
+  if (charity.score_overall != null) return Number(charity.score_overall);
+  return computeGivewizeScores(charity).overall;
+}
+
 export function getCombinedRating(charity: Charity): number | null {
-  const givewize = charity.score_overall != null ? Number(charity.score_overall) : null;
+  const givewize = getGivewizeScore(charity);
   const community = charity.community_rating_average != null ? Number(charity.community_rating_average) : null;
 
-  if (givewize != null && community != null) {
+  if (community != null) {
     return givewize * 0.6 + community * 0.4;
   }
-  if (givewize != null) return givewize;
-  if (community != null) return community;
-  return null;
+  return givewize;
 }
 
 export function getCategoryGradient(category: string): string {
@@ -69,14 +145,12 @@ export function getKeyStandoutBadge(charity: Charity): { label: string; color: s
   if (charity.program_expense_percentage != null && charity.program_expense_percentage >= 80) {
     return { label: "High Efficiency", color: "bg-emerald-100 text-emerald-800" };
   }
-  if (charity.score_overall != null && Number(charity.score_overall) >= 4.0) {
+  const score = getGivewizeScore(charity);
+  if (score >= 4.0) {
     return { label: "Top Rated", color: "bg-blue-100 text-blue-800" };
   }
   if (charity.community_rating_average != null && Number(charity.community_rating_average) >= 4.0) {
     return { label: "Community Favorite", color: "bg-amber-100 text-amber-800" };
-  }
-  if (charity.complete_990_filed && charity.financials_published) {
-    return { label: "Transparent", color: "bg-purple-100 text-purple-800" };
   }
   if (charity.ein) {
     return { label: "Tax Deductible", color: "bg-sky-100 text-sky-800" };

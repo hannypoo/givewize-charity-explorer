@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Filter, Loader2 } from "lucide-react";
+import { Filter, Loader2, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { CharityFilters } from "@/components/charities/CharityFilters";
 import { CharityGrid } from "@/components/charities/CharityGrid";
@@ -33,6 +33,7 @@ const Charities = () => {
   const [keyFactors, setKeyFactors] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [desktopFiltersOpen, setDesktopFiltersOpen] = useState(false);
 
   const filters: FilterState = {
     searchQuery,
@@ -141,12 +142,39 @@ const Charities = () => {
         </div>
         <div className="container py-8">
           <div className="flex gap-8">
-            {/* Desktop Sidebar */}
-            <aside className="hidden lg:block w-72 shrink-0">
-              <div className="sticky top-24 rounded-xl bg-card p-6 shadow-soft max-h-[calc(100vh-8rem)] overflow-y-auto">
-                <h2 className="font-semibold text-foreground mb-6">Filters</h2>
-                {FiltersContent}
-              </div>
+            {/* Desktop Sidebar - Collapsible */}
+            <aside className="hidden lg:block shrink-0">
+              {desktopFiltersOpen ? (
+                <div className="sticky top-24 w-72 rounded-xl bg-card p-6 shadow-soft max-h-[calc(100vh-8rem)] overflow-y-auto">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="font-semibold text-foreground">Filters</h2>
+                    <button
+                      onClick={() => setDesktopFiltersOpen(false)}
+                      className="p-1 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
+                      title="Collapse filters"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                  {FiltersContent}
+                </div>
+              ) : (
+                <div className="sticky top-24">
+                  <button
+                    onClick={() => setDesktopFiltersOpen(true)}
+                    className="flex items-center gap-2 px-4 py-3 rounded-xl bg-card shadow-soft text-sm font-medium text-foreground hover:bg-card/80 transition-colors"
+                  >
+                    <Filter className="h-4 w-4" />
+                    Filters
+                    {hasActiveFilters && (
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+                        !
+                      </span>
+                    )}
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </button>
+                </div>
+              )}
             </aside>
 
             {/* Main Content */}
