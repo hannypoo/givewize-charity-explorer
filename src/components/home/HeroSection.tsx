@@ -64,10 +64,10 @@ export function HeroSection() {
             <Button
               size="lg"
               variant="outline"
-              className="text-base px-8 py-6 gradient-orange font-semibold rounded-2xl text-accent-foreground hover:scale-[1.02] transition-all duration-300 glow-orange"
+              className="text-base px-8 py-6 border-white/30 text-white font-semibold rounded-2xl hover:bg-white/15 hover:scale-[1.02] transition-all duration-300"
               asChild
             >
-              <Link to="/auth">Sign Up</Link>
+              <Link to="/charities">Explore Charities</Link>
             </Button>
           </div>
 

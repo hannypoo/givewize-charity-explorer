@@ -55,11 +55,12 @@ export function CategoriesSection() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {categoryDefs.map((category) => (
+          {categoryDefs.map((category, i) => (
             <Link
               key={category.slug}
-              to={`/charities?category=${category.slug}`}
-              className="group glass-dark rounded-2xl p-5 hover:bg-white/20 hover:-translate-y-1 transition-all duration-300"
+              to={`/charities?categories=${category.slug}`}
+              className="group glass-dark rounded-2xl p-5 hover:bg-white/20 hover:-translate-y-1 transition-all duration-300 animate-fade-in-up opacity-0"
+              style={{ animationDelay: `${i * 60}ms`, animationFillMode: "forwards" }}
             >
               <div className="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center mb-4 group-hover:bg-white/25 transition-colors duration-300">
                 <category.icon className="h-5 w-5 text-white" />

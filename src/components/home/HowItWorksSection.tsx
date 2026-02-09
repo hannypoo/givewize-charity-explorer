@@ -54,7 +54,7 @@ export function HowItWorksSection() {
               
               <div className="glass-dark rounded-2xl p-6 hover:bg-white/20 hover:-translate-y-1 transition-all duration-300 text-center">
                 {/* Step number */}
-                <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-white/20 text-white text-sm font-bold mb-4">
+                <div className="inline-flex items-center justify-center w-8 h-8 rounded-full gradient-orange text-accent-foreground text-sm font-bold mb-4">
                   {step.number}
                 </div>
                 
