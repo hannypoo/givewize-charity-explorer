@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { usePageTitle } from "@/hooks/usePageTitle";
 
 const Quiz = () => {
-  usePageTitle("Charity Match Quiz");
+  usePageTitle("Charity Match Quiz", "Take our 3-minute quiz to discover charities that match your values, causes, and giving preferences.");
   return (
     <Layout>
       <div className="bg-quiz min-h-[calc(100vh-4rem)] -mt-16 pt-16 relative overflow-hidden">

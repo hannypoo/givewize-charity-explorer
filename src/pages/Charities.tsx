@@ -35,7 +35,7 @@ const scopeLabels: Record<string, string> = {
 };
 
 const Charities = () => {
-  usePageTitle("Explore Charities");
+  usePageTitle("Explore Charities", "Browse and filter vetted charities by category, rating, and impact. Find organizations that align with your values.");
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCategory = searchParams.get("category") || "";
 

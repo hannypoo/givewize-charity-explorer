@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { usePageTitle } from "@/hooks/usePageTitle";
 
 const About = () => {
-  usePageTitle("About");
+  usePageTitle("About", "Learn about GiveWiZe's mission to help donors give confidently with transparent charity ratings and community insights.");
   return (
     <Layout>
       <div className="bg-about min-h-screen -mt-16 pt-16 relative overflow-hidden">

@@ -6,8 +6,31 @@ import { StarRating } from "@/components/charities/StarRating";
 import { getCombinedRating, categoryLabels } from "@/lib/charityUtils";
 import type { CharityRow } from "@/hooks/useCharities";
 
+function FeaturedSkeleton() {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {[...Array(4)].map((_, i) => (
+        <div key={i} className="glass-dark rounded-2xl p-5 animate-pulse">
+          <div className="flex items-start gap-3 mb-3">
+            <div className="w-12 h-12 rounded-xl bg-white/15" />
+            <div className="flex-1 space-y-2">
+              <div className="h-4 bg-white/15 rounded w-3/4" />
+              <div className="h-3 bg-white/10 rounded w-1/2" />
+            </div>
+          </div>
+          <div className="h-4 bg-white/10 rounded w-24 mb-2" />
+          <div className="space-y-1.5">
+            <div className="h-3 bg-white/10 rounded w-full" />
+            <div className="h-3 bg-white/10 rounded w-2/3" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function FeaturedCharitiesSection() {
-  const { data: charities = [] } = useQuery({
+  const { data: charities = [], isLoading } = useQuery({
     queryKey: ["featured-charities"],
     queryFn: async () => {
       const { data } = await supabase
@@ -20,7 +43,7 @@ export function FeaturedCharitiesSection() {
     staleTime: 5 * 60 * 1000,
   });
 
-  if (charities.length === 0) return null;
+  if (!isLoading && charities.length === 0) return null;
 
   return (
     <section className="py-16 md:py-24 relative overflow-hidden bg-featured">
@@ -47,6 +70,7 @@ export function FeaturedCharitiesSection() {
           </Link>
         </div>
 
+        {isLoading ? <FeaturedSkeleton /> : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {charities.map((charity) => {
             const combined = getCombinedRating(charity);
@@ -94,6 +118,7 @@ export function FeaturedCharitiesSection() {
             );
           })}
         </div>
+        )}
       </div>
     </section>
   );

@@ -9,7 +9,7 @@ import { getCombinedRating, categoryLabels } from "@/lib/charityUtils";
 import { usePageTitle } from "@/hooks/usePageTitle";
 
 const QuizResults = () => {
-  usePageTitle("Your Matches");
+  usePageTitle("Your Matches", "Your personalized charity matches based on your quiz responses. View profiles, ratings, and why each charity is a great fit.");
   const location = useLocation();
   const navigate = useNavigate();
   const [matches, setMatches] = useState<MatchedCharity[]>([]);
