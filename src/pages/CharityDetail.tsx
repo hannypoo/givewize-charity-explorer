@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Heart, ExternalLink, MapPin, Calendar, Globe, Building2,
   ArrowLeft, Loader2, Check, X, Info, Users, Target, TrendingUp, Shield, Share2,
@@ -40,6 +40,32 @@ const CharityDetail = () => {
       ? `${charity.name} - ${categoryLabels[charity.primary_category] || charity.primary_category}. View ratings, financial transparency, and impact data on GiveWiZe.`
       : undefined
   );
+
+  // JSON-LD structured data for SEO
+  useEffect(() => {
+    if (!charity) return;
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "NGO",
+      name: charity.name,
+      description: charity.mission_statement || undefined,
+      url: charity.website || undefined,
+      foundingDate: charity.year_founded ? String(charity.year_founded) : undefined,
+      logo: charity.logo_url || undefined,
+      areaServed: charity.geographic_scope === "global" ? "Worldwide" : charity.geographic_scope,
+      address: charity.city || charity.state ? {
+        "@type": "PostalAddress",
+        addressLocality: charity.city || undefined,
+        addressRegion: charity.state || undefined,
+        addressCountry: charity.country || undefined,
+      } : undefined,
+    };
+    const script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.textContent = JSON.stringify(jsonLd);
+    document.head.appendChild(script);
+    return () => { document.head.removeChild(script); };
+  }, [charity]);
 
   const combinedRating = useMemo(
     () => (charity ? getCombinedRating(charity) : null),

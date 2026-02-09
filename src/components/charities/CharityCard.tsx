@@ -1,6 +1,9 @@
+import { useCallback } from "react";
 import { Link } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { Building2 } from "lucide-react";
 import { StarRating } from "./StarRating";
+import { supabase } from "@/integrations/supabase/client";
 import { getCombinedRating, categoryLabels, scopeLabels, getKeyStandoutBadge } from "@/lib/charityUtils";
 import type { CharityRow } from "@/hooks/useCharities";
 
@@ -36,9 +39,25 @@ export function charityRowToCard(row: CharityRow): Charity {
 export function CharityCard({ charity }: CharityCardProps) {
   const combinedRating = getCombinedRating(charity._row);
   const badge = getKeyStandoutBadge(charity._row);
+  const queryClient = useQueryClient();
+
+  const prefetch = useCallback(() => {
+    queryClient.prefetchQuery({
+      queryKey: ["charity", charity.id],
+      queryFn: async () => {
+        const { data } = await supabase
+          .from("charities")
+          .select("*")
+          .eq("id", charity.id)
+          .maybeSingle();
+        return data as CharityRow | null;
+      },
+      staleTime: 5 * 60 * 1000,
+    });
+  }, [charity.id, queryClient]);
 
   return (
-    <Link to={`/charities/${charity.id}`}>
+    <Link to={`/charities/${charity.id}`} onMouseEnter={prefetch} onFocus={prefetch}>
       <div className="group h-full rounded-2xl transition-all duration-300 p-5 relative overflow-hidden hover:-translate-y-1 bg-white/15 backdrop-blur-xl border border-white/20 hover:bg-white/25">
         <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
 
