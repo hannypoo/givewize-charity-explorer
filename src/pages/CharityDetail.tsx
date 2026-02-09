@@ -48,8 +48,24 @@ const CharityDetail = () => {
   if (isLoading) {
     return (
       <Layout>
-        <div className="flex min-h-[60vh] items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="relative -mt-16 pt-16" style={{ background: 'linear-gradient(135deg, hsl(220, 72%, 50%), hsl(220, 60%, 40%))' }}>
+          <div className="container py-8 md:py-12">
+            <div className="h-4 w-32 rounded bg-white/20 animate-pulse mb-6" />
+            <div className="flex flex-col md:flex-row md:items-start gap-6">
+              <div className="h-20 w-20 rounded-2xl bg-white/20 animate-pulse" />
+              <div className="flex-1 space-y-3">
+                <div className="h-8 w-64 rounded bg-white/20 animate-pulse" />
+                <div className="h-4 w-48 rounded bg-white/15 animate-pulse" />
+                <div className="h-10 w-40 rounded-xl bg-white/15 animate-pulse" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="container py-8 space-y-6">
+          <div className="h-6 w-48 rounded bg-muted animate-pulse" />
+          <div className="h-24 rounded-xl bg-muted animate-pulse" />
+          <div className="h-6 w-48 rounded bg-muted animate-pulse" />
+          <div className="h-48 rounded-xl bg-muted animate-pulse" />
         </div>
       </Layout>
     );
@@ -58,14 +74,24 @@ const CharityDetail = () => {
   if (error || !charity) {
     return (
       <Layout>
-        <div className="container py-16 text-center">
-          <h1 className="text-2xl font-bold text-foreground">Charity not found</h1>
-          <p className="mt-2 text-muted-foreground">
-            The charity you're looking for doesn't exist or has been removed.
-          </p>
-          <Button asChild className="mt-6 bg-primary hover:bg-primary/90">
-            <Link to="/charities">Browse Charities</Link>
-          </Button>
+        <div className="min-h-[60vh] -mt-16 pt-16 relative overflow-hidden" style={{ background: 'linear-gradient(180deg, hsl(220, 72%, 50%) 0%, hsl(220, 60%, 40%) 50%, hsl(220, 50%, 30%) 100%)' }}>
+          <div className="container flex flex-col items-center justify-center py-24 text-center">
+            <div className="glass-dark rounded-2xl p-8 md:p-12 max-w-md">
+              <div className="w-16 h-16 rounded-2xl bg-white/15 flex items-center justify-center mx-auto mb-4">
+                <Building2 className="h-8 w-8 text-white/40" />
+              </div>
+              <h1 className="text-2xl font-bold text-white mb-2">Charity not found</h1>
+              <p className="text-white/60 mb-6">
+                The charity you're looking for doesn't exist or has been removed.
+              </p>
+              <Button
+                className="gradient-orange text-accent-foreground font-semibold rounded-2xl glow-orange hover:scale-[1.02] transition-all duration-300"
+                asChild
+              >
+                <Link to="/charities">Browse Charities</Link>
+              </Button>
+            </div>
+          </div>
         </div>
       </Layout>
     );

@@ -65,7 +65,7 @@ export function Footer() {
 
         <div className="mt-12 pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-white/30">
-            © 2025 GiveWiZe. All rights reserved.
+            © 2026 GiveWiZe. All rights reserved.
           </p>
           <div className="flex items-center gap-6 text-sm text-white/30">
             <Link to="#" className="hover:text-white/60 transition-colors">Privacy</Link>

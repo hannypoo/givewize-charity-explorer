@@ -1,9 +1,10 @@
 import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Filter, Loader2, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { Filter, ChevronRight, X } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { CharityFilters } from "@/components/charities/CharityFilters";
 import { CharityGrid } from "@/components/charities/CharityGrid";
+import { CharityGridSkeleton } from "@/components/charities/CharityCardSkeleton";
 import { charityRowToCard } from "@/components/charities/CharityCard";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -215,9 +216,7 @@ const Charities = () => {
               </div>
 
               {isLoading ? (
-                <div className="flex items-center justify-center py-20">
-                  <Loader2 className="h-8 w-8 animate-spin text-white/60" />
-                </div>
+                <CharityGridSkeleton count={6} />
               ) : error ? (
                 <div className="flex flex-col items-center justify-center py-20 text-center">
                   <p className="text-lg font-medium text-white">Failed to load charities</p>
