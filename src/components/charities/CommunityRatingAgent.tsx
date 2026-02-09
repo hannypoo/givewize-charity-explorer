@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { StarRating } from "./StarRating";
 import { VerifiedDonorReviews, type DonorReview } from "./VerifiedDonorReviews";
 import type { Tables } from "@/integrations/supabase/types";
@@ -323,7 +324,7 @@ export function CommunityRatingAgent({ charity, onDonorReviewSubmit }: Community
     });
 
     if (error) {
-      console.error("Failed to save review:", error);
+      toast.error("Failed to save your review. Please try again.");
     }
     onDonorReviewSubmit?.(review);
   };

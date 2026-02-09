@@ -117,6 +117,8 @@ export function CharityFilters({
                     className="border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                   />
                   <button
+                    type="button"
+                    aria-expanded={isExpanded}
                     onClick={() => toggleGroup(group.label)}
                     className="flex-1 flex items-center justify-between text-sm font-medium text-foreground hover:text-primary transition-colors"
                   >
@@ -246,6 +248,7 @@ export function CharityFilters({
       {/* Clear Filters */}
       {hasActiveFilters && (
         <button
+          type="button"
           onClick={onClearFilters}
           className="text-sm text-primary hover:underline font-medium"
         >

@@ -37,8 +37,11 @@ export function StarRating({
   const displayRating = Math.round(rawRating * 10) / 10;
 
   return (
-    <div className={cn("flex items-center gap-1", className)}>
-      <div className="flex items-center gap-0.5">
+    <div
+      className={cn("flex items-center gap-1", className)}
+      {...(!interactive && { role: "img", "aria-label": `Rating: ${displayRating.toFixed(1)} out of ${maxStars} stars` })}
+    >
+      <div className="flex items-center gap-0.5" aria-hidden={!interactive}>
         {Array.from({ length: maxStars }, (_, i) => i + 1).map((star) => {
           const isFilled = displayRating >= star;
           const isHalf = !isFilled && displayRating >= star - 0.5;
