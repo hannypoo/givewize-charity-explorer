@@ -10,7 +10,6 @@ import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { CommunityRatingAgent } from "@/components/charities/CommunityRatingAgent";
-import { getDonorReviews } from "@/data/sampleDonorReviews";
 
 const categoryLabels: Record<string, string> = {
   "rare-diseases": "Rare Diseases", "medical-health": "Medical & Health",
@@ -215,7 +214,6 @@ const CharityDetail = () => {
             {/* Community Rating Agent */}
             <CommunityRatingAgent
               charity={charity}
-              donorReviews={getDonorReviews(charity.id)}
               onDonorReviewSubmit={(review) => {
                 console.log("New donor review submitted:", review);
               }}

@@ -119,6 +119,121 @@ export type Database = {
         }
         Relationships: []
       }
+      community_reviews: {
+        Row: {
+          id: string
+          charity_id: string
+          donor_name: string
+          verified: boolean
+          rating: number
+          rating_impact: number | null
+          rating_communication: number | null
+          rating_transparency: number | null
+          rating_experience: number | null
+          review_text: string
+          donation_amount: number | null
+          helpful_count: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          charity_id: string
+          donor_name: string
+          verified?: boolean
+          rating: number
+          rating_impact?: number | null
+          rating_communication?: number | null
+          rating_transparency?: number | null
+          rating_experience?: number | null
+          review_text: string
+          donation_amount?: number | null
+          helpful_count?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          charity_id?: string
+          donor_name?: string
+          verified?: boolean
+          rating?: number
+          rating_impact?: number | null
+          rating_communication?: number | null
+          rating_transparency?: number | null
+          rating_experience?: number | null
+          review_text?: string
+          donation_amount?: number | null
+          helpful_count?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_reviews_charity_id_fkey"
+            columns: ["charity_id"]
+            isOneToOne: false
+            referencedRelation: "charities"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      online_review_sources: {
+        Row: {
+          id: string
+          charity_id: string
+          source_name: string
+          display_name: string
+          rating: number | null
+          max_rating: number
+          rating_scale: string
+          review_count: number | null
+          source_url: string | null
+          note: string | null
+          last_updated: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          charity_id: string
+          source_name: string
+          display_name: string
+          rating?: number | null
+          max_rating: number
+          rating_scale?: string
+          review_count?: number | null
+          source_url?: string | null
+          note?: string | null
+          last_updated?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          charity_id?: string
+          source_name?: string
+          display_name?: string
+          rating?: number | null
+          max_rating?: number
+          rating_scale?: string
+          review_count?: number | null
+          source_url?: string | null
+          note?: string | null
+          last_updated?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "online_review_sources_charity_id_fkey"
+            columns: ["charity_id"]
+            isOneToOne: false
+            referencedRelation: "charities"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
