@@ -242,6 +242,7 @@ const Charities = () => {
                   <select
                     value={sortBy}
                     onChange={(e) => { setSortBy(e.target.value); setCurrentPage(1); }}
+                    aria-label="Sort charities"
                     className="bg-white/10 border border-white/20 text-white text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary/50 flex-1"
                   >
                     <option value="name-asc" className="bg-slate-800">Name A–Z</option>
@@ -254,7 +255,7 @@ const Charities = () => {
 
               {/* Results count + Sort (desktop) */}
               <div className="hidden lg:flex items-center justify-between mb-6">
-                <p className="text-sm text-white/70">
+                <p className="text-sm text-white/70" role="status" aria-live="polite">
                   {isLoading
                     ? "Loading charities..."
                     : `Showing ${paginatedCharities.length} of ${cardCharities.length} charities`}
@@ -264,6 +265,7 @@ const Charities = () => {
                   <select
                     value={sortBy}
                     onChange={(e) => { setSortBy(e.target.value); setCurrentPage(1); }}
+                    aria-label="Sort charities"
                     className="bg-white/10 border border-white/20 text-white text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none cursor-pointer"
                   >
                     <option value="name-asc" className="bg-slate-800">Name A–Z</option>
@@ -280,37 +282,37 @@ const Charities = () => {
                   {searchQuery && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-white/15 border border-white/20 px-3 py-1 text-xs text-white">
                       Search: "{searchQuery}"
-                      <button onClick={() => handleSearchChange("")} className="ml-1 hover:text-white/60"><X className="h-3 w-3" /></button>
+                      <button onClick={() => handleSearchChange("")} aria-label="Remove search filter" className="ml-1 hover:text-white/60"><X className="h-3 w-3" /></button>
                     </span>
                   )}
                   {selectedCategories.map((cat) => (
                     <span key={cat} className="inline-flex items-center gap-1 rounded-full bg-white/15 border border-white/20 px-3 py-1 text-xs text-white">
                       {categoryLabelMap.get(cat) || cat}
-                      <button onClick={() => handleCategoryToggle(selectedCategories.filter((c) => c !== cat))} className="ml-1 hover:text-white/60"><X className="h-3 w-3" /></button>
+                      <button onClick={() => handleCategoryToggle(selectedCategories.filter((c) => c !== cat))} aria-label={`Remove ${categoryLabelMap.get(cat) || cat} filter`} className="ml-1 hover:text-white/60"><X className="h-3 w-3" /></button>
                     </span>
                   ))}
                   {selectedScopes.map((scope) => (
                     <span key={scope} className="inline-flex items-center gap-1 rounded-full bg-white/15 border border-white/20 px-3 py-1 text-xs text-white">
                       {scopeLabels[scope] || scope}
-                      <button onClick={() => handleScopeToggle(scope)} className="ml-1 hover:text-white/60"><X className="h-3 w-3" /></button>
+                      <button onClick={() => handleScopeToggle(scope)} aria-label={`Remove ${scopeLabels[scope] || scope} filter`} className="ml-1 hover:text-white/60"><X className="h-3 w-3" /></button>
                     </span>
                   ))}
                   {minGivewizeScore > 0 && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-white/15 border border-white/20 px-3 py-1 text-xs text-white">
                       Score {minGivewizeScore}+
-                      <button onClick={() => { setMinGivewizeScore(0); setCurrentPage(1); }} className="ml-1 hover:text-white/60"><X className="h-3 w-3" /></button>
+                      <button onClick={() => { setMinGivewizeScore(0); setCurrentPage(1); }} aria-label="Remove score filter" className="ml-1 hover:text-white/60"><X className="h-3 w-3" /></button>
                     </span>
                   )}
                   {minCommunityRating > 0 && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-white/15 border border-white/20 px-3 py-1 text-xs text-white">
                       Community {minCommunityRating}+
-                      <button onClick={() => { setMinCommunityRating(0); setCurrentPage(1); }} className="ml-1 hover:text-white/60"><X className="h-3 w-3" /></button>
+                      <button onClick={() => { setMinCommunityRating(0); setCurrentPage(1); }} aria-label="Remove community rating filter" className="ml-1 hover:text-white/60"><X className="h-3 w-3" /></button>
                     </span>
                   )}
                   {keyFactors.map((factor) => (
                     <span key={factor} className="inline-flex items-center gap-1 rounded-full bg-white/15 border border-white/20 px-3 py-1 text-xs text-white">
                       {factor.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
-                      <button onClick={() => handleKeyFactorToggle(factor)} className="ml-1 hover:text-white/60"><X className="h-3 w-3" /></button>
+                      <button onClick={() => handleKeyFactorToggle(factor)} aria-label={`Remove ${factor} filter`} className="ml-1 hover:text-white/60"><X className="h-3 w-3" /></button>
                     </span>
                   ))}
                   <button
@@ -334,7 +336,7 @@ const Charities = () => {
               )}
 
               {totalPages > 1 && (
-                <div className="mt-8">
+                <nav className="mt-8" aria-label="Charity results pagination">
                   <Pagination>
                     <PaginationContent>
                       <PaginationItem>
@@ -374,7 +376,7 @@ const Charities = () => {
                       </PaginationItem>
                     </PaginationContent>
                   </Pagination>
-                </div>
+                </nav>
               )}
             </main>
           </div>
