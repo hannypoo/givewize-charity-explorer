@@ -21,16 +21,16 @@ export function CharityGrid({ charities }: CharityGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <ul role="list" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {charities.map((charity, i) => (
-        <div
+        <li
           key={charity.id}
           className="animate-fade-in-up opacity-0"
           style={{ animationDelay: `${i * 60}ms`, animationFillMode: "forwards" }}
         >
           <CharityCard charity={charity} />
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }

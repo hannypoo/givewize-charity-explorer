@@ -11,11 +11,14 @@ import { ProfileSectionNav } from "@/components/charities/ProfileSectionNav";
 import { StandoutCharacteristics } from "@/components/charities/StandoutCharacteristics";
 import { CommunityRatingAgent } from "@/components/charities/CommunityRatingAgent";
 import { StarRating } from "@/components/charities/StarRating";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useCharityById } from "@/hooks/useCharities";
 import type { CharityRow } from "@/hooks/useCharities";
 import { useActiveSection } from "@/hooks/useActiveSection";
 import { getCombinedRating, getCategoryGradient, categoryLabels, scopeLabels, computeGivewizeScores, computeScoreDescriptions } from "@/lib/charityUtils";
 import { usePageTitle } from "@/hooks/usePageTitle";
+import { toast } from "sonner";
 
 const SECTIONS = [
   { id: "overview", label: "Overview" },
@@ -44,7 +47,7 @@ const CharityDetail = () => {
   );
 
   // Related charities (same category, excluding current)
-  const { data: relatedCharities = [] } = useQuery({
+  const { data: relatedCharities = [], isLoading: relatedLoading } = useQuery({
     queryKey: ["related-charities", charity?.primary_category, charity?.id],
     queryFn: async () => {
       if (!charity) return [];
@@ -193,11 +196,16 @@ const CharityDetail = () => {
                   {isFavorited ? "Favorited" : "Favorite"}
                 </button>
                 <button
-                  onClick={() => {
+                  onClick={async () => {
                     if (navigator.share) {
-                      navigator.share({ title: charity.name, text: charity.mission_statement || "", url: window.location.href });
+                      try {
+                        await navigator.share({ title: charity.name, text: charity.mission_statement || "", url: window.location.href });
+                      } catch {
+                        /* user cancelled share dialog */
+                      }
                     } else {
-                      navigator.clipboard.writeText(window.location.href);
+                      await navigator.clipboard.writeText(window.location.href);
+                      toast.success("Link copied to clipboard");
                     }
                   }}
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border-2 border-white text-white hover:bg-white/10 transition-all"
@@ -359,8 +367,8 @@ const CharityDetail = () => {
               {/* Community Rating Agent */}
               <CommunityRatingAgent
                 charity={charity}
-                onDonorReviewSubmit={(review) => {
-                  console.log("New donor review submitted:", review);
+                onDonorReviewSubmit={() => {
+                  toast.success("Thank you! Your review has been submitted.");
                 }}
               />
             </div>
@@ -494,11 +502,28 @@ const CharityDetail = () => {
           </section>
 
           {/* ── Related Charities ─────────────────────────────────── */}
-          {relatedCharities.length > 0 && (
+          {(relatedLoading || relatedCharities.length > 0) && (
             <section className="mb-12">
               <h2 className="font-display text-2xl font-bold text-foreground mb-6">
                 More in {categoryLabels[charity.primary_category] || charity.primary_category}
               </h2>
+              {relatedLoading ? (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {[0, 1, 2].map((i) => (
+                    <div key={i} className="bg-card rounded-xl p-5 shadow-soft animate-pulse">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 rounded-lg bg-muted" />
+                        <div className="h-4 w-32 rounded bg-muted" />
+                      </div>
+                      <div className="h-3 w-20 rounded bg-muted mb-2" />
+                      <div className="space-y-1.5">
+                        <div className="h-3 w-full rounded bg-muted" />
+                        <div className="h-3 w-2/3 rounded bg-muted" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {relatedCharities.map((related) => {
                   const relCombined = getCombinedRating(related);
@@ -530,6 +555,7 @@ const CharityDetail = () => {
                   );
                 })}
               </div>
+              )}
             </section>
           )}
         </div>

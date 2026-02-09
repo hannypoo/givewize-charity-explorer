@@ -13,12 +13,15 @@ interface ProfileSectionNavProps {
 
 export function ProfileSectionNav({ sections, activeSection, onSectionClick }: ProfileSectionNavProps) {
   return (
-    <nav className="sticky top-16 z-30 bg-card/95 backdrop-blur-md border-b border-border">
+    <nav className="sticky top-16 z-30 bg-card/95 backdrop-blur-md border-b border-border" aria-label="Charity profile sections">
       <div className="container">
-        <div className="flex gap-1">
+        <div className="flex gap-1" role="tablist">
           {sections.map((section) => (
             <button
               key={section.id}
+              role="tab"
+              aria-selected={activeSection === section.id}
+              aria-label={`Jump to ${section.label} section`}
               onClick={() => onSectionClick(section.id)}
               className={cn(
                 "relative px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap",

@@ -63,7 +63,7 @@ const Charities = () => {
     keyFactors,
   };
 
-  const { data: charities = [], isLoading, error } = useCharities(filters);
+  const { data: charities = [], isLoading, error, refetch } = useCharities(filters);
 
   const sortedCharities = useMemo(() => {
     const sorted = [...charities];
@@ -329,7 +329,13 @@ const Charities = () => {
               ) : error ? (
                 <div className="flex flex-col items-center justify-center py-20 text-center">
                   <p className="text-lg font-medium text-white">Failed to load charities</p>
-                  <p className="mt-1 text-white/60">Please try again later</p>
+                  <p className="mt-1 text-white/60 mb-4">Something went wrong. Please try again.</p>
+                  <Button
+                    onClick={() => refetch()}
+                    className="gradient-orange text-accent-foreground font-semibold rounded-2xl glow-orange"
+                  >
+                    Retry
+                  </Button>
                 </div>
               ) : (
                 <CharityGrid charities={paginatedCharities} />
