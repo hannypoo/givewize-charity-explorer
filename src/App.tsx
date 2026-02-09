@@ -29,8 +29,11 @@ function ScrollToTop() {
 
 function PageFallback() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+    <div
+      className="flex min-h-screen items-center justify-center"
+      style={{ background: "linear-gradient(180deg, hsl(220, 60%, 30%) 0%, hsl(220, 50%, 20%) 100%)" }}
+    >
+      <Loader2 className="h-8 w-8 animate-spin text-white/60" />
     </div>
   );
 }
