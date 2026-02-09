@@ -2,7 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { useMemo, useState } from "react";
 import {
   Heart, ExternalLink, MapPin, Calendar, Globe, Building2,
-  ArrowLeft, Loader2, Check, X, Info, Users, Target, TrendingUp, Shield,
+  ArrowLeft, Loader2, Check, X, Info, Users, Target, TrendingUp, Shield, Share2,
 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { Layout } from "@/components/layout/Layout";
@@ -167,6 +167,19 @@ const CharityDetail = () => {
                 >
                   <Heart className={`h-4 w-4 ${isFavorited ? "fill-current" : ""}`} />
                   {isFavorited ? "Favorited" : "Favorite"}
+                </button>
+                <button
+                  onClick={() => {
+                    if (navigator.share) {
+                      navigator.share({ title: charity.name, text: charity.mission_statement || "", url: window.location.href });
+                    } else {
+                      navigator.clipboard.writeText(window.location.href);
+                    }
+                  }}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border-2 border-white text-white hover:bg-white/10 transition-all"
+                >
+                  <Share2 className="h-4 w-4" />
+                  Share
                 </button>
               </div>
             </div>
