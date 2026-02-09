@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Building2, Star } from "lucide-react";
@@ -30,18 +31,42 @@ function FeaturedSkeleton() {
 }
 
 export function FeaturedCharitiesSection() {
-  const { data: charities = [], isLoading } = useQuery({
+  const { data: allCharities = [], isLoading } = useQuery({
     queryKey: ["featured-charities"],
     queryFn: async () => {
       const { data } = await supabase
         .from("charities")
         .select("*")
         .order("community_rating_average", { ascending: false })
-        .limit(4);
+        .limit(20);
       return (data || []) as CharityRow[];
     },
     staleTime: 5 * 60 * 1000,
   });
+
+  // Pick top 4 by combined rating, one per category for variety
+  const charities = useMemo(() => {
+    if (allCharities.length === 0) return [];
+    const ranked = [...allCharities].sort(
+      (a, b) => (getCombinedRating(b) ?? 0) - (getCombinedRating(a) ?? 0)
+    );
+    const picks: CharityRow[] = [];
+    const usedCategories = new Set<string>();
+    // First pass: one per category
+    for (const c of ranked) {
+      if (picks.length >= 4) break;
+      if (!usedCategories.has(c.primary_category)) {
+        picks.push(c);
+        usedCategories.add(c.primary_category);
+      }
+    }
+    // Fill remaining slots if needed
+    for (const c of ranked) {
+      if (picks.length >= 4) break;
+      if (!picks.includes(c)) picks.push(c);
+    }
+    return picks;
+  }, [allCharities]);
 
   if (!isLoading && charities.length === 0) return null;
 
