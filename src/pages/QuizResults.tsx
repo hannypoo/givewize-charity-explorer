@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button";
 import { StarRating } from "@/components/charities/StarRating";
 import { matchCharities, type MatchedCharity, type QuizAnswers } from "@/lib/quizMatcher";
 import { getCombinedRating, categoryLabels } from "@/lib/charityUtils";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const QuizResults = () => {
+  usePageTitle("Your Matches");
   const location = useLocation();
   const navigate = useNavigate();
   const [matches, setMatches] = useState<MatchedCharity[]>([]);

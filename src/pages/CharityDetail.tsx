@@ -14,6 +14,7 @@ import { StarRating } from "@/components/charities/StarRating";
 import { useCharityById } from "@/hooks/useCharities";
 import { useActiveSection } from "@/hooks/useActiveSection";
 import { getCombinedRating, getCategoryGradient, categoryLabels, scopeLabels, computeGivewizeScores, computeScoreDescriptions } from "@/lib/charityUtils";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const SECTIONS = [
   { id: "overview", label: "Overview" },
@@ -29,6 +30,7 @@ const CharityDetail = () => {
   const { activeSection, scrollToSection } = useActiveSection(sectionIds);
 
   const { data: charity, isLoading, error } = useCharityById(id);
+  usePageTitle(charity?.name || "Charity Profile");
 
   const combinedRating = useMemo(
     () => (charity ? getCombinedRating(charity) : null),

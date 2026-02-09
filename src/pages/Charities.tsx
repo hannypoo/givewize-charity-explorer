@@ -17,10 +17,12 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { useCharities, type CharityFilters as FilterState } from "@/hooks/useCharities";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const ITEMS_PER_PAGE = 12;
 
 const Charities = () => {
+  usePageTitle("Explore Charities");
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCategory = searchParams.get("category") || "";
 

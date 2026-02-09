@@ -181,7 +181,11 @@
   }
 
   .bg-categories {
-    background: linear-gradient(180deg, hsl(215 60% 48%) 0%, hsl(215 55% 52%) 30%, hsl(210 50% 55%) 70%, hsl(30 55% 52%) 100%);
+    background: linear-gradient(180deg, hsl(215 60% 48%) 0%, hsl(215 55% 52%) 30%, hsl(210 50% 55%) 70%, hsl(25 50% 48%) 100%);
+  }
+
+  .bg-featured {
+    background: linear-gradient(180deg, hsl(25 50% 48%) 0%, hsl(28 55% 50%) 40%, hsl(30 55% 52%) 100%);
   }
 
   .bg-how-it-works {

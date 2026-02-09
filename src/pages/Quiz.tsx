@@ -2,8 +2,10 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles, Clock, CheckCircle, ListChecks } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const Quiz = () => {
+  usePageTitle("Charity Match Quiz");
   return (
     <Layout>
       <div className="bg-quiz min-h-[calc(100vh-4rem)] -mt-16 pt-16 relative overflow-hidden">

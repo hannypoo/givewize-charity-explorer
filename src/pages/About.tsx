@@ -2,8 +2,10 @@ import { Link } from "react-router-dom";
 import { Heart, Shield, Star, Eye, Target, Users, TrendingUp } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const About = () => {
+  usePageTitle("About");
   return (
     <Layout>
       <div className="bg-about min-h-screen -mt-16 pt-16 relative overflow-hidden">

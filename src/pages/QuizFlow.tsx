@@ -4,10 +4,12 @@ import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { quizQuestions } from "@/data/quizQuestions";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 type Answers = Record<string, string | string[] | number>;
 
 const QuizFlow = () => {
+  usePageTitle("Quiz");
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
