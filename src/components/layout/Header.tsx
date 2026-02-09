@@ -20,7 +20,7 @@ export function Header() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -133,6 +133,9 @@ export function Header() {
 
       {/* Mobile Menu */}
       <div
+        role="dialog"
+        aria-label="Navigation menu"
+        aria-hidden={!isMobileMenuOpen}
         className={`fixed top-16 right-0 z-50 h-[calc(100vh-4rem)] w-72 glass-strong transform transition-transform duration-300 ease-out md:hidden ${
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
