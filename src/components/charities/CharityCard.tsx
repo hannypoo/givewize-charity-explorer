@@ -61,7 +61,7 @@ export function CharityCard({ charity }: CharityCardProps) {
             </span>
           </div>
 
-          <h3 className="font-bold text-white line-clamp-1 mb-1">
+          <h3 className="font-bold text-white line-clamp-1 mb-1" title={charity.name}>
             {charity.name}
           </h3>
 

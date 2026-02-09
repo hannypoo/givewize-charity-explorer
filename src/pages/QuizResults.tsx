@@ -12,6 +12,7 @@ const QuizResults = () => {
   const navigate = useNavigate();
   const [matches, setMatches] = useState<MatchedCharity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const rawAnswers = (location.state as { answers?: Record<string, string | string[] | number> })?.answers;
 
@@ -34,10 +35,16 @@ const QuizResults = () => {
       keyFactors: Array.isArray(rawAnswers.keyFactors) ? rawAnswers.keyFactors : undefined,
     };
 
-    matchCharities(quizAnswers).then((results) => {
-      setMatches(results);
-      setIsLoading(false);
-    });
+    matchCharities(quizAnswers)
+      .then((results) => {
+        setMatches(results);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.error("Quiz matching failed:", err);
+        setError("Something went wrong finding your matches. Please try again.");
+        setIsLoading(false);
+      });
   }, [rawAnswers, navigate]);
 
   return (
@@ -65,6 +72,20 @@ const QuizResults = () => {
             <div className="flex flex-col items-center justify-center py-20">
               <Loader2 className="h-10 w-10 animate-spin text-white/60 mb-4" />
               <p className="text-white/60">Finding your best matches...</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-20">
+              <p className="text-lg text-white/60 mb-6">{error}</p>
+              <Button
+                size="lg"
+                className="gradient-orange text-accent-foreground font-semibold px-8 rounded-2xl"
+                asChild
+              >
+                <Link to="/quiz/start">
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Try Again
+                </Link>
+              </Button>
             </div>
           ) : matches.length === 0 ? (
             <div className="text-center py-20">

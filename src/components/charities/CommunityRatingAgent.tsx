@@ -392,8 +392,8 @@ export function CommunityRatingAgent({ charity, onDonorReviewSubmit }: Community
             <CriteriaExplanation isOpen={showCriteria} onToggle={() => setShowCriteria(!showCriteria)} />
             <div>
               <h3 className="mb-2 text-sm font-semibold text-foreground">Rating Sources</h3>
-              <div className="space-y-2">{sourceRatings.slice(0, 3).map((s) => <SourceRatingCard key={s.id} source={s} />)}</div>
-              {sourceRatings.length > 3 && <button onClick={() => setActiveTab("sources")} className="mt-2 text-xs font-medium text-primary hover:underline">View all {sourceRatings.length} sources &rarr;</button>}
+              <div className="space-y-2">{sourceRatings.filter((s) => s.normalizedRating !== null).slice(0, 3).map((s) => <SourceRatingCard key={s.id} source={s} />)}</div>
+              {sourceRatings.filter((s) => s.normalizedRating !== null).length > 3 && <button onClick={() => setActiveTab("sources")} className="mt-2 text-xs font-medium text-primary hover:underline">View all {sourceRatings.filter((s) => s.normalizedRating !== null).length} sources &rarr;</button>}
             </div>
             <CitationsFooter citations={citations} />
           </div>

@@ -1,8 +1,26 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Sparkles, Shield, TrendingUp } from "lucide-react";
+import { ArrowRight, Sparkles, Shield, TrendingUp, Users } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 export function HeroSection() {
+  const { data: stats } = useQuery({
+    queryKey: ["hero-stats"],
+    queryFn: async () => {
+      const { count } = await supabase.from("charities").select("*", { count: "exact", head: true });
+      const { data: topRated } = await supabase.from("charities").select("community_rating_average").gte("community_rating_average", 4.0);
+      return {
+        total: count || 71,
+        topRatedCount: topRated?.length || 0,
+      };
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const charityCount = stats?.total || 71;
+  const topRatedCount = stats?.topRatedCount || 0;
+
   return (
     <section className="relative pt-28 md:pt-36 lg:pt-44 pb-20 md:pb-28 lg:pb-36 -mt-16 overflow-hidden bg-hero">
       {/* Soft light orbs for depth */}
@@ -60,7 +78,7 @@ export function HeroSection() {
                 <Shield className="h-5 w-5 text-white" />
               </div>
               <div className="text-left">
-                <div className="text-xl font-bold text-white">71</div>
+                <div className="text-xl font-bold text-white">{charityCount}</div>
                 <div className="text-xs text-white/60">Vetted Charities</div>
               </div>
             </div>
@@ -69,8 +87,8 @@ export function HeroSection() {
                 <TrendingUp className="h-5 w-5 text-white" />
               </div>
               <div className="text-left">
-                <div className="text-xl font-bold text-white">100%</div>
-                <div className="text-xs text-white/60">Transparent</div>
+                <div className="text-xl font-bold text-white">18</div>
+                <div className="text-xs text-white/60">Cause Categories</div>
               </div>
             </div>
             <div className="glass-dark rounded-2xl px-6 py-4 flex items-center gap-3">
@@ -78,8 +96,8 @@ export function HeroSection() {
                 <Sparkles className="h-5 w-5 text-orange-light" />
               </div>
               <div className="text-left">
-                <div className="text-xl font-bold text-white">A+</div>
-                <div className="text-xs text-white/60">Top Rated</div>
+                <div className="text-xl font-bold text-white">{topRatedCount}+</div>
+                <div className="text-xs text-white/60">Top Rated (4+)</div>
               </div>
             </div>
           </div>
