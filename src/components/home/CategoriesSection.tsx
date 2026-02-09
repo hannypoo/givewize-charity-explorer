@@ -1,21 +1,34 @@
 import { Link } from "react-router-dom";
-import { 
+import { useQuery } from "@tanstack/react-query";
+import {
   Dna, HeartPulse, GraduationCap, Utensils,
   PawPrint, Baby, Leaf, Siren, ArrowRight
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
-const categories = [
-  { icon: Dna, name: "Rare Diseases", slug: "rare-diseases", count: 12 },
-  { icon: HeartPulse, name: "Medical & Health", slug: "medical-health", count: 24 },
-  { icon: GraduationCap, name: "Education", slug: "education", count: 18 },
-  { icon: Utensils, name: "Hunger & Food", slug: "hunger-food-security", count: 15 },
-  { icon: PawPrint, name: "Animal Welfare", slug: "animal-welfare", count: 21 },
-  { icon: Baby, name: "Child Welfare", slug: "child-welfare", count: 16 },
-  { icon: Leaf, name: "Environment", slug: "environment-climate", count: 19 },
-  { icon: Siren, name: "Emergency Relief", slug: "emergency-relief", count: 8 },
+const categoryDefs = [
+  { icon: Dna, name: "Rare Diseases", slug: "rare-diseases" },
+  { icon: HeartPulse, name: "Medical & Health", slug: "medical-health" },
+  { icon: GraduationCap, name: "Education", slug: "education" },
+  { icon: Utensils, name: "Hunger & Food", slug: "hunger-food-security" },
+  { icon: PawPrint, name: "Animal Welfare", slug: "animal-welfare" },
+  { icon: Baby, name: "Child Welfare", slug: "child-welfare" },
+  { icon: Leaf, name: "Environment", slug: "environment-climate" },
+  { icon: Siren, name: "Emergency Relief", slug: "emergency-relief" },
 ];
 
 export function CategoriesSection() {
+  const { data: counts } = useQuery({
+    queryKey: ["category-counts"],
+    queryFn: async () => {
+      const { data } = await supabase.from("charities").select("primary_category");
+      const map: Record<string, number> = {};
+      data?.forEach((c) => { map[c.primary_category] = (map[c.primary_category] || 0) + 1; });
+      return map;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
   return (
     <section className="py-16 md:py-24 relative overflow-hidden bg-categories">
       {/* Light orbs */}
@@ -42,7 +55,7 @@ export function CategoriesSection() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {categories.map((category) => (
+          {categoryDefs.map((category) => (
             <Link
               key={category.slug}
               to={`/charities?category=${category.slug}`}
@@ -51,12 +64,12 @@ export function CategoriesSection() {
               <div className="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center mb-4 group-hover:bg-white/25 transition-colors duration-300">
                 <category.icon className="h-5 w-5 text-white" />
               </div>
-              
+
               <h3 className="font-semibold text-white text-sm mb-1">
                 {category.name}
               </h3>
               <span className="text-xs text-white/50">
-                {category.count} charities
+                {counts?.[category.slug] || 0} {(counts?.[category.slug] || 0) === 1 ? "charity" : "charities"}
               </span>
             </Link>
           ))}
