@@ -30,7 +30,26 @@ const sectionIds = SECTIONS.map((s) => s.id);
 
 const CharityDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const [isFavorited, setIsFavorited] = useState(false);
+
+  // Persist favorites in localStorage
+  const [isFavorited, setIsFavorited] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("givewize-favorites") || "[]");
+      return Array.isArray(saved) && saved.includes(id);
+    } catch { return false; }
+  });
+
+  const toggleFavorite = () => {
+    setIsFavorited((prev) => {
+      const next = !prev;
+      try {
+        const saved: string[] = JSON.parse(localStorage.getItem("givewize-favorites") || "[]");
+        const updated = next ? [...new Set([...saved, id])] : saved.filter((fid) => fid !== id);
+        localStorage.setItem("givewize-favorites", JSON.stringify(updated));
+      } catch { /* ignore */ }
+      return next;
+    });
+  };
   const { activeSection, scrollToSection } = useActiveSection(sectionIds);
 
   const { data: charity, isLoading, error } = useCharityById(id);
@@ -213,7 +232,7 @@ const CharityDetail = () => {
                   </a>
                 )}
                 <button
-                  onClick={() => setIsFavorited(!isFavorited)}
+                  onClick={toggleFavorite}
                   aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
                   aria-pressed={isFavorited}
                   className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${

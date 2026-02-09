@@ -8,11 +8,30 @@ import { usePageTitle } from "@/hooks/usePageTitle";
 
 type Answers = Record<string, string | string[] | number>;
 
+const STORAGE_KEY = "givewize-quiz-progress";
+
+function loadSavedProgress(): { step: number; answers: Answers } | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed.step === "number" && parsed.answers) return parsed;
+  } catch { /* ignore corrupt data */ }
+  return null;
+}
+
 const QuizFlow = () => {
   usePageTitle("Quiz");
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [answers, setAnswers] = useState<Answers>({});
+  const saved = loadSavedProgress();
+  const [currentStep, setCurrentStep] = useState(saved?.step ?? 0);
+  const [answers, setAnswers] = useState<Answers>(saved?.answers ?? {});
+  const [showResume, setShowResume] = useState(!!saved && saved.step > 0);
+
+  // Persist progress to localStorage
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ step: currentStep, answers }));
+  }, [currentStep, answers]);
 
   const currentQuestion = quizQuestions[currentStep];
   const totalSteps = quizQuestions.length;
@@ -46,7 +65,10 @@ const QuizFlow = () => {
 
   const handleNext = () => {
     if (currentStep < totalSteps - 1) setCurrentStep((prev) => prev + 1);
-    else navigate("/quiz/results", { state: { answers } });
+    else {
+      localStorage.removeItem(STORAGE_KEY);
+      navigate("/quiz/results", { state: { answers } });
+    }
   };
 
   const handleBack = () => {
@@ -105,6 +127,36 @@ const QuizFlow = () => {
         <div className="absolute bottom-20 left-[10%] w-64 h-64 bg-white/5 rounded-full blur-[80px]" />
 
         <div className="container relative max-w-2xl py-8 md:py-12">
+          {/* Resume prompt */}
+          {showResume && (
+            <div className="glass-dark rounded-2xl p-4 mb-6 flex items-center justify-between animate-fade-in-up" style={{ animationDuration: "0.3s" }}>
+              <p className="text-sm text-white/70">
+                Welcome back! Continue from question {currentStep + 1}?
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-white/60 hover:text-white hover:bg-white/10"
+                  onClick={() => {
+                    setCurrentStep(0);
+                    setAnswers({});
+                    setShowResume(false);
+                  }}
+                >
+                  Start over
+                </Button>
+                <Button
+                  size="sm"
+                  className="gradient-orange text-accent-foreground font-semibold rounded-xl"
+                  onClick={() => setShowResume(false)}
+                >
+                  Continue
+                </Button>
+              </div>
+            </div>
+          )}
+
           {/* Progress Bar */}
           <div className="mb-8">
             <div className="flex items-center justify-between text-sm text-white/60 mb-2">

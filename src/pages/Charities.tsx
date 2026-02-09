@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Filter, ChevronRight, X, ArrowUpDown } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
@@ -51,8 +51,20 @@ const Charities = () => {
   const [sortBy, setSortBy] = useState("name-asc");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [desktopFiltersOpen, setDesktopFiltersOpen] = useState(false);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   const debouncedSearch = useDebounce(searchQuery, 300);
+
+  // Scroll to results area when page changes (skip initial render)
+  const isInitialMount = useRef(true);
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    resultsRef.current?.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+  }, [currentPage]);
 
   const filters: FilterState = {
     searchQuery: debouncedSearch,
@@ -254,7 +266,7 @@ const Charities = () => {
               </div>
 
               {/* Results count + Sort (desktop) */}
-              <div className="hidden lg:flex items-center justify-between mb-6">
+              <div ref={resultsRef} className="hidden lg:flex items-center justify-between mb-6 scroll-mt-24">
                 <p className="text-sm text-white/70" role="status" aria-live="polite">
                   {isLoading
                     ? "Loading charities..."
