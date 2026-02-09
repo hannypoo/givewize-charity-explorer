@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
@@ -70,6 +70,32 @@ const QuizFlow = () => {
     currentQuestion.multiSelect && Array.isArray(currentAnswer)
       ? currentAnswer.filter((id) => id !== "none").length
       : 0;
+
+  // Keyboard navigation: Enter=next, 1-5=scale, ArrowLeft/Right=back/next
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter" && canProceed()) {
+        e.preventDefault();
+        handleNext();
+        return;
+      }
+      if (currentQuestion.type === "scale" && e.key >= "1" && e.key <= "5") {
+        e.preventDefault();
+        handleScaleSelect(Number(e.key));
+        return;
+      }
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        handleBack();
+      }
+      if (e.key === "ArrowRight" && canProceed()) {
+        e.preventDefault();
+        handleNext();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  });
 
   return (
     <Layout>
@@ -199,6 +225,10 @@ const QuizFlow = () => {
               </Button>
             </div>
           </div>
+          {/* Keyboard hints (desktop only) */}
+          <p className="hidden md:block text-center text-xs text-white/30 mt-3">
+            Keyboard: Enter to continue{currentQuestion.type === "scale" ? ", 1–5 to select" : ""}, arrow keys to navigate
+          </p>
           {/* Spacer to prevent content from being hidden behind sticky nav on mobile */}
           <div className="h-16 md:hidden" />
         </div>

@@ -3,6 +3,7 @@ import { HeroSection } from "@/components/home/HeroSection";
 import { CategoriesSection } from "@/components/home/CategoriesSection";
 import { FeaturedCharitiesSection } from "@/components/home/FeaturedCharitiesSection";
 import { HowItWorksSection } from "@/components/home/HowItWorksSection";
+import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { usePageTitle } from "@/hooks/usePageTitle";
 
 const Index = () => {
@@ -13,6 +14,7 @@ const Index = () => {
       <CategoriesSection />
       <FeaturedCharitiesSection />
       <HowItWorksSection />
+      <TestimonialsSection />
     </Layout>
   );
 };

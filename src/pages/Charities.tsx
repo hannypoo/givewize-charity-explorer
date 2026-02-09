@@ -130,13 +130,15 @@ const Charities = () => {
     setSearchParams({});
   };
 
-  const hasActiveFilters =
-    searchQuery !== "" ||
-    selectedCategories.length > 0 ||
-    selectedScopes.length > 0 ||
-    minGivewizeScore > 0 ||
-    minCommunityRating > 0 ||
-    keyFactors.length > 0;
+  const activeFilterCount =
+    (searchQuery !== "" ? 1 : 0) +
+    selectedCategories.length +
+    selectedScopes.length +
+    (minGivewizeScore > 0 ? 1 : 0) +
+    (minCommunityRating > 0 ? 1 : 0) +
+    keyFactors.length;
+
+  const hasActiveFilters = activeFilterCount > 0;
 
   const FiltersContent = (
     <CharityFilters
@@ -198,7 +200,7 @@ const Charities = () => {
                     Filters
                     {hasActiveFilters && (
                       <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
-                        !
+                        {activeFilterCount}
                       </span>
                     )}
                     <ChevronRight className="h-4 w-4 ml-1" />
@@ -222,7 +224,7 @@ const Charities = () => {
                       Filters
                       {hasActiveFilters && (
                         <span className="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
-                          !
+                          {activeFilterCount}
                         </span>
                       )}
                     </Button>
