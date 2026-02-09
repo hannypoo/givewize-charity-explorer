@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { SearchX } from "lucide-react";
 import { CharityCard, Charity } from "./CharityCard";
 
@@ -5,7 +6,7 @@ interface CharityGridProps {
   charities: Charity[];
 }
 
-export function CharityGrid({ charities }: CharityGridProps) {
+export const CharityGrid = memo(function CharityGrid({ charities }: CharityGridProps) {
   if (charities.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -33,4 +34,4 @@ export function CharityGrid({ charities }: CharityGridProps) {
       ))}
     </ul>
   );
-}
+});

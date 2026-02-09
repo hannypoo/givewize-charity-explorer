@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { memo, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { Building2 } from "lucide-react";
@@ -36,7 +36,7 @@ export function charityRowToCard(row: CharityRow): Charity {
   };
 }
 
-export function CharityCard({ charity }: CharityCardProps) {
+export const CharityCard = memo(function CharityCard({ charity }: CharityCardProps) {
   const combinedRating = getCombinedRating(charity._row);
   const badge = getKeyStandoutBadge(charity._row);
   const queryClient = useQueryClient();
@@ -113,4 +113,4 @@ export function CharityCard({ charity }: CharityCardProps) {
       </div>
     </Link>
   );
-}
+});

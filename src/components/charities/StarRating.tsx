@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -20,7 +20,7 @@ const sizeMap = {
   lg: "h-8 w-8",
 };
 
-export function StarRating({
+export const StarRating = memo(function StarRating({
   rating = 0,
   maxStars = 5,
   size = "md",
@@ -89,4 +89,4 @@ export function StarRating({
       )}
     </div>
   );
-}
+});

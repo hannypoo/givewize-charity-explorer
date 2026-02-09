@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   Receipt, TrendingUp, Eye, FileText, Building2,
   Users, Star, Shield, Globe, MapPin, Layers,
@@ -163,10 +164,10 @@ interface StandoutCharacteristicsProps {
 }
 
 export function StandoutCharacteristics({ charity }: StandoutCharacteristicsProps) {
-  const characteristics = getCharacteristics(charity);
-  const specialFeatures = getSpecialFeatures(charity);
-  const availableFeatures = specialFeatures.filter((f) => f.available);
-  const unavailableFeatures = specialFeatures.filter((f) => !f.available);
+  const characteristics = useMemo(() => getCharacteristics(charity), [charity]);
+  const specialFeatures = useMemo(() => getSpecialFeatures(charity), [charity]);
+  const availableFeatures = useMemo(() => specialFeatures.filter((f) => f.available), [specialFeatures]);
+  const unavailableFeatures = useMemo(() => specialFeatures.filter((f) => !f.available), [specialFeatures]);
 
   return (
     <div className="space-y-8">

@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Filter, ChevronRight, X, ArrowUpDown } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
@@ -34,26 +34,52 @@ const scopeLabels: Record<string, string> = {
   global: "Global",
 };
 
+/** Read array from a URLSearchParams key (comma-separated) */
+function getParamArray(params: URLSearchParams, key: string): string[] {
+  const v = params.get(key);
+  return v ? v.split(",").filter(Boolean) : [];
+}
+
+/** Read number from a URLSearchParams key */
+function getParamNumber(params: URLSearchParams, key: string, fallback = 0): number {
+  const v = params.get(key);
+  if (!v) return fallback;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : fallback;
+}
+
 const Charities = () => {
   usePageTitle("Explore Charities", "Browse and filter vetted charities by category, rating, and impact. Find organizations that align with your values.");
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialCategory = searchParams.get("category") || "";
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(
-    initialCategory ? [initialCategory] : []
-  );
-  const [selectedScopes, setSelectedScopes] = useState<string[]>([]);
-  const [minGivewizeScore, setMinGivewizeScore] = useState(0);
-  const [minCommunityRating, setMinCommunityRating] = useState(0);
-  const [keyFactors, setKeyFactors] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [sortBy, setSortBy] = useState("name-asc");
+  // Initialize state from URL params on mount
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get("search") || "");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(() => getParamArray(searchParams, "categories"));
+  const [selectedScopes, setSelectedScopes] = useState<string[]>(() => getParamArray(searchParams, "scopes"));
+  const [minGivewizeScore, setMinGivewizeScore] = useState(() => getParamNumber(searchParams, "minScore"));
+  const [minCommunityRating, setMinCommunityRating] = useState(() => getParamNumber(searchParams, "minRating"));
+  const [keyFactors, setKeyFactors] = useState<string[]>(() => getParamArray(searchParams, "factors"));
+  const [currentPage, setCurrentPage] = useState(() => getParamNumber(searchParams, "page", 1));
+  const [sortBy, setSortBy] = useState(() => searchParams.get("sort") || "name-asc");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [desktopFiltersOpen, setDesktopFiltersOpen] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const debouncedSearch = useDebounce(searchQuery, 300);
+
+  // Sync all filter state to URL search params
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (debouncedSearch) params.set("search", debouncedSearch);
+    if (selectedCategories.length) params.set("categories", selectedCategories.join(","));
+    if (selectedScopes.length) params.set("scopes", selectedScopes.join(","));
+    if (minGivewizeScore > 0) params.set("minScore", String(minGivewizeScore));
+    if (minCommunityRating > 0) params.set("minRating", String(minCommunityRating));
+    if (keyFactors.length) params.set("factors", keyFactors.join(","));
+    if (currentPage > 1) params.set("page", String(currentPage));
+    if (sortBy !== "name-asc") params.set("sort", sortBy);
+    setSearchParams(params, { replace: true });
+  }, [debouncedSearch, selectedCategories, selectedScopes, minGivewizeScore, minCommunityRating, keyFactors, currentPage, sortBy, setSearchParams]);
 
   // Scroll to results area when page changes (skip initial render)
   const isInitialMount = useRef(true);
@@ -99,39 +125,46 @@ const Charities = () => {
     return cardCharities.slice(start, start + ITEMS_PER_PAGE);
   }, [cardCharities, currentPage]);
 
-  const handleSearchChange = (value: string) => {
+  const handleSearchChange = useCallback((value: string) => {
     setSearchQuery(value);
     setCurrentPage(1);
-  };
+  }, []);
 
-  const handleCategoryToggle = (categories: string[]) => {
+  const handleCategoryToggle = useCallback((categories: string[]) => {
     setSelectedCategories(categories);
     setCurrentPage(1);
-    if (categories.length === 0) {
-      searchParams.delete("category");
-    } else if (categories.length === 1) {
-      searchParams.set("category", categories[0]);
-    } else {
-      searchParams.delete("category");
-    }
-    setSearchParams(searchParams);
-  };
+  }, []);
 
-  const handleScopeToggle = (value: string) => {
+  const handleScopeToggle = useCallback((value: string) => {
     setSelectedScopes((prev) =>
       prev.includes(value) ? prev.filter((s) => s !== value) : [...prev, value]
     );
     setCurrentPage(1);
-  };
+  }, []);
 
-  const handleKeyFactorToggle = (value: string) => {
+  const handleKeyFactorToggle = useCallback((value: string) => {
     setKeyFactors((prev) =>
       prev.includes(value) ? prev.filter((f) => f !== value) : [...prev, value]
     );
     setCurrentPage(1);
-  };
+  }, []);
 
-  const clearFilters = () => {
+  const handleGivewizeScoreChange = useCallback((v: number) => {
+    setMinGivewizeScore(v);
+    setCurrentPage(1);
+  }, []);
+
+  const handleCommunityRatingChange = useCallback((v: number) => {
+    setMinCommunityRating(v);
+    setCurrentPage(1);
+  }, []);
+
+  const handleSortChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortBy(e.target.value);
+    setCurrentPage(1);
+  }, []);
+
+  const clearFilters = useCallback(() => {
     setSearchQuery("");
     setSelectedCategories([]);
     setSelectedScopes([]);
@@ -139,8 +172,7 @@ const Charities = () => {
     setMinCommunityRating(0);
     setKeyFactors([]);
     setCurrentPage(1);
-    setSearchParams({});
-  };
+  }, []);
 
   const activeFilterCount =
     (searchQuery !== "" ? 1 : 0) +
@@ -161,9 +193,9 @@ const Charities = () => {
       selectedScopes={selectedScopes}
       onScopeToggle={handleScopeToggle}
       minGivewizeScore={minGivewizeScore}
-      onGivewizeScoreChange={(v) => { setMinGivewizeScore(v); setCurrentPage(1); }}
+      onGivewizeScoreChange={handleGivewizeScoreChange}
       minCommunityRating={minCommunityRating}
-      onCommunityRatingChange={(v) => { setMinCommunityRating(v); setCurrentPage(1); }}
+      onCommunityRatingChange={handleCommunityRatingChange}
       keyFactors={keyFactors}
       onKeyFactorToggle={handleKeyFactorToggle}
       onClearFilters={clearFilters}
@@ -253,7 +285,7 @@ const Charities = () => {
                   <ArrowUpDown className="h-4 w-4 text-white/50" />
                   <select
                     value={sortBy}
-                    onChange={(e) => { setSortBy(e.target.value); setCurrentPage(1); }}
+                    onChange={handleSortChange}
                     aria-label="Sort charities"
                     className="bg-white/10 border border-white/20 text-white text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary/50 flex-1"
                   >
@@ -276,7 +308,7 @@ const Charities = () => {
                   <ArrowUpDown className="h-4 w-4 text-white/50" />
                   <select
                     value={sortBy}
-                    onChange={(e) => { setSortBy(e.target.value); setCurrentPage(1); }}
+                    onChange={handleSortChange}
                     aria-label="Sort charities"
                     className="bg-white/10 border border-white/20 text-white text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none cursor-pointer"
                   >
