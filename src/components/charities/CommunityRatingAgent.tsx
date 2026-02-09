@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { StarRating } from "./StarRating";
 import { VerifiedDonorReviews, type DonorReview } from "./VerifiedDonorReviews";
 import type { Tables } from "@/integrations/supabase/types";
+import { computeGivewizeScores } from "@/lib/charityUtils";
 
 // ── Types ────────────────────────────────────────────────────────────────
 type Charity = Tables<"charities">;
@@ -243,7 +244,8 @@ export function CommunityRatingAgent({ charity, onDonorReviewSubmit }: Community
     tp += Math.min(2, tp);
     tp = Math.min(5, tp);
 
-    const impactScore = Math.min(5, Number(charity.score_impact) || 0);
+    const computed = computeGivewizeScores(charity);
+    const impactScore = computed.impact != null ? computed.impact : (computed.overall * 0.8);
     const commScore = donorReviews.length > 0
       ? donorReviews.reduce((s, r) => s + (r.categories?.communication || 0), 0) / donorReviews.length
       : donorSat * 0.9;
