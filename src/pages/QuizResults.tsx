@@ -1,20 +1,26 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ArrowRight, Building2, RefreshCw, Loader2 } from "lucide-react";
+import { ArrowRight, Building2, RefreshCw, Loader2, Save } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { StarRating } from "@/components/charities/StarRating";
 import { matchCharities, type MatchedCharity, type QuizAnswers } from "@/lib/quizMatcher";
 import { getCombinedRating, categoryLabels } from "@/lib/charityUtils";
 import { usePageTitle } from "@/hooks/usePageTitle";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const QuizResults = () => {
   usePageTitle("Your Matches", "Your personalized charity matches based on your quiz responses. View profiles, ratings, and why each charity is a great fit.");
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [matches, setMatches] = useState<MatchedCharity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
+  const savedRef = useRef(false);
 
   const rawAnswers = (location.state as { answers?: Record<string, string | string[] | number> })?.answers;
 
@@ -35,18 +41,33 @@ const QuizResults = () => {
       taxBenefits: typeof rawAnswers.taxBenefits === "number" ? rawAnswers.taxBenefits : undefined,
       orgSize: typeof rawAnswers.orgSize === "string" ? rawAnswers.orgSize : undefined,
       keyFactors: Array.isArray(rawAnswers.keyFactors) ? rawAnswers.keyFactors : undefined,
+      employerMatch: typeof rawAnswers.employerMatch === "string" ? rawAnswers.employerMatch : undefined,
     };
 
     matchCharities(quizAnswers)
-      .then((results) => {
+      .then(async (results) => {
         setMatches(results);
         setIsLoading(false);
+
+        // Auto-save for logged-in users
+        if (user && !savedRef.current) {
+          savedRef.current = true;
+          const { error: saveError } = await supabase.from("user_quiz_results").insert({
+            user_id: user.id,
+            answers: quizAnswers as any,
+            matched_charity_ids: results.map((m) => m.charity.id),
+          });
+          if (!saveError) {
+            setSaved(true);
+            toast.success("Quiz results saved to your profile");
+          }
+        }
       })
       .catch(() => {
         setError("Something went wrong finding your matches. Please try again.");
         setIsLoading(false);
       });
-  }, [rawAnswers, navigate]);
+  }, [rawAnswers, navigate, user]);
 
   return (
     <Layout>
@@ -176,6 +197,22 @@ const QuizResults = () => {
                   );
                 })}
               </div>
+
+              {/* Save Prompt */}
+              {!user && (
+                <div className="glass-dark rounded-2xl p-5 mb-6 text-center">
+                  <Save className="h-5 w-5 text-orange-light mx-auto mb-2" />
+                  <p className="text-sm text-white/70 mb-3">Sign up to save your results and track your matches over time.</p>
+                  <Button size="sm" className="gradient-orange text-accent-foreground font-semibold rounded-xl" asChild>
+                    <Link to="/auth" state={{ from: "/quiz/results" }}>Create Account</Link>
+                  </Button>
+                </div>
+              )}
+              {saved && (
+                <div className="glass-dark rounded-2xl p-4 mb-6 text-center">
+                  <p className="text-sm text-white/60">Results saved to your <Link to="/profile" className="text-orange-light hover:underline">profile</Link>.</p>
+                </div>
+              )}
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

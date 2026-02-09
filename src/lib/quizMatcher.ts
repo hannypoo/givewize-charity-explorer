@@ -14,6 +14,7 @@ export interface QuizAnswers {
   taxBenefits?: number;
   orgSize?: string;
   keyFactors?: string[];
+  employerMatch?: string;
 }
 
 export interface MatchedCharity {

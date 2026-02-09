@@ -47,7 +47,7 @@ const Quiz = () => {
           <div className="flex flex-wrap justify-center gap-4 mt-12">
             {[
               { icon: <Clock className="h-4 w-4 text-white/70" />, text: "Takes ~3 minutes" },
-              { icon: <ListChecks className="h-4 w-4 text-white/70" />, text: "10 questions" },
+              { icon: <ListChecks className="h-4 w-4 text-white/70" />, text: "11 questions" },
               { icon: <CheckCircle className="h-4 w-4 text-white/70" />, text: "No account required" },
             ].map((pill, i) => (
               <div

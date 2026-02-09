@@ -129,4 +129,15 @@ export const quizQuestions: QuizQuestion[] = [
       { id: "global-reach", label: "Global Reach" },
     ],
   },
+  {
+    id: "employerMatch",
+    question: "Does your employer match charitable donations?",
+    type: "cards",
+    options: [
+      { id: "yes", label: "Yes" },
+      { id: "not-sure", label: "Not sure" },
+      { id: "no", label: "No" },
+      { id: "self-employed", label: "Self-employed" },
+    ],
+  },
 ];

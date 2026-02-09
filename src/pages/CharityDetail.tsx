@@ -2,11 +2,13 @@ import { useParams, Link } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import {
   Heart, ExternalLink, MapPin, Calendar, Globe, Building2,
-  ArrowLeft, Loader2, Check, X, Info, Users, Target, TrendingUp, Shield, Share2,
+  ArrowLeft, Loader2, Check, X, Info, Users, Target, TrendingUp, Shield, Share2, Briefcase,
 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ProfileSectionNav } from "@/components/charities/ProfileSectionNav";
 import { StandoutCharacteristics } from "@/components/charities/StandoutCharacteristics";
 import { CommunityRatingAgent } from "@/components/charities/CommunityRatingAgent";
@@ -18,6 +20,8 @@ import type { CharityRow } from "@/hooks/useCharities";
 import { useActiveSection } from "@/hooks/useActiveSection";
 import { getCombinedRating, getCategoryGradient, categoryLabels, scopeLabels, computeGivewizeScores, computeScoreDescriptions } from "@/lib/charityUtils";
 import { usePageTitle } from "@/hooks/usePageTitle";
+import { useFavorites } from "@/hooks/useFavorites";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 const SECTIONS = [
@@ -30,26 +34,13 @@ const sectionIds = SECTIONS.map((s) => s.id);
 
 const CharityDetail = () => {
   const { id } = useParams<{ id: string }>();
-
-  // Persist favorites in localStorage
-  const [isFavorited, setIsFavorited] = useState(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem("givewize-favorites") || "[]");
-      return Array.isArray(saved) && saved.includes(id);
-    } catch { return false; }
-  });
-
-  const toggleFavorite = () => {
-    setIsFavorited((prev) => {
-      const next = !prev;
-      try {
-        const saved: string[] = JSON.parse(localStorage.getItem("givewize-favorites") || "[]");
-        const updated = next ? [...new Set([...saved, id])] : saved.filter((fid) => fid !== id);
-        localStorage.setItem("givewize-favorites", JSON.stringify(updated));
-      } catch { /* ignore */ }
-      return next;
-    });
-  };
+  const { user, profile } = useAuth();
+  const { isFavorited: checkFavorited, toggleFavorite: toggleFav } = useFavorites();
+  const favorited = checkFavorited(id || "");
+  const [showMatchDialog, setShowMatchDialog] = useState(false);
+  const [matchAmount, setMatchAmount] = useState("");
+  const [matchNotes, setMatchNotes] = useState("");
+  const [matchSubmitting, setMatchSubmitting] = useState(false);
   const { activeSection, scrollToSection } = useActiveSection(sectionIds);
 
   const { data: charity, isLoading, error } = useCharityById(id);
@@ -232,15 +223,15 @@ const CharityDetail = () => {
                   </a>
                 )}
                 <button
-                  onClick={toggleFavorite}
-                  aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
-                  aria-pressed={isFavorited}
+                  onClick={() => toggleFav(id!)}
+                  aria-label={favorited ? "Remove from favorites" : "Add to favorites"}
+                  aria-pressed={favorited}
                   className={`inline-flex items-center gap-2 px-4 py-2.5 md:py-2 rounded-full text-sm font-medium transition-all ${
-                    isFavorited ? "bg-white text-primary" : "border-2 border-white text-white hover:bg-white/10"
+                    favorited ? "bg-white text-primary" : "border-2 border-white text-white hover:bg-white/10"
                   }`}
                 >
-                  <Heart className={`h-4 w-4 ${isFavorited ? "fill-current" : ""}`} />
-                  {isFavorited ? "Favorited" : "Favorite"}
+                  <Heart className={`h-4 w-4 ${favorited ? "fill-current" : ""}`} />
+                  {favorited ? "Favorited" : "Favorite"}
                 </button>
                 <button
                   onClick={async () => {
@@ -261,6 +252,25 @@ const CharityDetail = () => {
                   <Share2 className="h-4 w-4" />
                   Share
                 </button>
+                {user && (
+                  profile?.employer_name && profile?.employer_matches_donations ? (
+                    <button
+                      onClick={() => setShowMatchDialog(true)}
+                      className="inline-flex items-center gap-2 px-4 py-2.5 md:py-2 rounded-full text-sm font-medium border-2 border-white text-white hover:bg-white/10 transition-all"
+                    >
+                      <Briefcase className="h-4 w-4" />
+                      Employer Match
+                    </button>
+                  ) : (
+                    <Link
+                      to="/profile#employer-matching"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 md:py-2 rounded-full text-sm font-medium border-2 border-white/50 text-white/50 hover:bg-white/10 transition-all"
+                    >
+                      <Briefcase className="h-4 w-4" />
+                      Set Up Matching
+                    </Link>
+                  )
+                )}
               </div>
             </div>
           </header>
@@ -548,6 +558,58 @@ const CharityDetail = () => {
               <StandoutCharacteristics charity={charity} />
             </div>
           </section>
+
+          {/* ── Employer Match Dialog ─────────────────────────────── */}
+          {showMatchDialog && charity && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setShowMatchDialog(false)}>
+              <div className="bg-card rounded-2xl p-6 md:p-8 shadow-lg max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+                <h3 className="font-display text-xl font-semibold text-foreground mb-2">Request Employer Match</h3>
+                <p className="text-sm text-muted-foreground mb-6">
+                  Request {profile?.employer_name} to match your donation to {charity.name}.
+                </p>
+                <div className="space-y-4 mb-6">
+                  <div>
+                    <Label htmlFor="match-amount">Donation Amount ($)</Label>
+                    <Input id="match-amount" type="number" step="0.01" min="0" value={matchAmount} onChange={(e) => setMatchAmount(e.target.value)} className="mt-1" placeholder="100.00" />
+                  </div>
+                  <div>
+                    <Label htmlFor="match-notes">Notes (optional)</Label>
+                    <Input id="match-notes" value={matchNotes} onChange={(e) => setMatchNotes(e.target.value)} className="mt-1" placeholder="Any additional details..." />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    disabled={!matchAmount || matchSubmitting}
+                    className="gradient-orange text-accent-foreground font-semibold rounded-xl"
+                    onClick={async () => {
+                      if (!user || !charity || !profile?.employer_name) return;
+                      setMatchSubmitting(true);
+                      const { error } = await supabase.from("user_employer_match_requests").insert({
+                        user_id: user.id,
+                        charity_id: charity.id,
+                        charity_name: charity.name,
+                        employer_name: profile.employer_name,
+                        amount: parseFloat(matchAmount),
+                        notes: matchNotes || null,
+                      });
+                      setMatchSubmitting(false);
+                      if (error) {
+                        toast.error("Failed to submit match request");
+                      } else {
+                        toast.success("Employer match request submitted!");
+                        setShowMatchDialog(false);
+                        setMatchAmount("");
+                        setMatchNotes("");
+                      }
+                    }}
+                  >
+                    {matchSubmitting ? "Submitting..." : "Submit Request"}
+                  </Button>
+                  <Button variant="outline" onClick={() => setShowMatchDialog(false)} className="rounded-xl">Cancel</Button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* ── Related Charities ─────────────────────────────────── */}
           {(relatedLoading || relatedCharities.length > 0) && (

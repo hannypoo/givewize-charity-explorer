@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { useScrollToTop } from "@/hooks/useScrollToTop";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 
 // Lazy-loaded routes for code splitting
@@ -17,6 +19,7 @@ const QuizFlow = lazy(() => import("./pages/QuizFlow"));
 const QuizResults = lazy(() => import("./pages/QuizResults"));
 const About = lazy(() => import("./pages/About"));
 const Auth = lazy(() => import("./pages/Auth"));
+const Profile = lazy(() => import("./pages/Profile"));
 const ImportCharities = lazy(() => import("./pages/ImportCharities"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -45,6 +48,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <AuthProvider>
         <ScrollToTop />
         <Suspense fallback={<PageFallback />}>
           <Routes>
@@ -57,11 +61,13 @@ const App = () => (
             <Route path="/quiz/results" element={<QuizResults />} />
             <Route path="/about" element={<About />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/admin/import" element={<ImportCharities />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

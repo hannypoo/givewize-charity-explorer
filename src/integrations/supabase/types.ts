@@ -246,6 +246,186 @@ export type Database = {
           }
         ]
       }
+      user_profiles: {
+        Row: {
+          id: string
+          display_name: string
+          avatar_url: string | null
+          employer_name: string | null
+          employer_matches_donations: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          display_name?: string
+          avatar_url?: string | null
+          employer_name?: string | null
+          employer_matches_donations?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          display_name?: string
+          avatar_url?: string | null
+          employer_name?: string | null
+          employer_matches_donations?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_favorites: {
+        Row: {
+          id: string
+          user_id: string
+          charity_id: string
+          gift_registry: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          charity_id: string
+          gift_registry?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          charity_id?: string
+          gift_registry?: boolean
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_favorites_charity_id_fkey"
+            columns: ["charity_id"]
+            isOneToOne: false
+            referencedRelation: "charities"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      user_donation_receipts: {
+        Row: {
+          id: string
+          user_id: string
+          charity_id: string | null
+          charity_name: string
+          amount: number
+          donation_date: string
+          tax_year: number
+          receipt_note: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          charity_id?: string | null
+          charity_name: string
+          amount: number
+          donation_date?: string
+          tax_year?: number
+          receipt_note?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          charity_id?: string | null
+          charity_name?: string
+          amount?: number
+          donation_date?: string
+          tax_year?: number
+          receipt_note?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_donation_receipts_charity_id_fkey"
+            columns: ["charity_id"]
+            isOneToOne: false
+            referencedRelation: "charities"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      user_quiz_results: {
+        Row: {
+          id: string
+          user_id: string
+          answers: Json
+          matched_charity_ids: string[]
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          answers?: Json
+          matched_charity_ids?: string[]
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          answers?: Json
+          matched_charity_ids?: string[]
+          created_at?: string
+        }
+        Relationships: []
+      }
+      user_employer_match_requests: {
+        Row: {
+          id: string
+          user_id: string
+          charity_id: string
+          charity_name: string
+          employer_name: string
+          amount: number
+          status: string
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          charity_id: string
+          charity_name: string
+          employer_name: string
+          amount: number
+          status?: string
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          charity_id?: string
+          charity_name?: string
+          employer_name?: string
+          amount?: number
+          status?: string
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_employer_match_requests_charity_id_fkey"
+            columns: ["charity_id"]
+            isOneToOne: false
+            referencedRelation: "charities"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
