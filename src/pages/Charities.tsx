@@ -1,11 +1,12 @@
 import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Filter, ChevronRight, X } from "lucide-react";
+import { Filter, ChevronRight, X, ArrowUpDown } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { CharityFilters } from "@/components/charities/CharityFilters";
 import { CharityGrid } from "@/components/charities/CharityGrid";
 import { CharityGridSkeleton } from "@/components/charities/CharityCardSkeleton";
 import { charityRowToCard } from "@/components/charities/CharityCard";
+import { getCombinedRating } from "@/lib/charityUtils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -18,8 +19,20 @@ import {
 } from "@/components/ui/pagination";
 import { useCharities, type CharityFilters as FilterState } from "@/hooks/useCharities";
 import { usePageTitle } from "@/hooks/usePageTitle";
+import { useDebounce } from "@/hooks/useDebounce";
+import { categoryHierarchy } from "@/data/categoryHierarchy";
 
 const ITEMS_PER_PAGE = 12;
+
+const categoryLabelMap = new Map(
+  categoryHierarchy.flatMap((g) => g.subcategories.map((s) => [s.value, s.label]))
+);
+
+const scopeLabels: Record<string, string> = {
+  local: "Local",
+  national: "National",
+  global: "Global",
+};
 
 const Charities = () => {
   usePageTitle("Explore Charities");
@@ -35,11 +48,14 @@ const Charities = () => {
   const [minCommunityRating, setMinCommunityRating] = useState(0);
   const [keyFactors, setKeyFactors] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortBy, setSortBy] = useState("name-asc");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [desktopFiltersOpen, setDesktopFiltersOpen] = useState(false);
 
+  const debouncedSearch = useDebounce(searchQuery, 300);
+
   const filters: FilterState = {
-    searchQuery,
+    searchQuery: debouncedSearch,
     selectedCategories,
     selectedScopes,
     minGivewizeScore,
@@ -49,9 +65,20 @@ const Charities = () => {
 
   const { data: charities = [], isLoading, error } = useCharities(filters);
 
+  const sortedCharities = useMemo(() => {
+    const sorted = [...charities];
+    switch (sortBy) {
+      case "name-asc": sorted.sort((a, b) => a.name.localeCompare(b.name)); break;
+      case "name-desc": sorted.sort((a, b) => b.name.localeCompare(a.name)); break;
+      case "rating-desc": sorted.sort((a, b) => (getCombinedRating(b) ?? 0) - (getCombinedRating(a) ?? 0)); break;
+      case "newest": sorted.sort((a, b) => (b.year_founded ?? 0) - (a.year_founded ?? 0)); break;
+    }
+    return sorted;
+  }, [charities, sortBy]);
+
   const cardCharities = useMemo(
-    () => charities.map(charityRowToCard),
-    [charities]
+    () => sortedCharities.map(charityRowToCard),
+    [sortedCharities]
   );
 
   const totalPages = Math.ceil(cardCharities.length / ITEMS_PER_PAGE);
@@ -182,12 +209,13 @@ const Charities = () => {
 
             {/* Main Content */}
             <main className="flex-1 min-w-0">
-              {/* Mobile Filter Button */}
-              <div className="lg:hidden mb-6 flex items-center justify-between">
-                <p className="text-sm text-white/70">
-                  {cardCharities.length} charities found
-                </p>
-                <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
+              {/* Mobile Filter + Sort Bar */}
+              <div className="lg:hidden mb-6 space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-white/70">
+                    {cardCharities.length} charities found
+                  </p>
+                  <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
                   <SheetTrigger asChild>
                     <Button variant="outline" size="sm" className="border-border">
                       <Filter className="mr-2 h-4 w-4" />
@@ -206,16 +234,91 @@ const Charities = () => {
                     <div className="mt-6">{FiltersContent}</div>
                   </SheetContent>
                 </Sheet>
+                </div>
+                <div className="flex items-center gap-2">
+                  <ArrowUpDown className="h-4 w-4 text-white/50" />
+                  <select
+                    value={sortBy}
+                    onChange={(e) => { setSortBy(e.target.value); setCurrentPage(1); }}
+                    className="bg-white/10 border border-white/20 text-white text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary/50 flex-1"
+                  >
+                    <option value="name-asc" className="bg-slate-800">Name A–Z</option>
+                    <option value="name-desc" className="bg-slate-800">Name Z–A</option>
+                    <option value="rating-desc" className="bg-slate-800">Highest Rated</option>
+                    <option value="newest" className="bg-slate-800">Newest</option>
+                  </select>
+                </div>
               </div>
 
-              {/* Results count (desktop) */}
-              <div className="hidden lg:block mb-6">
+              {/* Results count + Sort (desktop) */}
+              <div className="hidden lg:flex items-center justify-between mb-6">
                 <p className="text-sm text-white/70">
                   {isLoading
                     ? "Loading charities..."
                     : `Showing ${paginatedCharities.length} of ${cardCharities.length} charities`}
                 </p>
+                <div className="flex items-center gap-2">
+                  <ArrowUpDown className="h-4 w-4 text-white/50" />
+                  <select
+                    value={sortBy}
+                    onChange={(e) => { setSortBy(e.target.value); setCurrentPage(1); }}
+                    className="bg-white/10 border border-white/20 text-white text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none cursor-pointer"
+                  >
+                    <option value="name-asc" className="bg-slate-800">Name A–Z</option>
+                    <option value="name-desc" className="bg-slate-800">Name Z–A</option>
+                    <option value="rating-desc" className="bg-slate-800">Highest Rated</option>
+                    <option value="newest" className="bg-slate-800">Newest</option>
+                  </select>
+                </div>
               </div>
+
+              {/* Active filter chips */}
+              {hasActiveFilters && (
+                <div className="flex flex-wrap items-center gap-2 mb-6">
+                  {searchQuery && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-white/15 border border-white/20 px-3 py-1 text-xs text-white">
+                      Search: "{searchQuery}"
+                      <button onClick={() => handleSearchChange("")} className="ml-1 hover:text-white/60"><X className="h-3 w-3" /></button>
+                    </span>
+                  )}
+                  {selectedCategories.map((cat) => (
+                    <span key={cat} className="inline-flex items-center gap-1 rounded-full bg-white/15 border border-white/20 px-3 py-1 text-xs text-white">
+                      {categoryLabelMap.get(cat) || cat}
+                      <button onClick={() => handleCategoryToggle(selectedCategories.filter((c) => c !== cat))} className="ml-1 hover:text-white/60"><X className="h-3 w-3" /></button>
+                    </span>
+                  ))}
+                  {selectedScopes.map((scope) => (
+                    <span key={scope} className="inline-flex items-center gap-1 rounded-full bg-white/15 border border-white/20 px-3 py-1 text-xs text-white">
+                      {scopeLabels[scope] || scope}
+                      <button onClick={() => handleScopeToggle(scope)} className="ml-1 hover:text-white/60"><X className="h-3 w-3" /></button>
+                    </span>
+                  ))}
+                  {minGivewizeScore > 0 && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-white/15 border border-white/20 px-3 py-1 text-xs text-white">
+                      Score {minGivewizeScore}+
+                      <button onClick={() => { setMinGivewizeScore(0); setCurrentPage(1); }} className="ml-1 hover:text-white/60"><X className="h-3 w-3" /></button>
+                    </span>
+                  )}
+                  {minCommunityRating > 0 && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-white/15 border border-white/20 px-3 py-1 text-xs text-white">
+                      Community {minCommunityRating}+
+                      <button onClick={() => { setMinCommunityRating(0); setCurrentPage(1); }} className="ml-1 hover:text-white/60"><X className="h-3 w-3" /></button>
+                    </span>
+                  )}
+                  {keyFactors.map((factor) => (
+                    <span key={factor} className="inline-flex items-center gap-1 rounded-full bg-white/15 border border-white/20 px-3 py-1 text-xs text-white">
+                      {factor.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+                      <button onClick={() => handleKeyFactorToggle(factor)} className="ml-1 hover:text-white/60"><X className="h-3 w-3" /></button>
+                    </span>
+                  ))}
+                  <button
+                    onClick={clearFilters}
+                    className="text-xs text-white/50 hover:text-white underline underline-offset-2"
+                  >
+                    Clear all
+                  </button>
+                </div>
+              )}
 
               {isLoading ? (
                 <CharityGridSkeleton count={6} />
