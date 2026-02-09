@@ -65,7 +65,9 @@ const QuizResults = () => {
               Your Top Charity Matches
             </h1>
             <p className="text-lg text-white/60">
-              Based on your quiz responses, here are charities that align with your values.
+              {!isLoading && matches.length > 0
+                ? `We found ${matches.length} ${matches.length === 1 ? "charity" : "charities"} that align with your values.`
+                : "Based on your quiz responses, here are charities that align with your values."}
             </p>
           </div>
 
