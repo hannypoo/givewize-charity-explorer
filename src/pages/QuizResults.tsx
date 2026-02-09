@@ -129,12 +129,13 @@ const QuizResults = () => {
             <>
               {/* Matched Charity Cards */}
               <div className="space-y-4 mb-10">
-                {matches.map((match) => {
+                {matches.map((match, index) => {
                   const combined = getCombinedRating(match.charity);
                   return (
                     <div
                       key={match.charity.id}
-                      className="glass-dark rounded-2xl p-5 md:p-6 hover:bg-white/20 transition-all duration-300"
+                      className="glass-dark rounded-2xl p-5 md:p-6 hover:bg-white/20 transition-all duration-300 animate-fade-in-up opacity-0"
+                      style={{ animationDelay: `${index * 100}ms`, animationFillMode: "forwards" }}
                     >
                       <div className="flex flex-col sm:flex-row sm:items-start gap-4">
                         <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white/15">

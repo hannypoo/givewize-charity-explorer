@@ -46,7 +46,7 @@ export function Footer() {
           {/* Navigation */}
           <div className="flex flex-col items-center">
             <span className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-4">Navigate</span>
-            <nav className="flex flex-col items-center gap-2">
+            <nav aria-label="Footer navigation" className="flex flex-col items-center gap-2">
               {navLinks.map((link) => (
                 <Link
                   key={link.to}
@@ -56,6 +56,9 @@ export function Footer() {
                   {link.label}
                 </Link>
               ))}
+              <Link to="/auth" className="text-sm text-white/50 hover:text-white transition-colors">
+                Sign In
+              </Link>
             </nav>
           </div>
 
@@ -79,7 +82,8 @@ export function Footer() {
             © 2026 GiveWiZe. All rights reserved.
           </p>
           <div className="flex items-center gap-6 text-sm text-white/30">
-            <span>Built with transparency in mind</span>
+            <span>Privacy Policy</span>
+            <span>Terms of Service</span>
           </div>
         </div>
       </div>

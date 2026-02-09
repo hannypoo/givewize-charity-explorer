@@ -86,6 +86,31 @@ export function useFavorites() {
         return { added: true };
       }
     },
+    onMutate: async (charityId: string) => {
+      // Optimistic update for instant UI feedback
+      if (user) {
+        await queryClient.cancelQueries({ queryKey: ["user-favorites", user.id] });
+        const prev = queryClient.getQueryData<Favorite[]>(["user-favorites", user.id]);
+        const existing = prev?.find((f) => f.charity_id === charityId);
+        if (existing) {
+          queryClient.setQueryData(["user-favorites", user.id], prev?.filter((f) => f.id !== existing.id));
+        } else {
+          queryClient.setQueryData(["user-favorites", user.id], [
+            ...(prev || []),
+            { id: `temp-${Date.now()}`, charity_id: charityId, gift_registry: false },
+          ]);
+        }
+        return { prev };
+      } else {
+        await queryClient.cancelQueries({ queryKey: ["local-favorites"] });
+        const prev = queryClient.getQueryData<string[]>(["local-favorites"]);
+        const next = prev?.includes(charityId)
+          ? prev.filter((id) => id !== charityId)
+          : [...(prev || []), charityId];
+        queryClient.setQueryData(["local-favorites"], next);
+        return { prev };
+      }
+    },
     onSuccess: (result) => {
       if (user) {
         queryClient.invalidateQueries({ queryKey: ["user-favorites", user.id] });
@@ -94,7 +119,13 @@ export function useFavorites() {
       }
       toast.success(result.added ? "Added to favorites" : "Removed from favorites");
     },
-    onError: () => {
+    onError: (_err, _charityId, context) => {
+      // Rollback optimistic update
+      if (user) {
+        queryClient.setQueryData(["user-favorites", user.id], context?.prev);
+      } else {
+        queryClient.setQueryData(["local-favorites"], context?.prev);
+      }
       toast.error("Failed to update favorites");
     },
   });

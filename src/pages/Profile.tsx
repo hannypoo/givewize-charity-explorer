@@ -54,23 +54,23 @@ const Profile = () => {
 
       <div className="bg-secondary min-h-screen">
         <div className="container py-8 md:py-10 space-y-12">
-          <section id="overview" className="scroll-mt-28">
+          <section id="overview" className="scroll-mt-28 animate-fade-in-up opacity-0" style={{ animationDelay: "0ms", animationFillMode: "forwards" }}>
             <ProfileOverview />
           </section>
 
-          <section id="my-charities" className="scroll-mt-28">
+          <section id="my-charities" className="scroll-mt-28 animate-fade-in-up opacity-0" style={{ animationDelay: "80ms", animationFillMode: "forwards" }}>
             <MyCharities />
           </section>
 
-          <section id="donation-receipts" className="scroll-mt-28">
+          <section id="donation-receipts" className="scroll-mt-28 animate-fade-in-up opacity-0" style={{ animationDelay: "160ms", animationFillMode: "forwards" }}>
             <DonationReceipts />
           </section>
 
-          <section id="quiz-matches" className="scroll-mt-28">
+          <section id="quiz-matches" className="scroll-mt-28 animate-fade-in-up opacity-0" style={{ animationDelay: "240ms", animationFillMode: "forwards" }}>
             <QuizMatchesSection />
           </section>
 
-          <section id="employer-matching" className="scroll-mt-28">
+          <section id="employer-matching" className="scroll-mt-28 animate-fade-in-up opacity-0" style={{ animationDelay: "320ms", animationFillMode: "forwards" }}>
             <EmployerMatching />
           </section>
         </div>

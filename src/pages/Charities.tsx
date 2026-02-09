@@ -267,8 +267,10 @@ const Charities = () => {
               {/* Mobile Filter + Sort Bar */}
               <div className="lg:hidden mb-6 space-y-3">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-white/70">
-                    {cardCharities.length} charities found
+                  <p className="text-sm text-white/70" role="status" aria-live="polite">
+                    {isLoading
+                      ? "Loading charities..."
+                      : `Showing ${paginatedCharities.length} of ${cardCharities.length} charities`}
                   </p>
                   <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
                   <SheetTrigger asChild>
@@ -378,7 +380,7 @@ const Charities = () => {
               )}
 
               {isLoading ? (
-                <CharityGridSkeleton count={6} />
+                <CharityGridSkeleton count={ITEMS_PER_PAGE} />
               ) : error ? (
                 <div className="flex flex-col items-center justify-center py-20 text-center">
                   <p className="text-lg font-medium text-white">Failed to load charities</p>

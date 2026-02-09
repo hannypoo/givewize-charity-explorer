@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { User, Mail, Calendar, Pencil } from "lucide-react";
+import { User, Mail, Calendar, Pencil, Heart, Receipt, Brain } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
+import { useFavorites } from "@/hooks/useFavorites";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -12,6 +14,29 @@ export function ProfileOverview() {
   const [isEditing, setIsEditing] = useState(false);
   const [displayName, setDisplayName] = useState(profile?.display_name || "");
   const [saving, setSaving] = useState(false);
+  const { favorites } = useFavorites();
+
+  const { data: receiptCount = 0 } = useQuery({
+    queryKey: ["receipt-count", user?.id],
+    queryFn: async () => {
+      if (!user) return 0;
+      const { count } = await supabase.from("user_donation_receipts").select("*", { count: "exact", head: true }).eq("user_id", user.id);
+      return count || 0;
+    },
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: quizCount = 0 } = useQuery({
+    queryKey: ["quiz-count", user?.id],
+    queryFn: async () => {
+      if (!user) return 0;
+      const { count } = await supabase.from("user_quiz_results").select("*", { count: "exact", head: true }).eq("user_id", user.id);
+      return count || 0;
+    },
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+  });
 
   const memberSince = user?.created_at
     ? new Date(user.created_at).toLocaleDateString("en-US", { month: "long", year: "numeric" })
@@ -90,6 +115,31 @@ export function ProfileOverview() {
                 Member since {memberSince}
               </div>
             )}
+
+            {/* Quick Stats */}
+            <div className="grid grid-cols-3 gap-3 pt-4 mt-4 border-t border-border">
+              <div className="text-center">
+                <div className="flex items-center justify-center mb-1">
+                  <Heart className="h-4 w-4 text-primary" />
+                </div>
+                <p className="font-display text-xl font-bold text-foreground">{favorites.length}</p>
+                <p className="text-xs text-muted-foreground">Favorites</p>
+              </div>
+              <div className="text-center">
+                <div className="flex items-center justify-center mb-1">
+                  <Receipt className="h-4 w-4 text-primary" />
+                </div>
+                <p className="font-display text-xl font-bold text-foreground">{receiptCount}</p>
+                <p className="text-xs text-muted-foreground">Receipts</p>
+              </div>
+              <div className="text-center">
+                <div className="flex items-center justify-center mb-1">
+                  <Brain className="h-4 w-4 text-primary" />
+                </div>
+                <p className="font-display text-xl font-bold text-foreground">{quizCount}</p>
+                <p className="text-xs text-muted-foreground">Quizzes</p>
+              </div>
+            </div>
           </div>
         )}
       </div>

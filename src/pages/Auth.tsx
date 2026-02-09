@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Mail, KeyRound, User, ArrowRight, Loader2 } from "lucide-react";
+import { Mail, KeyRound, User, ArrowRight, Loader2, Check, X } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +32,9 @@ const Auth = () => {
     return null;
   }
 
+  const passwordsMatch = tab === "signup" && password.length > 0 && confirmPassword.length > 0 && password === confirmPassword;
+  const passwordsMismatch = tab === "signup" && confirmPassword.length > 0 && password !== confirmPassword;
+
   const validate = () => {
     const e: Record<string, string> = {};
     if (!email.trim()) e.email = "Email is required";
@@ -62,7 +65,15 @@ const Auth = () => {
       navigate(redirectTo, { replace: true });
     } catch (err: any) {
       const msg = err?.message || "Something went wrong";
-      toast.error(msg);
+      // Provide helpful recovery suggestions
+      if (msg.includes("Invalid login credentials")) {
+        toast.error("Invalid email or password. Try again or create an account.");
+      } else if (msg.includes("User already registered")) {
+        toast.error("An account with this email already exists. Try signing in instead.");
+        setTab("signin");
+      } else {
+        toast.error(msg);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -103,6 +114,8 @@ const Auth = () => {
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
                       placeholder="Your name"
+                      autoComplete="name"
+                      disabled={isSubmitting}
                       className="pl-10 bg-white/10 border-white/15 text-white placeholder:text-white/30 rounded-xl"
                     />
                   </div>
@@ -120,6 +133,8 @@ const Auth = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
+                    autoComplete="email"
+                    disabled={isSubmitting}
                     className="pl-10 bg-white/10 border-white/15 text-white placeholder:text-white/30 rounded-xl"
                   />
                 </div>
@@ -136,6 +151,8 @@ const Auth = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="At least 6 characters"
+                    autoComplete={tab === "signin" ? "current-password" : "new-password"}
+                    disabled={isSubmitting}
                     className="pl-10 bg-white/10 border-white/15 text-white placeholder:text-white/30 rounded-xl"
                   />
                 </div>
@@ -153,10 +170,21 @@ const Auth = () => {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Confirm your password"
-                      className="pl-10 bg-white/10 border-white/15 text-white placeholder:text-white/30 rounded-xl"
+                      autoComplete="new-password"
+                      disabled={isSubmitting}
+                      className={`pl-10 pr-10 bg-white/10 border-white/15 text-white placeholder:text-white/30 rounded-xl ${
+                        passwordsMatch ? "border-emerald-400/50" : passwordsMismatch ? "border-red-400/50" : ""
+                      }`}
                     />
+                    {passwordsMatch && (
+                      <Check className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-400" />
+                    )}
+                    {passwordsMismatch && (
+                      <X className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-red-400" />
+                    )}
                   </div>
                   {errors.confirmPassword && <p className="text-xs text-red-400 mt-1">{errors.confirmPassword}</p>}
+                  {passwordsMatch && <p className="text-xs text-emerald-400 mt-1">Passwords match</p>}
                 </div>
               )}
 

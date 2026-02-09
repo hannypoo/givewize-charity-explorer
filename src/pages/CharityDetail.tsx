@@ -43,6 +43,14 @@ const CharityDetail = () => {
   const [matchSubmitting, setMatchSubmitting] = useState(false);
   const { activeSection, scrollToSection } = useActiveSection(sectionIds);
 
+  // Close employer match dialog on Escape
+  useEffect(() => {
+    if (!showMatchDialog) return;
+    const handleEsc = (e: KeyboardEvent) => { if (e.key === "Escape") setShowMatchDialog(false); };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [showMatchDialog]);
+
   const { data: charity, isLoading, error } = useCharityById(id);
   usePageTitle(
     charity?.name || "Charity Profile",
@@ -226,11 +234,11 @@ const CharityDetail = () => {
                   onClick={() => toggleFav(id!)}
                   aria-label={favorited ? "Remove from favorites" : "Add to favorites"}
                   aria-pressed={favorited}
-                  className={`inline-flex items-center gap-2 px-4 py-2.5 md:py-2 rounded-full text-sm font-medium transition-all ${
-                    favorited ? "bg-white text-primary" : "border-2 border-white text-white hover:bg-white/10"
+                  className={`inline-flex items-center gap-2 px-4 py-2.5 md:py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                    favorited ? "bg-white text-primary scale-105" : "border-2 border-white text-white hover:bg-white/10"
                   }`}
                 >
-                  <Heart className={`h-4 w-4 ${favorited ? "fill-current" : ""}`} />
+                  <Heart className={`h-4 w-4 transition-all duration-200 ${favorited ? "fill-current scale-110" : ""}`} />
                   {favorited ? "Favorited" : "Favorite"}
                 </button>
                 <button
