@@ -7,6 +7,10 @@
    Premium & polished aesthetic
 */
 
+html {
+  scroll-behavior: smooth;
+}
+
 @layer base {
   :root {
     /* Warm off-white base */
@@ -193,7 +197,11 @@
   }
 
   .bg-testimonials {
-    background: linear-gradient(180deg, hsl(220 50% 35%) 0%, hsl(220 48% 30%) 50%, hsl(220 45% 25%) 100%);
+    background: linear-gradient(180deg, hsl(220 50% 35%) 0%, hsl(220 48% 30%) 50%, hsl(220 45% 28%) 100%);
+  }
+
+  .bg-cta {
+    background: linear-gradient(180deg, hsl(220 45% 28%) 0%, hsl(220 45% 25%) 100%);
   }
 
   .bg-footer {
