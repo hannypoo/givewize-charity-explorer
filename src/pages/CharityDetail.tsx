@@ -12,6 +12,7 @@ import { StandoutCharacteristics } from "@/components/charities/StandoutCharacte
 import { CommunityRatingAgent } from "@/components/charities/CommunityRatingAgent";
 import { StarRating } from "@/components/charities/StarRating";
 import { useCharityById } from "@/hooks/useCharities";
+import type { CharityRow } from "@/hooks/useCharities";
 import { useActiveSection } from "@/hooks/useActiveSection";
 import { getCombinedRating, getCategoryGradient, categoryLabels, scopeLabels, computeGivewizeScores, computeScoreDescriptions } from "@/lib/charityUtils";
 import { usePageTitle } from "@/hooks/usePageTitle";
@@ -30,12 +31,35 @@ const CharityDetail = () => {
   const { activeSection, scrollToSection } = useActiveSection(sectionIds);
 
   const { data: charity, isLoading, error } = useCharityById(id);
-  usePageTitle(charity?.name || "Charity Profile");
+  usePageTitle(
+    charity?.name || "Charity Profile",
+    charity
+      ? `${charity.name} - ${categoryLabels[charity.primary_category] || charity.primary_category}. View ratings, financial transparency, and impact data on GiveWiZe.`
+      : undefined
+  );
 
   const combinedRating = useMemo(
     () => (charity ? getCombinedRating(charity) : null),
     [charity]
   );
+
+  // Related charities (same category, excluding current)
+  const { data: relatedCharities = [] } = useQuery({
+    queryKey: ["related-charities", charity?.primary_category, charity?.id],
+    queryFn: async () => {
+      if (!charity) return [];
+      const { data } = await supabase
+        .from("charities")
+        .select("id, name, primary_category, logo_url, mission_statement, community_rating_average, score_overall")
+        .eq("primary_category", charity.primary_category)
+        .neq("id", charity.id)
+        .order("community_rating_average", { ascending: false })
+        .limit(3);
+      return (data || []) as CharityRow[];
+    },
+    enabled: !!charity,
+    staleTime: 5 * 60 * 1000,
+  });
 
   const computedScores = useMemo(
     () => (charity ? computeGivewizeScores(charity) : null),
@@ -468,6 +492,46 @@ const CharityDetail = () => {
               <StandoutCharacteristics charity={charity} />
             </div>
           </section>
+
+          {/* ── Related Charities ─────────────────────────────────── */}
+          {relatedCharities.length > 0 && (
+            <section className="mb-12">
+              <h2 className="font-display text-2xl font-bold text-foreground mb-6">
+                More in {categoryLabels[charity.primary_category] || charity.primary_category}
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {relatedCharities.map((related) => {
+                  const relCombined = getCombinedRating(related);
+                  return (
+                    <Link
+                      key={related.id}
+                      to={`/charities/${related.id}`}
+                      className="bg-card rounded-xl p-5 shadow-soft hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+                    >
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+                          {related.logo_url ? (
+                            <img src={related.logo_url} alt="" className="h-7 w-7 object-contain rounded" />
+                          ) : (
+                            <Building2 className="h-4 w-4 text-muted-foreground" />
+                          )}
+                        </div>
+                        <h3 className="font-semibold text-foreground text-sm line-clamp-1">
+                          {related.name}
+                        </h3>
+                      </div>
+                      {relCombined != null && (
+                        <StarRating rating={relCombined} size="sm" showValue className="mb-2" />
+                      )}
+                      <p className="text-xs text-muted-foreground line-clamp-2">
+                        {related.mission_statement}
+                      </p>
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+          )}
         </div>
       </div>
     </Layout>
