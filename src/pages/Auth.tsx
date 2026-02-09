@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { usePageTitle } from "@/hooks/usePageTitle";
 
 const Auth = () => {
-  usePageTitle("Sign In");
+  usePageTitle("Sign In", "Account features are coming soon. Explore vetted charities and take the quiz to find your perfect match.");
   return (
     <Layout>
       <div className="min-h-[calc(100vh-4rem)] -mt-16 pt-16 relative overflow-hidden" style={{ background: 'linear-gradient(180deg, hsl(220, 72%, 50%) 0%, hsl(220, 60%, 40%) 50%, hsl(220, 50%, 30%) 100%)' }}>

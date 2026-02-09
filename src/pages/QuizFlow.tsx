@@ -21,7 +21,7 @@ function loadSavedProgress(): { step: number; answers: Answers } | null {
 }
 
 const QuizFlow = () => {
-  usePageTitle("Quiz");
+  usePageTitle("Quiz", "Answer 10 quick questions to discover charities that align with your values, giving preferences, and impact goals.");
   const navigate = useNavigate();
   const saved = loadSavedProgress();
   const [currentStep, setCurrentStep] = useState(saved?.step ?? 0);

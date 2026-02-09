@@ -120,10 +120,19 @@ const Charities = () => {
   );
 
   const totalPages = Math.ceil(cardCharities.length / ITEMS_PER_PAGE);
+
+  // Reset to page 1 if current page exceeds available pages (e.g., after filter change)
+  useEffect(() => {
+    if (totalPages > 0 && currentPage > totalPages) {
+      setCurrentPage(1);
+    }
+  }, [totalPages, currentPage]);
+
+  const safePage = totalPages > 0 && currentPage > totalPages ? 1 : currentPage;
   const paginatedCharities = useMemo(() => {
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    const start = (safePage - 1) * ITEMS_PER_PAGE;
     return cardCharities.slice(start, start + ITEMS_PER_PAGE);
-  }, [cardCharities, currentPage]);
+  }, [cardCharities, safePage]);
 
   const handleSearchChange = useCallback((value: string) => {
     setSearchQuery(value);
