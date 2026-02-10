@@ -123,6 +123,14 @@ const About = () => {
                 values, creating transparency standards that hold charities accountable, and
                 fostering a community of thoughtful givers who share their insights.
               </p>
+              <p className="text-white/60 leading-relaxed mb-4">
+                We are committed to{" "}
+                <span className="font-semibold text-white">honest transparency with no
+                biases</span>. We will always give you the truth — our ratings are driven
+                purely by data and community feedback, never by partnerships, sponsorships,
+                or hidden agendas. You deserve to make your giving decisions based on facts,
+                and that's exactly what we provide.
+              </p>
               <p className="text-white/60 leading-relaxed">
                 Because of Z, I know what it feels like to be on the receiving end of
                 someone's generosity. That feeling is what drives this work — the belief
@@ -207,10 +215,9 @@ const About = () => {
               </div>
 
               <p className="text-white/50 text-center mt-6 text-sm leading-relaxed">
-                Ratings are based on available data and are not a definitive measure of a
-                charity's worthiness. A lower score may simply reflect limited public filings,
-                not a lack of impact. We encourage you to look beyond the numbers and consider
-                each organization's mission before deciding how to give.
+                Scores are based on available data and may not reflect the full picture of an
+                organization. They are meant to be one part of your decision, not the entire
+                decision.
               </p>
             </div>
           </section>

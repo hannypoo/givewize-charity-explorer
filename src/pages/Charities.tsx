@@ -258,9 +258,9 @@ const Charities = () => {
             <div className="mt-6 flex items-start gap-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/15 px-4 py-3">
               <Info className="h-4 w-4 text-white/60 mt-0.5 shrink-0" />
               <p className="text-sm text-white/70 leading-relaxed">
-                Ratings are based on weighted factors including financial efficiency, transparency, impact, and community input.
-                A score does not dictate a charity's worthiness to receive — it simply provides a breakdown of factors that may
-                be important to donors. Please look into each organization and consider how to Give Wi<span className="text-orange-light font-semibold">Z</span>ely.
+                Scores are based on available data and may not reflect the full picture of an
+                organization. They are meant to be one part of your decision, not the entire
+                decision.
               </p>
             </div>
             <p className="mt-3 text-sm text-white/50">
