@@ -22,65 +22,85 @@ const About = () => {
               <span className="text-sm font-medium text-white/80">Our story</span>
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
-              About GiveWiZe
+              About Give<span className="text-orange-light">WiZ</span>e
             </h1>
             <p className="text-xl text-white/60 leading-relaxed">
-              We believe everyone deserves to give with confidence, knowing their
-              donation will make a real difference.
+              Born from a mother's journey, built to help everyone give with confidence.
             </p>
           </div>
 
-          {/* Our Mission */}
+          {/* The Inspiration */}
           <section className="max-w-3xl mx-auto mb-12">
             <div className="glass-dark rounded-2xl p-6 md:p-8">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center">
                   <Heart className="h-6 w-6 text-white" />
                 </div>
-                <h2 className="text-2xl md:text-3xl font-bold text-white">Our Mission</h2>
+                <h2 className="text-2xl md:text-3xl font-bold text-white">The Inspiration</h2>
               </div>
               <p className="text-white/60 leading-relaxed mb-4">
-                GiveWiZe exists to help donors give confidently. In a world with millions of
-                charities, finding the right one to support can feel overwhelming. How do you
-                know your money will be used effectively?
+                My name is Hannah Hoffmaster, and I'm a single mom to a beautiful, medically
+                fragile little boy named Ezra — the "Z" in GiveWiZe. Since he was eight months
+                old, we've been in and out of hospitals navigating a journey neither of us
+                asked for but one that has shaped everything I believe about generosity.
               </p>
               <p className="text-white/60 leading-relaxed mb-4">
-                We created GiveWiZe to answer these questions. By combining rigorous financial
-                analysis with community insights, we help you discover charities that align
-                with your values and meet the highest standards of accountability.
+                Through the kindness of others — charitable organizations, community support,
+                and the many people who showed up when we needed it most — we've been able to
+                not only get by, but to live comfortable and happy lives. Ezra gets the care
+                he needs, and I've even been able to pursue a master's degree, something I
+                once thought was out of reach.
+              </p>
+              <p className="text-white/60 leading-relaxed mb-4">
+                As I look toward the future and the opportunity to earn a higher income, my
+                heart keeps returning to the same question:{" "}
+                <span className="font-semibold text-white">how can I give back the way others
+                gave to us?</span> I want my giving to make the same kind of difference that
+                receiving made for me and Z. But when I started looking into where to donate,
+                I ran into a problem — it's genuinely difficult to know which charities you
+                can trust to use your money well and truly help the people who need it.
+              </p>
+              <p className="text-white/60 leading-relaxed mb-4">
+                That frustration became the spark for GiveWiZe.
               </p>
               <p className="text-white/60 leading-relaxed">
-                Our goal is simple: <span className="font-semibold text-white">make giving easier,
-                smarter, and more impactful</span> for everyone.
+                Ezra is my inspiration for all of it. Without him, I would never have
+                understood firsthand what a difference charity and generosity can make in
+                someone's life. He gives so much love to everyone around him and stays strong
+                no matter what comes his way. Because of him,{" "}
+                <span className="font-semibold text-white">GiveWiZe is more than a project
+                — it's my life's purpose</span>: to help people like us, and everyone in need,
+                find genuine help so they can have a chance at a happy and prosperous life.
               </p>
             </div>
           </section>
 
-          {/* Founder's Story */}
+          {/* Our Mission */}
           <section className="max-w-3xl mx-auto mb-12">
             <div className="glass-dark rounded-2xl p-6 md:p-8">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center">
                   <Users className="h-6 w-6 text-white" />
                 </div>
-                <h2 className="text-2xl md:text-3xl font-bold text-white">The Founder's Story</h2>
+                <h2 className="text-2xl md:text-3xl font-bold text-white">Our Mission</h2>
               </div>
               <p className="text-white/60 leading-relaxed mb-4">
-                GiveWiZe was born from a personal experience. After being touched by a rare
-                disease in our family, we wanted to support research and patient advocacy
-                organizations—but we quickly discovered how difficult it was to evaluate
-                charities objectively.
+                I believe that now more than ever, we need to see goodness in one another — to
+                lean into that place of love and generosity that I believe lives in all of us.
+                GiveWiZe exists to make that easier.
               </p>
               <p className="text-white/60 leading-relaxed mb-4">
-                Which organizations put the most money toward their mission? Who was truly
-                making progress? Where would our donation have the greatest impact? These
-                questions led to months of research, spreadsheets, and frustration.
+                In a world with millions of charities, finding the right one to support can feel
+                overwhelming. Which organizations truly put their money toward their mission? Who
+                is making real progress? Where will your donation have the greatest impact?
               </p>
               <p className="text-white/60 leading-relaxed">
-                We built GiveWiZe so that no one else has to go through that process alone.
-                Every feature, every metric, and every recommendation is designed with the
-                thoughtful donor in mind—<span className="font-semibold text-white">someone
-                who cares deeply and wants to give wisely</span>.
+                By combining rigorous financial analysis with community insights, GiveWiZe helps
+                you discover charities that align with your values and meet the highest standards
+                of accountability. Our goal is simple:{" "}
+                <span className="font-semibold text-white">make giving easier, smarter, and
+                more impactful</span> — so that every act of generosity reaches the people who
+                need it most.
               </p>
             </div>
           </section>
@@ -175,18 +195,21 @@ const About = () => {
                 <h2 className="text-2xl md:text-3xl font-bold text-white">Our Vision</h2>
               </div>
               <p className="text-white/60 leading-relaxed mb-4">
-                We envision a future where <span className="font-semibold text-white">every
-                donation is an informed donation</span>. Where donors feel empowered to ask
-                questions, compare options, and give with complete confidence.
+                I envision a future where <span className="font-semibold text-white">every
+                donation is an informed donation</span> — where donors feel empowered to ask
+                questions, compare options, and give with complete confidence that their
+                generosity will reach the people who need it.
               </p>
               <p className="text-white/60 leading-relaxed mb-4">
-                We're building tools to match you with causes that resonate with your personal
-                values. We're creating transparency standards that hold charities accountable.
-                And we're fostering a community of thoughtful givers who share their insights.
+                GiveWiZe is building tools to match you with causes that resonate with your
+                values, creating transparency standards that hold charities accountable, and
+                fostering a community of thoughtful givers who share their insights.
               </p>
               <p className="text-white/60 leading-relaxed mb-8">
-                The future of giving is confident, connected, and impactful—and we're
-                building it together.
+                Because of Z, I know what it feels like to be on the receiving end of
+                someone's generosity. That feeling is what drives this work — the belief
+                that <span className="font-semibold text-white">when we make it easier to
+                give wisely, we make it easier to change lives</span>.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
