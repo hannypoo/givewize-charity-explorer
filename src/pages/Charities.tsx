@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Filter, ChevronRight, X, ArrowUpDown, Info, Heart, Building2 } from "lucide-react";
+import { getCategoryIcon } from "@/components/charities/CategoryIcon";
 import { Layout } from "@/components/layout/Layout";
 import { CharityFilters } from "@/components/charities/CharityFilters";
 import { CharityGrid } from "@/components/charities/CharityGrid";
@@ -516,7 +517,10 @@ const Charities = () => {
                           {charity.logo_url ? (
                             <img src={charity.logo_url} alt="" loading="lazy" className="h-7 w-7 object-contain rounded" />
                           ) : (
-                            <Building2 className="h-4 w-4 text-white/50" />
+                            (() => {
+                              const Icon = getCategoryIcon(charity.primary_category);
+                              return <Icon className="h-4 w-4 text-white/50" />;
+                            })()
                           )}
                         </div>
                         <div className="min-w-0">

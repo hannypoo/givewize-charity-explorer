@@ -4,6 +4,7 @@ import {
   Heart, ExternalLink, MapPin, Calendar, Globe, Building2,
   ArrowLeft, Loader2, Check, X, Info, Users, Target, TrendingUp, Shield, Share2, Briefcase,
 } from "lucide-react";
+import { getCategoryIcon } from "@/components/charities/CategoryIcon";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -195,7 +196,10 @@ const CharityDetail = () => {
               {charity.logo_url ? (
                 <img src={charity.logo_url} alt={`${charity.name} logo`} className="h-14 w-14 object-contain" />
               ) : (
-                <Building2 className="h-10 w-10 text-muted-foreground" />
+                (() => {
+                  const Icon = getCategoryIcon(charity.primary_category);
+                  return <Icon className="h-10 w-10 text-muted-foreground" />;
+                })()
               )}
             </div>
 
@@ -656,7 +660,10 @@ const CharityDetail = () => {
                           {related.logo_url ? (
                             <img src={related.logo_url} alt="" loading="lazy" className="h-7 w-7 object-contain rounded" />
                           ) : (
-                            <Building2 className="h-4 w-4 text-muted-foreground" />
+                            (() => {
+                              const Icon = getCategoryIcon(related.primary_category);
+                              return <Icon className="h-4 w-4 text-muted-foreground" />;
+                            })()
                           )}
                         </div>
                         <h3 className="font-semibold text-foreground text-sm line-clamp-1">

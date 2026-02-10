@@ -2,6 +2,7 @@ import { memo, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { Building2 } from "lucide-react";
+import { getCategoryIcon } from "./CategoryIcon";
 import { StarRating } from "./StarRating";
 import { supabase } from "@/integrations/supabase/client";
 import { getCombinedRating, categoryLabels, scopeLabels, getKeyStandoutBadge } from "@/lib/charityUtils";
@@ -72,7 +73,10 @@ export const CharityCard = memo(function CharityCard({ charity }: CharityCardPro
                   className="h-10 w-10 object-contain rounded-lg"
                 />
               ) : (
-                <Building2 className="h-5 w-5 text-primary-foreground" />
+                (() => {
+                  const Icon = getCategoryIcon(charity.category);
+                  return <Icon className="h-6 w-6 text-primary-foreground" />;
+                })()
               )}
             </div>
 
