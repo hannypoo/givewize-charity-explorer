@@ -1,7 +1,7 @@
 import { Heart, Shield, Star, Eye, Target, Users, TrendingUp } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { usePageTitle } from "@/hooks/usePageTitle";
-import zAndI from "@/assets/ZandI.JPG";
+import zAndI from "@/assets/zandi.jpg";
 import zPhoto from "@/assets/z.jpeg";
 import zVideo from "@/assets/zsfirststeps.mp4";
 
