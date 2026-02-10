@@ -177,8 +177,11 @@ const About = () => {
                 </div>
               </div>
 
-              <p className="text-white/50 text-center mt-6 text-sm">
-                Together, these ratings give you a complete picture of each charity's performance and reputation.
+              <p className="text-white/50 text-center mt-6 text-sm leading-relaxed">
+                Ratings are based on available data and are not a definitive measure of a
+                charity's worthiness. A lower score may simply reflect limited public filings,
+                not a lack of impact. We encourage you to look beyond the numbers and consider
+                each organization's mission before deciding how to give.
               </p>
             </div>
           </section>
