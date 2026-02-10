@@ -6,8 +6,19 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { StarRating } from "@/components/charities/StarRating";
 import { getCombinedRating, categoryLabels } from "@/lib/charityUtils";
+import { quizQuestions, QUIZ_TIERS } from "@/data/quizQuestions";
 import type { CharityRow } from "@/hooks/useCharities";
 import type { Tables } from "@/integrations/supabase/types";
+
+/** Infer tier from which answer keys are present */
+function inferTier(answers: Record<string, unknown>): 1 | 2 | 3 {
+  const answeredIds = new Set(Object.keys(answers).filter((k) => answers[k] != null));
+  const tier3Ids = quizQuestions.filter((q) => q.tier === 3).map((q) => q.id);
+  const tier2Ids = quizQuestions.filter((q) => q.tier === 2).map((q) => q.id);
+  if (tier3Ids.some((id) => answeredIds.has(id))) return 3;
+  if (tier2Ids.some((id) => answeredIds.has(id))) return 2;
+  return 1;
+}
 
 type QuizResult = Tables<"user_quiz_results">;
 
@@ -85,7 +96,18 @@ export function QuizMatchesSection() {
           {/* Latest quiz info */}
           <div className="bg-card rounded-xl p-6 shadow-soft">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-foreground">Latest Results</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold text-foreground">Latest Results</h3>
+                {latestResult.answers && (() => {
+                  const t = inferTier(latestResult.answers as Record<string, unknown>);
+                  const tierMeta = QUIZ_TIERS[t - 1];
+                  return (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                      {tierMeta.label}
+                    </span>
+                  );
+                })()}
+              </div>
               <span className="text-xs text-muted-foreground">
                 {new Date(latestResult.created_at).toLocaleDateString()}
               </span>

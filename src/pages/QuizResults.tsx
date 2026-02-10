@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ArrowRight, Building2, RefreshCw, Loader2, Save } from "lucide-react";
+import { ArrowRight, Building2, RefreshCw, Loader2, Save, Check, Sparkles } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { StarRating } from "@/components/charities/StarRating";
@@ -10,6 +10,15 @@ import { usePageTitle } from "@/hooks/usePageTitle";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { QUIZ_TIERS, tierStartIndex, quizQuestions } from "@/data/quizQuestions";
+import { loadQuizResults, saveQuizResults, clearQuizResults } from "@/lib/quizStorage";
+
+type Answers = Record<string, string | string[] | number>;
+
+/** Count how many of the 8 quiz question IDs have answers */
+function countAnsweredFactors(answers: Answers): number {
+  return quizQuestions.filter((q) => answers[q.id] != null).length;
+}
 
 const QuizResults = () => {
   usePageTitle("Your Matches", "Your personalized charity matches based on your quiz responses. View profiles, ratings, and why each charity is a great fit.");
@@ -22,32 +31,61 @@ const QuizResults = () => {
   const [saved, setSaved] = useState(false);
   const savedRef = useRef(false);
 
-  const rawAnswers = (location.state as { answers?: Record<string, string | string[] | number> })?.answers;
+  // Resolve answers + tier from multiple sources (priority order)
+  const locState = location.state as { answers?: Answers; tier?: 1 | 2 | 3 } | null;
+  const storedResults = loadQuizResults();
+
+  const rawAnswers = locState?.answers ?? storedResults?.answers ?? null;
+  const tier: 1 | 2 | 3 = locState?.tier ?? storedResults?.tier ?? 1;
+
+  const tierMeta = QUIZ_TIERS[tier - 1];
+  const nextTier = tier < 3 ? ((tier + 1) as 2 | 3) : null;
+  const nextTierMeta = nextTier ? QUIZ_TIERS[nextTier - 1] : null;
+  const answeredCount = rawAnswers ? countAnsweredFactors(rawAnswers) : 0;
+  const totalFactors = quizQuestions.length;
 
   useEffect(() => {
     if (!rawAnswers) {
-      navigate("/quiz");
+      // Try Supabase for logged-in user as last resort
+      if (user) {
+        supabase
+          .from("user_quiz_results")
+          .select("answers, matched_charity_ids")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .then(({ data }) => {
+            if (data && data[0]) {
+              const dbAnswers = data[0].answers as Answers;
+              // Re-run matching with DB answers
+              const quizAnswers = buildQuizAnswers(dbAnswers);
+              matchCharities(quizAnswers).then((results) => {
+                setMatches(results);
+                setIsLoading(false);
+              });
+            } else {
+              navigate("/quiz");
+            }
+          });
+      } else {
+        navigate("/quiz");
+      }
       return;
     }
 
-    const quizAnswers: QuizAnswers = {
-      causes: Array.isArray(rawAnswers.causes) ? rawAnswers.causes : undefined,
-      geographic: typeof rawAnswers.geographic === "string" ? rawAnswers.geographic : undefined,
-      personal: Array.isArray(rawAnswers.personal) ? rawAnswers.personal : undefined,
-      efficiency: typeof rawAnswers.efficiency === "number" ? rawAnswers.efficiency : undefined,
-      age: typeof rawAnswers.age === "string" ? rawAnswers.age : undefined,
-      transparency: typeof rawAnswers.transparency === "string" ? rawAnswers.transparency : undefined,
-      engagement: typeof rawAnswers.engagement === "string" ? rawAnswers.engagement : undefined,
-      taxBenefits: typeof rawAnswers.taxBenefits === "number" ? rawAnswers.taxBenefits : undefined,
-      orgSize: typeof rawAnswers.orgSize === "string" ? rawAnswers.orgSize : undefined,
-      keyFactors: Array.isArray(rawAnswers.keyFactors) ? rawAnswers.keyFactors : undefined,
-      employerMatch: typeof rawAnswers.employerMatch === "string" ? rawAnswers.employerMatch : undefined,
-    };
+    const quizAnswers = buildQuizAnswers(rawAnswers);
 
     matchCharities(quizAnswers)
       .then(async (results) => {
         setMatches(results);
         setIsLoading(false);
+
+        // Save to localStorage for persistence through refresh/auth
+        saveQuizResults(
+          rawAnswers,
+          tier,
+          results.map((m) => m.charity.id),
+        );
 
         // Auto-save for logged-in users
         if (user && !savedRef.current) {
@@ -59,6 +97,7 @@ const QuizResults = () => {
           });
           if (!saveError) {
             setSaved(true);
+            clearQuizResults(); // Clear localStorage after successful DB save
             toast.success("Quiz results saved to your profile");
           }
         }
@@ -69,6 +108,24 @@ const QuizResults = () => {
       });
   }, [rawAnswers, navigate, user]);
 
+  function buildQuizAnswers(answers: Answers): QuizAnswers {
+    return {
+      causes: Array.isArray(answers.causes) ? answers.causes : undefined,
+      geographic: typeof answers.geographic === "string" ? answers.geographic : undefined,
+      efficiency: typeof answers.efficiency === "number" ? answers.efficiency : undefined,
+      age: typeof answers.age === "string" ? answers.age : undefined,
+      transparency: typeof answers.transparency === "string" ? answers.transparency : undefined,
+      taxBenefits: typeof answers.taxBenefits === "number" ? answers.taxBenefits : undefined,
+      orgSize: typeof answers.orgSize === "string" ? answers.orgSize : undefined,
+      keyFactors: Array.isArray(answers.keyFactors) ? answers.keyFactors : undefined,
+    };
+  }
+
+  const handleRetake = () => {
+    clearQuizResults();
+    navigate("/quiz/start");
+  };
+
   return (
     <Layout>
       <div className="bg-quiz-results min-h-[calc(100vh-4rem)] -mt-16 pt-16 relative overflow-hidden">
@@ -77,10 +134,42 @@ const QuizResults = () => {
         <div className="absolute bottom-32 right-[15%] w-64 h-64 bg-white/5 rounded-full blur-[80px]" />
 
         <div className="container relative max-w-3xl py-10 md:py-14">
+          {/* Tier Stepper */}
+          <div className="flex items-center justify-center gap-3 mb-6">
+            {QUIZ_TIERS.map((t, i) => {
+              const isCompleted = t.tier < tier;
+              const isCurrent = t.tier === tier;
+              return (
+                <div key={t.tier} className="flex items-center gap-3">
+                  <div className={`flex items-center justify-center h-8 w-8 rounded-full border-2 transition-colors ${
+                    isCompleted
+                      ? "border-orange-light bg-orange-light/20"
+                      : isCurrent
+                      ? "border-orange-light bg-orange-light/10"
+                      : "border-white/20 bg-white/5"
+                  }`}>
+                    {isCompleted ? (
+                      <Check className="h-4 w-4 text-orange-light" />
+                    ) : (
+                      <span className={`text-xs font-bold ${isCurrent ? "text-orange-light" : "text-white/30"}`}>
+                        {t.tier}
+                      </span>
+                    )}
+                  </div>
+                  {i < QUIZ_TIERS.length - 1 && (
+                    <div className={`w-8 h-0.5 ${isCompleted ? "bg-orange-light/40" : "bg-white/15"}`} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
           {/* Header */}
           <div className="text-center mb-10">
+            {/* Specificity badge */}
             <div className="inline-flex items-center gap-2 glass-dark rounded-full px-5 py-2.5 mb-6">
-              <span className="text-sm font-medium text-white/80">Your results</span>
+              <Sparkles className="h-4 w-4 text-orange-light" />
+              <span className="text-sm font-medium text-white/80">{tierMeta.specificity} results</span>
             </div>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 tracking-tight">
               Your Top Charity Matches
@@ -90,6 +179,12 @@ const QuizResults = () => {
                 ? `We found ${matches.length} ${matches.length === 1 ? "charity" : "charities"} that align with your values.`
                 : "Based on your quiz responses, here are charities that align with your values."}
             </p>
+            {/* Context note for partial matches */}
+            {tier < 3 && !isLoading && matches.length > 0 && (
+              <p className="text-sm text-white/40 mt-2">
+                Based on {answeredCount} of {totalFactors} factors. Refine for more differentiated results.
+              </p>
+            )}
           </div>
 
           {isLoading ? (
@@ -117,12 +212,10 @@ const QuizResults = () => {
               <Button
                 size="lg"
                 className="gradient-orange text-accent-foreground font-semibold px-8 rounded-2xl"
-                asChild
+                onClick={handleRetake}
               >
-                <Link to="/quiz/start">
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                  Retake Quiz
-                </Link>
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Retake Quiz
               </Button>
             </div>
           ) : (
@@ -199,6 +292,36 @@ const QuizResults = () => {
                 })}
               </div>
 
+              {/* Refine Results CTA or Tier 3 completion */}
+              {nextTier && nextTierMeta && rawAnswers ? (
+                <div className="glass-dark rounded-2xl p-6 mb-6 text-center">
+                  <Sparkles className="h-5 w-5 text-orange-light mx-auto mb-2" />
+                  <p className="text-white/80 font-medium mb-1">Want more specific results?</p>
+                  <p className="text-sm text-white/50 mb-4">
+                    Answer {nextTierMeta.questionCount} more question{nextTierMeta.questionCount > 1 ? "s" : ""} to get {nextTierMeta.specificity.toLowerCase()} matches.
+                  </p>
+                  <Button
+                    size="sm"
+                    className="gradient-orange text-accent-foreground font-semibold rounded-xl"
+                    onClick={() =>
+                      navigate("/quiz/start", {
+                        state: { answers: rawAnswers, startStep: tierStartIndex(nextTier) },
+                      })
+                    }
+                  >
+                    Refine Results
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              ) : tier === 3 ? (
+                <div className="glass-dark rounded-2xl p-5 mb-6 text-center">
+                  <Check className="h-5 w-5 text-orange-light mx-auto mb-2" />
+                  <p className="text-sm text-white/60">
+                    You've completed the full Deep Match quiz! These are your most precise matches.
+                  </p>
+                </div>
+              ) : null}
+
               {/* Save Prompt */}
               {!user && (
                 <div className="glass-dark rounded-2xl p-5 mb-6 text-center">
@@ -231,12 +354,10 @@ const QuizResults = () => {
                   variant="outline"
                   size="lg"
                   className="border-white/25 text-white hover:bg-white/15 rounded-2xl"
-                  asChild
+                  onClick={handleRetake}
                 >
-                  <Link to="/quiz/start">
-                    <RefreshCw className="mr-2 h-4 w-4" />
-                    Retake Quiz
-                  </Link>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Retake Quiz
                 </Button>
               </div>
             </>

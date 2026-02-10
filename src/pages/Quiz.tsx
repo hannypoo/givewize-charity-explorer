@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { usePageTitle } from "@/hooks/usePageTitle";
 
 const Quiz = () => {
-  usePageTitle("Charity Match Quiz", "Take our 3-minute quiz to discover charities that match your values, causes, and giving preferences.");
+  usePageTitle("Charity Match Quiz", "Take our 1-minute quiz to discover charities that match your values, causes, and giving preferences.");
   return (
     <Layout>
       <div className="bg-quiz min-h-[calc(100vh-4rem)] -mt-16 pt-16 relative overflow-hidden">
@@ -28,8 +28,11 @@ const Quiz = () => {
             <span className="text-orange-light">Charity Match</span>
           </h1>
 
-          <p className="text-lg md:text-xl text-white/60 text-center max-w-md mb-12">
+          <p className="text-lg md:text-xl text-white/60 text-center max-w-md mb-3">
             Answer a few questions and we'll match you with charities that align with your values
+          </p>
+          <p className="text-sm text-white/40 text-center max-w-md mb-12">
+            Start quick. Refine if you want more precision.
           </p>
 
           <Button
@@ -46,8 +49,8 @@ const Quiz = () => {
           {/* Info pills */}
           <div className="flex flex-wrap justify-center gap-4 mt-12">
             {[
-              { icon: <Clock className="h-4 w-4 text-white/70" />, text: "Takes ~3 minutes" },
-              { icon: <ListChecks className="h-4 w-4 text-white/70" />, text: "11 questions" },
+              { icon: <Clock className="h-4 w-4 text-white/70" />, text: "Takes ~1 minute" },
+              { icon: <ListChecks className="h-4 w-4 text-white/70" />, text: "As few as 3 questions" },
               { icon: <CheckCircle className="h-4 w-4 text-white/70" />, text: "No account required" },
             ].map((pill, i) => (
               <div

@@ -7,9 +7,38 @@ export interface QuizQuestion {
   multiSelect?: boolean;
   maxSelections?: number;
   scaleLabels?: { low: string; high: string };
+  tier: 1 | 2 | 3;
+}
+
+export interface QuizTier {
+  tier: 1 | 2 | 3;
+  label: string;
+  specificity: string;
+  questionCount: number;
+}
+
+export const QUIZ_TIERS: QuizTier[] = [
+  { tier: 1, label: "Quick Match", specificity: "Somewhat specific", questionCount: 3 },
+  { tier: 2, label: "Refined Match", specificity: "Specific", questionCount: 3 },
+  { tier: 3, label: "Deep Match", specificity: "Very specific", questionCount: 2 },
+];
+
+/** First question index for a given tier (0-based) */
+export function tierStartIndex(tier: 1 | 2 | 3): number {
+  if (tier === 1) return 0;
+  if (tier === 2) return 3;
+  return 6; // tier 3
+}
+
+/** Last question index (inclusive) for a given tier */
+export function tierEndIndex(tier: 1 | 2 | 3): number {
+  if (tier === 1) return 2;
+  if (tier === 2) return 5;
+  return 7; // tier 3
 }
 
 export const quizQuestions: QuizQuestion[] = [
+  // ── Tier 1: Quick Match (3 Qs) ──
   {
     id: "causes",
     question: "What causes matter most to you?",
@@ -17,6 +46,7 @@ export const quizQuestions: QuizQuestion[] = [
     type: "cards",
     multiSelect: true,
     maxSelections: 3,
+    tier: 1,
     options: [
       { id: "rare-diseases", label: "Rare Diseases" },
       { id: "medical-health", label: "Medical & Health" },
@@ -34,82 +64,11 @@ export const quizQuestions: QuizQuestion[] = [
     id: "geographic",
     question: "What geographic impact do you prefer?",
     type: "cards",
+    tier: 1,
     options: [
       { id: "local", label: "Local" },
       { id: "national", label: "National" },
       { id: "global", label: "Global" },
-      { id: "no-preference", label: "No preference" },
-    ],
-  },
-  {
-    id: "personal",
-    question: "Have you been personally affected by...",
-    subtitle: "Select all that apply",
-    type: "cards",
-    multiSelect: true,
-    options: [
-      { id: "medical-condition", label: "A medical condition" },
-      { id: "rare-disease", label: "A rare disease" },
-      { id: "food-insecurity", label: "Food insecurity" },
-      { id: "natural-disaster", label: "A natural disaster" },
-      { id: "none", label: "None of the above" },
-    ],
-  },
-  {
-    id: "efficiency",
-    question: "How important is financial efficiency to you?",
-    subtitle: "How much of each dollar goes directly to programs",
-    type: "scale",
-    scaleLabels: { low: "Not important", high: "Very important" },
-  },
-  {
-    id: "age",
-    question: "What's your organization age preference?",
-    type: "cards",
-    options: [
-      { id: "established", label: "Established (10+ years)" },
-      { id: "growing", label: "Growing (5-10 years)" },
-      { id: "new", label: "New (under 5 years)" },
-      { id: "no-preference", label: "No preference" },
-    ],
-  },
-  {
-    id: "transparency",
-    question: "What transparency matters most to you?",
-    type: "cards",
-    options: [
-      { id: "financial", label: "Financial reports" },
-      { id: "impact", label: "Impact metrics" },
-      { id: "programs", label: "Program updates" },
-      { id: "all", label: "All equally important" },
-    ],
-  },
-  {
-    id: "engagement",
-    question: "How do you want to engage?",
-    type: "cards",
-    options: [
-      { id: "donate-once", label: "Donate once" },
-      { id: "recurring", label: "Recurring giving" },
-      { id: "volunteer", label: "Volunteer" },
-      { id: "advocacy", label: "Advocacy" },
-    ],
-  },
-  {
-    id: "taxBenefits",
-    question: "How important are tax benefits?",
-    subtitle: "Getting a tax deduction for your donation",
-    type: "scale",
-    scaleLabels: { low: "Not important", high: "Very important" },
-  },
-  {
-    id: "orgSize",
-    question: "What size organization do you prefer?",
-    type: "cards",
-    options: [
-      { id: "large", label: "Large (100K+ served)" },
-      { id: "medium", label: "Medium" },
-      { id: "small", label: "Small & personal" },
       { id: "no-preference", label: "No preference" },
     ],
   },
@@ -120,6 +79,7 @@ export const quizQuestions: QuizQuestion[] = [
     type: "cards",
     multiSelect: true,
     maxSelections: 3,
+    tier: 1,
     options: [
       { id: "high-efficiency", label: "High Efficiency" },
       { id: "transparency", label: "Transparency" },
@@ -129,15 +89,58 @@ export const quizQuestions: QuizQuestion[] = [
       { id: "global-reach", label: "Global Reach" },
     ],
   },
+  // ── Tier 2: Refined Match (3 Qs) ──
   {
-    id: "employerMatch",
-    question: "Does your employer match charitable donations?",
+    id: "efficiency",
+    question: "How important is financial efficiency to you?",
+    subtitle: "How much of each dollar goes directly to programs",
+    type: "scale",
+    tier: 2,
+    scaleLabels: { low: "Not important", high: "Very important" },
+  },
+  {
+    id: "orgSize",
+    question: "What size organization do you prefer?",
     type: "cards",
+    tier: 2,
     options: [
-      { id: "yes", label: "Yes" },
-      { id: "not-sure", label: "Not sure" },
-      { id: "no", label: "No" },
-      { id: "self-employed", label: "Self-employed" },
+      { id: "large", label: "Large (100K+ served)" },
+      { id: "medium", label: "Medium" },
+      { id: "small", label: "Small & personal" },
+      { id: "no-preference", label: "No preference" },
     ],
+  },
+  {
+    id: "transparency",
+    question: "What transparency matters most to you?",
+    type: "cards",
+    tier: 2,
+    options: [
+      { id: "financial", label: "Financial reports" },
+      { id: "impact", label: "Impact metrics" },
+      { id: "programs", label: "Program updates" },
+      { id: "all", label: "All equally important" },
+    ],
+  },
+  // ── Tier 3: Deep Match (2 Qs) ──
+  {
+    id: "age",
+    question: "What's your organization age preference?",
+    type: "cards",
+    tier: 3,
+    options: [
+      { id: "established", label: "Established (10+ years)" },
+      { id: "growing", label: "Growing (5-10 years)" },
+      { id: "new", label: "New (under 5 years)" },
+      { id: "no-preference", label: "No preference" },
+    ],
+  },
+  {
+    id: "taxBenefits",
+    question: "How important are tax benefits?",
+    subtitle: "Getting a tax deduction for your donation",
+    type: "scale",
+    tier: 3,
+    scaleLabels: { low: "Not important", high: "Very important" },
   },
 ];

@@ -6,15 +6,12 @@ type Charity = Tables<"charities">;
 export interface QuizAnswers {
   causes?: string[];
   geographic?: string;
-  personal?: string[];
   efficiency?: number;
   age?: string;
   transparency?: string;
-  engagement?: string;
   taxBenefits?: number;
   orgSize?: string;
   keyFactors?: string[];
-  employerMatch?: string;
 }
 
 export interface MatchedCharity {

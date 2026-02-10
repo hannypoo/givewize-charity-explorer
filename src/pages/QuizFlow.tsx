@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
-import { quizQuestions } from "@/data/quizQuestions";
+import { quizQuestions, QUIZ_TIERS, tierEndIndex, tierStartIndex } from "@/data/quizQuestions";
 import { usePageTitle } from "@/hooks/usePageTitle";
 
 type Answers = Record<string, string | string[] | number>;
@@ -20,13 +20,28 @@ function loadSavedProgress(): { step: number; answers: Answers } | null {
   return null;
 }
 
+/** Determine which tier a step index falls within */
+function getTierForStep(step: number): 1 | 2 | 3 {
+  if (step <= tierEndIndex(1)) return 1;
+  if (step <= tierEndIndex(2)) return 2;
+  return 3;
+}
+
 const QuizFlow = () => {
-  usePageTitle("Quiz", "Answer 10 quick questions to discover charities that align with your values, giving preferences, and impact goals.");
+  usePageTitle("Quiz", "Answer a few quick questions to discover charities that align with your values, giving preferences, and impact goals.");
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Resume state from results page (for tier 2/3 continuation)
+  const resumeState = location.state as { answers?: Answers; startStep?: number } | null;
+
   const saved = loadSavedProgress();
-  const [currentStep, setCurrentStep] = useState(saved?.step ?? 0);
-  const [answers, setAnswers] = useState<Answers>(saved?.answers ?? {});
-  const [showResume, setShowResume] = useState(!!saved && saved.step > 0);
+  const initialStep = resumeState?.startStep ?? saved?.step ?? 0;
+  const initialAnswers = resumeState?.answers ?? saved?.answers ?? {};
+
+  const [currentStep, setCurrentStep] = useState(initialStep);
+  const [answers, setAnswers] = useState<Answers>(initialAnswers);
+  const [showResume, setShowResume] = useState(!resumeState && !!saved && saved.step > 0);
 
   // Persist progress to localStorage
   useEffect(() => {
@@ -35,7 +50,8 @@ const QuizFlow = () => {
 
   const currentQuestion = quizQuestions[currentStep];
   const totalSteps = quizQuestions.length;
-  const progress = ((currentStep + 1) / totalSteps) * 100;
+  const currentTier = getTierForStep(currentStep);
+  const currentTierMeta = QUIZ_TIERS[currentTier - 1];
 
   const handleSelectAnswer = (optionId: string) => {
     if (currentQuestion.multiSelect) {
@@ -64,14 +80,22 @@ const QuizFlow = () => {
   };
 
   const handleNext = () => {
-    if (currentStep < totalSteps - 1) setCurrentStep((prev) => prev + 1);
-    else {
-      localStorage.removeItem(STORAGE_KEY);
-      navigate("/quiz/results", { state: { answers } });
+    const tierEnd = tierEndIndex(currentTier);
+    if (currentStep === tierEnd) {
+      // End of a tier → navigate to results with current tier
+      navigate("/quiz/results", { state: { answers, tier: currentTier } });
+    } else if (currentStep < totalSteps - 1) {
+      setCurrentStep((prev) => prev + 1);
     }
   };
 
   const handleBack = () => {
+    // At first question of Tier 2/3 → go back to previous tier results
+    if (currentTier > 1 && currentStep === tierStartIndex(currentTier)) {
+      const prevTier = (currentTier - 1) as 1 | 2 | 3;
+      navigate("/quiz/results", { state: { answers, tier: prevTier } });
+      return;
+    }
     if (currentStep > 0) setCurrentStep((prev) => prev - 1);
     else navigate("/quiz");
   };
@@ -92,6 +116,16 @@ const QuizFlow = () => {
     currentQuestion.multiSelect && Array.isArray(currentAnswer)
       ? currentAnswer.filter((id) => id !== "none").length
       : 0;
+
+  // Dynamic button label
+  const getNextLabel = () => {
+    const tierEnd = tierEndIndex(currentTier);
+    if (currentStep === tierEnd) {
+      if (currentTier === 3) return "See Final Results";
+      return `See ${currentTierMeta.label} Results`;
+    }
+    return "Next";
+  };
 
   // Keyboard navigation: Enter=next, 1-5=scale, ArrowLeft/Right=back/next
   useEffect(() => {
@@ -157,17 +191,56 @@ const QuizFlow = () => {
             </div>
           )}
 
-          {/* Progress Bar */}
+          {/* Segmented Progress Bar */}
           <div className="mb-8">
             <div className="flex items-center justify-between text-sm text-white/60 mb-2">
               <span>Question {currentStep + 1} of {totalSteps}</span>
-              <span>{Math.round(progress)}% complete</span>
+              <span>{currentTierMeta.label}</span>
             </div>
-            <div className="h-2 bg-white/15 rounded-full overflow-hidden">
-              <div
-                className="h-full gradient-orange rounded-full transition-all duration-300"
-                style={{ width: `${progress}%` }}
-              />
+            <div className="flex gap-1 h-2">
+              {QUIZ_TIERS.map((t) => {
+                const start = tierStartIndex(t.tier);
+                const end = tierEndIndex(t.tier);
+                const width = `${(t.questionCount / totalSteps) * 100}%`;
+                const isCompleted = currentStep > end;
+                const isActive = currentTier === t.tier;
+                const progressInTier = isActive
+                  ? ((currentStep - start + 1) / t.questionCount) * 100
+                  : 0;
+
+                return (
+                  <div
+                    key={t.tier}
+                    className="relative rounded-full overflow-hidden bg-white/15"
+                    style={{ width }}
+                  >
+                    <div
+                      className={`h-full rounded-full transition-all duration-300 ${
+                        isCompleted || isActive ? "gradient-orange" : ""
+                      }`}
+                      style={{ width: isCompleted ? "100%" : isActive ? `${progressInTier}%` : "0%" }}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+            {/* Tier labels */}
+            <div className="flex gap-1 mt-1.5">
+              {QUIZ_TIERS.map((t) => {
+                const width = `${(t.questionCount / totalSteps) * 100}%`;
+                const isCompleted = currentStep > tierEndIndex(t.tier);
+                const isActive = currentTier === t.tier;
+                return (
+                  <div key={t.tier} className="flex items-center gap-1" style={{ width }}>
+                    {isCompleted && <Check className="h-3 w-3 text-orange-light shrink-0" />}
+                    <span className={`text-xs truncate ${
+                      isActive ? "text-white/80 font-medium" : isCompleted ? "text-orange-light/70" : "text-white/30"
+                    }`}>
+                      {t.label}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -275,7 +348,7 @@ const QuizFlow = () => {
                 disabled={!canProceed()}
                 className="gradient-orange text-accent-foreground font-semibold px-8 rounded-2xl glow-orange hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                {currentStep === totalSteps - 1 ? "See Results" : "Next"}
+                {getNextLabel()}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>

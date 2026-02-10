@@ -122,8 +122,9 @@ const faqGroups: FAQGroup[] = [
           <p>
             Our{" "}
             <Link to="/quiz" className="text-orange-light hover:underline">Charity Match Quiz</Link>{" "}
-            asks 11 questions about your values, interests, and giving preferences. Our matching
-            algorithm then scores every charity against your answers to recommend the best fits.
+            starts with just 3 questions about your values and interests, then lets you optionally
+            refine your results with more detail across 3 tiers. Our matching algorithm scores every
+            charity against your answers to recommend the best fits.
           </p>
         ),
       },

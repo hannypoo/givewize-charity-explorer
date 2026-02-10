@@ -3,6 +3,7 @@ import type { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { toast } from "sonner";
+import { migrateQuizResults } from "@/lib/quizStorage";
 
 type UserProfile = Tables<"user_profiles">;
 
@@ -70,6 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
           if (event === "SIGNED_IN") {
             migrateFavorites(newSession.user.id);
+            migrateQuizResults(newSession.user.id);
           }
         } else {
           setProfile(null);
