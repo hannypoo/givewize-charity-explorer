@@ -1,7 +1,5 @@
-import { Link } from "react-router-dom";
 import { Heart, Shield, Star, Eye, Target, Users, TrendingUp } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
-import { Button } from "@/components/ui/button";
 import { usePageTitle } from "@/hooks/usePageTitle";
 
 const About = () => {
@@ -205,30 +203,12 @@ const About = () => {
                 values, creating transparency standards that hold charities accountable, and
                 fostering a community of thoughtful givers who share their insights.
               </p>
-              <p className="text-white/60 leading-relaxed mb-8">
+              <p className="text-white/60 leading-relaxed">
                 Because of Z, I know what it feels like to be on the receiving end of
                 someone's generosity. That feeling is what drives this work — the belief
                 that <span className="font-semibold text-white">when we make it easier to
                 give wisely, we make it easier to change lives</span>.
               </p>
-
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Button
-                  size="lg"
-                  className="gradient-orange text-accent-foreground font-semibold px-8 rounded-2xl glow-orange hover:scale-[1.02] transition-all duration-300"
-                  asChild
-                >
-                  <Link to="/quiz">Find Your Match</Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="border-white/25 text-white hover:bg-white/15 rounded-2xl"
-                  asChild
-                >
-                  <Link to="/charities">Explore Charities</Link>
-                </Button>
-              </div>
             </div>
           </section>
         </div>
