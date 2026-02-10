@@ -151,7 +151,7 @@ const QuizFlow = () => {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  });
+  }, [currentStep, answers]);
 
   return (
     <Layout>

@@ -36,12 +36,29 @@ export const StarRating = memo(function StarRating({
   // Round to 1 decimal so star fills match the displayed text value
   const displayRating = Math.round(rawRating * 10) / 10;
 
+  const handleKeyDown = interactive
+    ? (e: React.KeyboardEvent, star: number) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onRate?.(star);
+        } else if (e.key === "ArrowRight" && star < maxStars) {
+          e.preventDefault();
+          onRate?.(star + 1);
+          (e.currentTarget.nextElementSibling as HTMLElement)?.focus();
+        } else if (e.key === "ArrowLeft" && star > 1) {
+          e.preventDefault();
+          onRate?.(star - 1);
+          (e.currentTarget.previousElementSibling as HTMLElement)?.focus();
+        }
+      }
+    : undefined;
+
   return (
     <div
       className={cn("flex items-center gap-1", className)}
       {...(!interactive && { role: "img", "aria-label": `Rating: ${displayRating.toFixed(1)} out of ${maxStars} stars` })}
     >
-      <div className="flex items-center gap-0.5" aria-hidden={!interactive}>
+      <div className="flex items-center gap-0.5" {...(interactive ? { role: "radiogroup" } : { "aria-hidden": true })}>
         {Array.from({ length: maxStars }, (_, i) => i + 1).map((star) => {
           const isFilled = displayRating >= star;
           const isHalf = !isFilled && displayRating >= star - 0.5;
@@ -51,15 +68,17 @@ export const StarRating = memo(function StarRating({
               key={star}
               type="button"
               disabled={!interactive}
+              tabIndex={interactive ? 0 : -1}
               className={cn(
                 "relative transition-transform duration-150",
-                interactive && "cursor-pointer hover:scale-110",
+                interactive && "cursor-pointer hover:scale-110 focus-visible:ring-2 focus-visible:ring-primary focus-visible:rounded",
                 !interactive && "cursor-default"
               )}
               onMouseEnter={() => interactive && setHoverRating(star)}
               onMouseLeave={() => interactive && setHoverRating(0)}
               onClick={() => interactive && onRate?.(star)}
-              aria-label={interactive ? `Rate ${star} star${star !== 1 ? "s" : ""}` : undefined}
+              onKeyDown={handleKeyDown ? (e) => handleKeyDown(e, star) : undefined}
+              {...(interactive ? { role: "radio", "aria-checked": displayRating === star, "aria-label": `${star} star${star !== 1 ? "s" : ""}` } : {})}
             >
               {/* Background (empty) star */}
               <Star className={cn(sizeMap[size], "text-muted")} />

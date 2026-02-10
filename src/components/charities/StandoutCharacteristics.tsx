@@ -121,7 +121,7 @@ function getCharacteristics(charity: Charity): Characteristic[] {
   if (charity.programs_list && charity.programs_list.length >= 4) {
     chars.push({
       label: "Multiple Programs",
-      description: `Operates ${charity.programs_list.length} distinct programs and services.`,
+      description: `Operates ${charity.programs_list.length} distinct ${charity.programs_list.length === 1 ? "program" : "programs"} and services.`,
       icon: <Layers className="h-5 w-5" />,
       color: "bg-cyan-50 text-cyan-700 border-cyan-200",
     });

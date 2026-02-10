@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
+import { getGivewizeScore } from "@/lib/charityUtils";
 
 type Charity = Tables<"charities">;
 
@@ -119,8 +120,9 @@ function generateWhyMatch(charity: Charity, answers: QuizAnswers): string {
   if (Number(charity.program_expense_percentage) >= 80) {
     reasons.push(`${charity.program_expense_percentage}% of funds go directly to programs`);
   }
-  if (Number(charity.score_overall) >= 4.0) {
-    reasons.push(`high GiveWiZe score of ${Number(charity.score_overall).toFixed(1)}`);
+  const givewizeScore = getGivewizeScore(charity);
+  if (givewizeScore >= 4.0) {
+    reasons.push(`high GiveWiZe score of ${givewizeScore.toFixed(1)}`);
   }
   if (charity.complete_990_filed && charity.financials_published) {
     reasons.push("strong financial transparency");

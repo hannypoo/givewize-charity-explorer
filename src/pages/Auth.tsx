@@ -13,8 +13,7 @@ const Auth = () => {
   usePageTitle("Sign In", "Sign in or create an account to save favorites, track donations, and get personalized charity matches.");
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, isLoading: authLoading } = useAuth();
-  const { signIn, signUp } = useAuth();
+  const { user, isLoading: authLoading, signIn, signUp } = useAuth();
 
   const [tab, setTab] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");

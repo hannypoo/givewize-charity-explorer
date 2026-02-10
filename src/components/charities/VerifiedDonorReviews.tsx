@@ -276,7 +276,7 @@ function ReviewForm({ onSubmit, charityName }: { onSubmit: (review: DonorReview)
         />
         <div className="mt-1 flex justify-between">
           {errors.reviewText && <p className="text-xs text-error">{errors.reviewText}</p>}
-          <span className={cn("ml-auto text-xs", reviewText.length < MIN_CHARS ? "text-muted-foreground" : "text-muted-foreground")}>
+          <span className={cn("ml-auto text-xs", reviewText.length >= MIN_CHARS ? "text-emerald-600" : "text-muted-foreground")}>
             {reviewText.length}/{MAX_CHARS}
           </span>
         </div>
@@ -312,12 +312,31 @@ export function VerifiedDonorReviews({ charityName, reviews = [], onSubmitReview
     if (votedIds.has(id)) return;
 
     // Optimistic update
+    const prevReviews = localReviews;
     setLocalReviews((prev) => prev.map((r) => (r.id === id ? { ...r, helpful_count: (r.helpful_count || 0) + 1 } : r)));
     markVoted(id);
     setVotedIds((prev) => new Set(prev).add(id));
 
     // Persist to database
-    await supabase.rpc("increment_review_helpful", { review_id: id });
+    const { error } = await supabase.rpc("increment_review_helpful", { review_id: id });
+    if (error) {
+      // Rollback optimistic update
+      setLocalReviews(prevReviews);
+      // Remove from voted set
+      setVotedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+      // Clear from localStorage
+      try {
+        const raw = localStorage.getItem(VOTED_KEY);
+        if (raw) {
+          const ids: string[] = JSON.parse(raw);
+          localStorage.setItem(VOTED_KEY, JSON.stringify(ids.filter((v) => v !== id)));
+        }
+      } catch { /* ignore */ }
+    }
   };
 
   const sortedReviews = [...localReviews].sort((a, b) => {

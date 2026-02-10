@@ -84,8 +84,8 @@ export function Footer() {
             © 2026 GiveWiZe. All rights reserved.
           </p>
           <div className="flex items-center gap-6 text-sm text-white/30">
-            <span>Privacy Policy</span>
-            <span>Terms of Service</span>
+            <Link to="/privacy" className="hover:text-white/50 transition-colors">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-white/50 transition-colors">Terms of Service</Link>
             <Link to="/faq" className="hover:text-white/50 transition-colors">FAQ</Link>
           </div>
         </div>

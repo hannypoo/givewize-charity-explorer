@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { ProfileSectionNav } from "@/components/charities/ProfileSectionNav";
 import { useActiveSection } from "@/hooks/useActiveSection";
@@ -23,6 +25,17 @@ const Profile = () => {
   usePageTitle("My Profile", "Manage your GiveWiZe profile, favorite charities, donation receipts, quiz results, and employer matching.");
   const { user, profile } = useAuth();
   const { activeSection, scrollToSection } = useActiveSection(sectionIds);
+  const location = useLocation();
+
+  // Handle hash navigation from other pages (e.g. /profile#employer-matching)
+  useEffect(() => {
+    const hash = location.hash.replace("#", "");
+    if (hash && sectionIds.includes(hash)) {
+      // Small delay to let the page render before scrolling
+      const timer = setTimeout(() => scrollToSection(hash), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [location.hash, scrollToSection]);
 
   return (
     <Layout>

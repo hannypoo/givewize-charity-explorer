@@ -54,13 +54,20 @@ const QuizResults = () => {
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
           .limit(1)
-          .then(({ data }) => {
+          .then(({ data, error: fetchError }) => {
+            if (fetchError) {
+              setError("Could not load your saved results. Please try retaking the quiz.");
+              setIsLoading(false);
+              return;
+            }
             if (data && data[0]) {
               const dbAnswers = data[0].answers as Answers;
-              // Re-run matching with DB answers
               const quizAnswers = buildQuizAnswers(dbAnswers);
               matchCharities(quizAnswers).then((results) => {
                 setMatches(results);
+                setIsLoading(false);
+              }).catch(() => {
+                setError("Something went wrong finding your matches. Please try again.");
                 setIsLoading(false);
               });
             } else {
