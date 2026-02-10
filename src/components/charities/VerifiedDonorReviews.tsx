@@ -5,6 +5,24 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { StarRating } from "./StarRating";
+import { supabase } from "@/integrations/supabase/client";
+
+const VOTED_KEY = "givewize-helpful-votes";
+
+function getVotedIds(): Set<string> {
+  try {
+    const raw = localStorage.getItem(VOTED_KEY);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch {
+    return new Set();
+  }
+}
+
+function markVoted(id: string): void {
+  const voted = getVotedIds();
+  voted.add(id);
+  localStorage.setItem(VOTED_KEY, JSON.stringify([...voted]));
+}
 
 // ── Types ────────────────────────────────────────────────────────────────
 export interface DonorReview {
@@ -46,7 +64,7 @@ const SORT_OPTIONS = [
 ];
 
 // ── Review Card ──────────────────────────────────────────────────────────
-function ReviewCard({ review, onHelpful }: { review: DonorReview; onHelpful: (id: string) => void }) {
+function ReviewCard({ review, onHelpful, hasVoted }: { review: DonorReview; onHelpful: (id: string) => void; hasVoted: boolean }) {
   const avgRating = (review.categories.impact + review.categories.communication + review.categories.transparency + review.categories.experience) / 4;
   const dateStr = new Date(review.date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
   const initials = review.donor_name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
@@ -94,10 +112,16 @@ function ReviewCard({ review, onHelpful }: { review: DonorReview; onHelpful: (id
 
       <div className="flex items-center gap-3 border-t border-border pt-2">
         <button
-          onClick={() => onHelpful(review.id)}
-          className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-primary"
+          onClick={() => !hasVoted && onHelpful(review.id)}
+          disabled={hasVoted}
+          className={cn(
+            "flex items-center gap-1 text-xs transition-colors",
+            hasVoted
+              ? "text-primary cursor-default"
+              : "text-muted-foreground hover:text-primary"
+          )}
         >
-          <ThumbsUp className="h-3.5 w-3.5" />
+          <ThumbsUp className={cn("h-3.5 w-3.5", hasVoted && "fill-current")} />
           Helpful ({review.helpful_count || 0})
         </button>
       </div>
@@ -282,8 +306,18 @@ export function VerifiedDonorReviews({ charityName, reviews = [], onSubmitReview
     setShowForm(false);
   };
 
-  const handleHelpful = (id: string) => {
+  const [votedIds, setVotedIds] = useState<Set<string>>(getVotedIds);
+
+  const handleHelpful = async (id: string) => {
+    if (votedIds.has(id)) return;
+
+    // Optimistic update
     setLocalReviews((prev) => prev.map((r) => (r.id === id ? { ...r, helpful_count: (r.helpful_count || 0) + 1 } : r)));
+    markVoted(id);
+    setVotedIds((prev) => new Set(prev).add(id));
+
+    // Persist to database
+    await supabase.rpc("increment_review_helpful", { review_id: id });
   };
 
   const sortedReviews = [...localReviews].sort((a, b) => {
@@ -402,7 +436,7 @@ export function VerifiedDonorReviews({ charityName, reviews = [], onSubmitReview
           </div>
         ) : (
           filteredReviews.map((review) => (
-            <ReviewCard key={review.id} review={review} onHelpful={handleHelpful} />
+            <ReviewCard key={review.id} review={review} onHelpful={handleHelpful} hasVoted={votedIds.has(review.id)} />
           ))
         )}
       </div>
