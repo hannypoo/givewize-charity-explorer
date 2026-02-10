@@ -1,10 +1,9 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { Loader2 } from "lucide-react";
 import { useScrollToTop } from "@/hooks/useScrollToTop";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -35,13 +34,38 @@ function ScrollToTop() {
   return null;
 }
 
+const loadingMessages = [
+  "Don't lose your smile, we'll get you there soon :)",
+  "Good things come to those who wait!",
+  "Brewing up some goodness for you...",
+  "Hang tight, magic is happening!",
+  "Almost there, stay awesome!",
+  "Loading some generosity your way...",
+  "Great things take a moment!",
+  "Your kindness is worth the wait :)",
+];
+
 function PageFallback() {
+  const [msgIndex, setMsgIndex] = useState(() => Math.floor(Math.random() * loadingMessages.length));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMsgIndex((prev) => (prev + 1) % loadingMessages.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div
-      className="flex min-h-screen items-center justify-center"
+      className="flex min-h-screen flex-col items-center justify-center gap-6"
       style={{ background: "linear-gradient(180deg, hsl(220, 60%, 30%) 0%, hsl(220, 50%, 20%) 100%)" }}
     >
-      <Loader2 className="h-8 w-8 animate-spin text-white/60" />
+      <span className="text-6xl animate-breathe" role="img" aria-label="Loading">
+        😊
+      </span>
+      <p className="text-white/60 text-lg font-medium text-center px-6 transition-opacity duration-500">
+        {loadingMessages[msgIndex]}
+      </p>
     </div>
   );
 }
