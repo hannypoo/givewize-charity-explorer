@@ -29,7 +29,7 @@ const faqGroups: FAQGroup[] = [
           <p>
             GiveWiZe is an AI-powered charity discovery platform that helps donors find and evaluate
             charities based on financial efficiency, transparency, impact, and community feedback.
-            We are not a nonprofit ourselves — we're a free tool designed to help you give wisely.
+            We are not a nonprofit ourselves. We're a free tool designed to help you give wisely.
           </p>
         ),
       },
@@ -63,10 +63,10 @@ const faqGroups: FAQGroup[] = [
           <div className="space-y-2">
             <p>The GiveWiZe Score is a weighted average of four factors:</p>
             <ul className="list-disc list-inside space-y-1 text-white/50">
-              <li><strong className="text-white/70">Financial Efficiency (35%)</strong> — How much goes directly to programs</li>
-              <li><strong className="text-white/70">Transparency (30%)</strong> — Availability of financial reports and audits</li>
-              <li><strong className="text-white/70">Impact (25%)</strong> — Measurable outcomes and documented programs</li>
-              <li><strong className="text-white/70">Longevity (10%)</strong> — Track record and organizational stability</li>
+              <li><strong className="text-white/70">Financial Efficiency (35%)</strong>: How much goes directly to programs</li>
+              <li><strong className="text-white/70">Transparency (30%)</strong>: Availability of financial reports and audits</li>
+              <li><strong className="text-white/70">Impact (25%)</strong>: Measurable outcomes and documented programs</li>
+              <li><strong className="text-white/70">Longevity (10%)</strong>: Track record and organizational stability</li>
             </ul>
             <p>If a sub-score isn't available for a charity, it's excluded and the remaining weights are renormalized.</p>
           </div>
@@ -85,10 +85,10 @@ const faqGroups: FAQGroup[] = [
         question: "Why does a charity I like have a low score?",
         answer: (
           <p>
-            A lower score reflects the available data, not a charity's worthiness. Some organizations
-            — especially smaller or newer ones — may have limited financial filings or fewer community
-            reviews. We encourage you to look beyond the number and consider each organization's
-            mission and impact. Read more on the{" "}
+            A lower score reflects the available data, not a charity's worthiness. Some organizations,
+            especially smaller or newer ones, may have limited financial filings or fewer community
+            reviews. Scores are meant to be one part of your decision, not the entire decision.
+            Read more on the{" "}
             <Link to="/charities" className="text-orange-light hover:underline">Explore page</Link> scoring disclaimer.
           </p>
         ),
@@ -111,7 +111,7 @@ const faqGroups: FAQGroup[] = [
         question: "Can I donate through GiveWiZe?",
         answer: (
           <p>
-            Not yet — GiveWiZe currently helps you discover and evaluate charities. When you're
+            Not yet. GiveWiZe currently helps you discover and evaluate charities. When you're
             ready to donate, we'll direct you to the charity's own website to complete the process.
           </p>
         ),

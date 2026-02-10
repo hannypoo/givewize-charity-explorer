@@ -499,7 +499,7 @@ const Charities = () => {
               </div>
               <p className="text-sm text-white/60 mb-6 max-w-2xl">
                 These charities hold a special place in our hearts. They represent causes that are deeply personal
-                to Z and our family — from rare disease research to education access. We encourage you to learn more
+                to Z and our family, from rare disease research to education access. We encourage you to learn more
                 about each one.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">

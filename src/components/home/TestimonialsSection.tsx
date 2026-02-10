@@ -19,7 +19,7 @@ const testimonials = [
     name: "Priya K.",
     role: "Philanthropist",
     quote:
-      "The dual rating system is brilliant — seeing both the financial data and community feedback side by side makes evaluating charities so much easier.",
+      "The dual rating system is brilliant. Seeing both the financial data and community feedback side by side makes evaluating charities so much easier.",
     rating: 5,
   },
 ];

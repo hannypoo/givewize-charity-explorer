@@ -166,7 +166,7 @@ function CitationsFooter({ citations }: { citations: Citation[] }) {
             <span className="flex-shrink-0">[{idx + 1}]</span>
             <span>
               {cite.name}
-              {cite.url && <>{" — "}<a href={cite.url} target="_blank" rel="noopener noreferrer" className="break-all underline hover:text-foreground">{cite.url}</a></>}
+              {cite.url && <>{" - "}<a href={cite.url} target="_blank" rel="noopener noreferrer" className="break-all underline hover:text-foreground">{cite.url}</a></>}
               <span className="text-muted-foreground/40"> (Accessed {cite.accessed})</span>
             </span>
           </li>
@@ -303,7 +303,7 @@ export function CommunityRatingAgent({ charity, onDonorReviewSubmit }: Community
       }
     });
 
-    if (ein) cites.push({ name: "ProPublica Nonprofit Explorer — IRS 990 Filings", url: `https://projects.propublica.org/nonprofits/organizations/${ein}`, accessed: today });
+    if (ein) cites.push({ name: "ProPublica Nonprofit Explorer - IRS 990 Filings", url: `https://projects.propublica.org/nonprofits/organizations/${ein}`, accessed: today });
     if (charity.website) cites.push({ name: `${charity.name} Official Website`, url: charity.website.startsWith("http") ? charity.website : `https://${charity.website}`, accessed: today });
     return cites;
   }, [sourceRatings, charity]);

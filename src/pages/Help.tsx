@@ -59,7 +59,7 @@ const knowledge: KnowledgeEntry[] = [
   {
     keywords: ["z's list", "zs list", "z list", "personal", "family"],
     answer:
-      "Z's List is a curated collection of charities personally important to Z and the family behind GiveWiZe — from rare disease research to education access. Find it on the Explore page!",
+      "Z's List is a curated collection of charities personally important to Z and the family behind GiveWiZe, from rare disease research to education access. Find it on the Explore page!",
   },
   {
     keywords: ["who", "behind", "created", "founder", "team"],
@@ -69,7 +69,7 @@ const knowledge: KnowledgeEntry[] = [
   {
     keywords: ["free", "cost", "money", "pay", "charge", "ads"],
     answer:
-      "GiveWiZe is completely free! It's a passion project — no fees, no ads, no commissions. Our only goal is to help you give wisely.",
+      "GiveWiZe is completely free! It's a passion project with no fees, no ads, and no commissions. Our only goal is to help you give wisely.",
   },
   {
     keywords: ["low score", "bad score", "worthiness", "worth"],
@@ -126,7 +126,7 @@ const quickActions = [
 const Help = () => {
   usePageTitle(
     "Help & Contact",
-    "Get help with GiveWiZe — chat with our smart assistant or contact us by email."
+    "Get help with GiveWiZe. Chat with our smart assistant or contact us by email."
   );
 
   const [messages, setMessages] = useState<Message[]>([

@@ -38,13 +38,13 @@ const About = () => {
               </div>
               <p className="text-white/60 leading-relaxed mb-4">
                 My name is Hannah Hoffmaster, and I'm a single mom to a beautiful, medically
-                fragile little boy named Ezra — the "Z" in GiveWiZe. Since he was eight months
+                fragile little boy named Ezra, the "Z" in GiveWiZe. Since he was eight months
                 old, we've been in and out of hospitals navigating a journey neither of us
                 asked for but one that has shaped everything I believe about generosity.
               </p>
               <p className="text-white/60 leading-relaxed mb-4">
-                Through the kindness of others — charitable organizations, community support,
-                and the many people who showed up when we needed it most — we've been able to
+                Through the kindness of others (charitable organizations, community support,
+                and the many people who showed up when we needed it most) we've been able to
                 not only get by, but to live comfortable and happy lives. Ezra gets the care
                 he needs, and I've even been able to pursue a master's degree, something I
                 once thought was out of reach.
@@ -55,7 +55,7 @@ const About = () => {
                 <span className="font-semibold text-white">how can I give back the way others
                 gave to us?</span> I want my giving to make the same kind of difference that
                 receiving made for me and Z. But when I started looking into where to donate,
-                I ran into a problem — it's genuinely difficult to know which charities you
+                I ran into a problem: it's genuinely difficult to know which charities you
                 can trust to use your money well and truly help the people who need it.
               </p>
               <p className="text-white/60 leading-relaxed mb-4">
@@ -67,7 +67,7 @@ const About = () => {
                 someone's life. He gives so much love to everyone around him and stays strong
                 no matter what comes his way. Because of him,{" "}
                 <span className="font-semibold text-white">GiveWiZe is more than a project
-                — it's my life's purpose</span>: to help people like us, and everyone in need,
+                , it's my life's purpose</span>: to help people like us, and everyone in need,
                 find genuine help so they can have a chance at a happy and prosperous life.
               </p>
             </div>
@@ -83,7 +83,7 @@ const About = () => {
                 <h2 className="text-2xl md:text-3xl font-bold text-white">Our Mission</h2>
               </div>
               <p className="text-white/60 leading-relaxed mb-4">
-                I believe that now more than ever, we need to see goodness in one another — to
+                I believe that now more than ever, we need to see goodness in one another, to
                 lean into that place of love and generosity that I believe lives in all of us.
                 GiveWiZe exists to make that easier.
               </p>
@@ -97,7 +97,7 @@ const About = () => {
                 you discover charities that align with your values and meet the highest standards
                 of accountability. Our goal is simple:{" "}
                 <span className="font-semibold text-white">make giving easier, smarter, and
-                more impactful</span> — so that every act of generosity reaches the people who
+                more impactful</span>, so that every act of generosity reaches the people who
                 need it most.
               </p>
             </div>
@@ -114,7 +114,7 @@ const About = () => {
               </div>
               <p className="text-white/60 leading-relaxed mb-4">
                 I envision a future where <span className="font-semibold text-white">every
-                donation is an informed donation</span> — where donors feel empowered to ask
+                donation is an informed donation</span>, where donors feel empowered to ask
                 questions, compare options, and give with complete confidence that their
                 generosity will reach the people who need it.
               </p>
@@ -126,14 +126,14 @@ const About = () => {
               <p className="text-white/60 leading-relaxed mb-4">
                 We are committed to{" "}
                 <span className="font-semibold text-white">honest transparency with no
-                biases</span>. We will always give you the truth — our ratings are driven
+                biases</span>. We will always give you the truth. Our ratings are driven
                 purely by data and community feedback, never by partnerships, sponsorships,
                 or hidden agendas. You deserve to make your giving decisions based on facts,
                 and that's exactly what we provide.
               </p>
               <p className="text-white/60 leading-relaxed">
                 Because of Z, I know what it feels like to be on the receiving end of
-                someone's generosity. That feeling is what drives this work — the belief
+                someone's generosity. That feeling is what drives this work, the belief
                 that <span className="font-semibold text-white">when we make it easier to
                 give wisely, we make it easier to change lives</span>.
               </p>
@@ -167,19 +167,19 @@ const About = () => {
                   <ul className="space-y-2 text-sm text-white/60">
                     <li className="flex items-start gap-2">
                       <TrendingUp className="h-4 w-4 text-orange-light mt-0.5 shrink-0" />
-                      <span><strong className="text-white">Financial Efficiency</strong> — Percentage of funds going to programs</span>
+                      <span><strong className="text-white">Financial Efficiency</strong>: Percentage of funds going to programs</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Eye className="h-4 w-4 text-orange-light mt-0.5 shrink-0" />
-                      <span><strong className="text-white">Transparency</strong> — Availability of financial reports and audits</span>
+                      <span><strong className="text-white">Transparency</strong>: Availability of financial reports and audits</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Shield className="h-4 w-4 text-orange-light mt-0.5 shrink-0" />
-                      <span><strong className="text-white">Longevity</strong> — Track record and organizational stability</span>
+                      <span><strong className="text-white">Longevity</strong>: Track record and organizational stability</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Heart className="h-4 w-4 text-orange-light mt-0.5 shrink-0" />
-                      <span><strong className="text-white">Impact</strong> — Measurable outcomes and effectiveness</span>
+                      <span><strong className="text-white">Impact</strong>: Measurable outcomes and effectiveness</span>
                     </li>
                   </ul>
                 </div>
