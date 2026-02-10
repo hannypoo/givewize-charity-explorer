@@ -167,11 +167,11 @@ const faqGroups: FAQGroup[] = [
         question: "How do I delete my account?",
         answer: (
           <p>
-            To delete your account and all associated data, please email us at{" "}
-            <a href="mailto:admin@givewize.org" className="text-orange-light hover:underline">
-              admin@givewize.org
-            </a>{" "}
-            and we'll process your request promptly.
+            You can delete your account at any time from your{" "}
+            <Link to="/profile" className="text-orange-light hover:underline">profile page</Link>.
+            Just scroll to the "Delete Account" section under Overview. This permanently removes
+            your account and all associated data (favorites, receipts, quiz results, and employer
+            match requests).
           </p>
         ),
       },
