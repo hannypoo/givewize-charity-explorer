@@ -103,8 +103,37 @@ const About = () => {
             </div>
           </section>
 
-          {/* How We Rate */}
+          {/* Our Vision */}
           <section className="max-w-3xl mx-auto mb-12">
+            <div className="glass-dark rounded-2xl p-6 md:p-8 text-center">
+              <div className="flex items-center justify-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center">
+                  <Eye className="h-6 w-6 text-white" />
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold text-white">Our Vision</h2>
+              </div>
+              <p className="text-white/60 leading-relaxed mb-4">
+                I envision a future where <span className="font-semibold text-white">every
+                donation is an informed donation</span> — where donors feel empowered to ask
+                questions, compare options, and give with complete confidence that their
+                generosity will reach the people who need it.
+              </p>
+              <p className="text-white/60 leading-relaxed mb-4">
+                GiveWiZe is building tools to match you with causes that resonate with your
+                values, creating transparency standards that hold charities accountable, and
+                fostering a community of thoughtful givers who share their insights.
+              </p>
+              <p className="text-white/60 leading-relaxed">
+                Because of Z, I know what it feels like to be on the receiving end of
+                someone's generosity. That feeling is what drives this work — the belief
+                that <span className="font-semibold text-white">when we make it easier to
+                give wisely, we make it easier to change lives</span>.
+              </p>
+            </div>
+          </section>
+
+          {/* How We Rate */}
+          <section className="max-w-3xl mx-auto pb-16 md:pb-24">
             <div className="glass-dark rounded-2xl p-6 md:p-8">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center">
@@ -182,35 +211,6 @@ const About = () => {
                 charity's worthiness. A lower score may simply reflect limited public filings,
                 not a lack of impact. We encourage you to look beyond the numbers and consider
                 each organization's mission before deciding how to give.
-              </p>
-            </div>
-          </section>
-
-          {/* Our Vision + CTA */}
-          <section className="max-w-3xl mx-auto pb-16 md:pb-24">
-            <div className="glass-dark rounded-2xl p-6 md:p-8 text-center">
-              <div className="flex items-center justify-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center">
-                  <Eye className="h-6 w-6 text-white" />
-                </div>
-                <h2 className="text-2xl md:text-3xl font-bold text-white">Our Vision</h2>
-              </div>
-              <p className="text-white/60 leading-relaxed mb-4">
-                I envision a future where <span className="font-semibold text-white">every
-                donation is an informed donation</span> — where donors feel empowered to ask
-                questions, compare options, and give with complete confidence that their
-                generosity will reach the people who need it.
-              </p>
-              <p className="text-white/60 leading-relaxed mb-4">
-                GiveWiZe is building tools to match you with causes that resonate with your
-                values, creating transparency standards that hold charities accountable, and
-                fostering a community of thoughtful givers who share their insights.
-              </p>
-              <p className="text-white/60 leading-relaxed">
-                Because of Z, I know what it feels like to be on the receiving end of
-                someone's generosity. That feeling is what drives this work — the belief
-                that <span className="font-semibold text-white">when we make it easier to
-                give wisely, we make it easier to change lives</span>.
               </p>
             </div>
           </section>
