@@ -1,6 +1,9 @@
 import { Heart, Shield, Star, Eye, Target, Users, TrendingUp } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { usePageTitle } from "@/hooks/usePageTitle";
+import zAndI from "@/assets/ZandI.JPG";
+import zPhoto from "@/assets/z.jpeg";
+import zVideo from "@/assets/zsfirststeps.mp4";
 
 const About = () => {
   usePageTitle("About", "Learn about GiveWiZe's mission to help donors give confidently with transparent charity ratings and community insights.");
@@ -30,6 +33,13 @@ const About = () => {
           {/* The Inspiration */}
           <section className="max-w-3xl mx-auto mb-12">
             <div className="glass-dark rounded-2xl p-6 md:p-8">
+              <div className="mb-6 rounded-xl overflow-hidden">
+                <img
+                  src={zAndI}
+                  alt="Hannah and Ezra"
+                  className="w-full h-64 md:h-80 object-cover"
+                />
+              </div>
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center">
                   <Heart className="h-6 w-6 text-white" />
@@ -76,6 +86,13 @@ const About = () => {
           {/* Our Mission */}
           <section className="max-w-3xl mx-auto mb-12">
             <div className="glass-dark rounded-2xl p-6 md:p-8">
+              <div className="mb-6 rounded-xl overflow-hidden">
+                <img
+                  src={zPhoto}
+                  alt="Ezra"
+                  className="w-full h-64 md:h-80 object-cover"
+                />
+              </div>
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center">
                   <Users className="h-6 w-6 text-white" />
@@ -106,6 +123,16 @@ const About = () => {
           {/* Our Vision */}
           <section className="max-w-3xl mx-auto mb-12">
             <div className="glass-dark rounded-2xl p-6 md:p-8 text-center">
+              <div className="mb-6 rounded-xl overflow-hidden">
+                <video
+                  src={zVideo}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="w-full h-64 md:h-80 object-cover"
+                />
+              </div>
               <div className="flex items-center justify-center gap-3 mb-6">
                 <div className="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center">
                   <Eye className="h-6 w-6 text-white" />
