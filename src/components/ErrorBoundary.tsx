@@ -75,7 +75,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </Button>
               <Button
                 variant="outline"
-                className="border-white/25 text-white hover:bg-white/15 rounded-2xl"
+                className="border-white/25 bg-transparent text-white hover:bg-white/15 rounded-2xl"
                 onClick={() => {
                   this.setState({ hasError: false });
                   window.location.href = "/";
