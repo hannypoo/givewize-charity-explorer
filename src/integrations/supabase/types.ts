@@ -296,6 +296,7 @@ export type Database = {
           id: string
           display_name: string
           avatar_url: string | null
+          bio: string | null
           employer_name: string | null
           employer_matches_donations: boolean
           created_at: string
@@ -305,6 +306,7 @@ export type Database = {
           id: string
           display_name?: string
           avatar_url?: string | null
+          bio?: string | null
           employer_name?: string | null
           employer_matches_donations?: boolean
           created_at?: string
@@ -314,6 +316,7 @@ export type Database = {
           id?: string
           display_name?: string
           avatar_url?: string | null
+          bio?: string | null
           employer_name?: string | null
           employer_matches_donations?: boolean
           created_at?: string

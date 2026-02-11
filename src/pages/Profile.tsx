@@ -5,6 +5,7 @@ import { ProfileSectionNav } from "@/components/charities/ProfileSectionNav";
 import { useActiveSection } from "@/hooks/useActiveSection";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { useAuth } from "@/contexts/AuthContext";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ProfileOverview } from "@/components/profile/ProfileOverview";
 import { MyCharities } from "@/components/profile/MyCharities";
 import { DonationReceipts } from "@/components/profile/DonationReceipts";
@@ -46,14 +47,22 @@ const Profile = () => {
       >
         <div className="container py-8 md:py-12">
           <div className="flex items-center gap-4">
-            <div className="h-16 w-16 rounded-full bg-white/20 flex items-center justify-center text-2xl font-bold text-white">
-              {profile?.display_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "?"}
-            </div>
+            <Avatar className="h-16 w-16 border-2 border-white/30">
+              {profile?.avatar_url && (
+                <AvatarImage src={profile.avatar_url} alt={profile.display_name || "Avatar"} />
+              )}
+              <AvatarFallback className="bg-white/20 text-2xl font-bold text-white">
+                {profile?.display_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "?"}
+              </AvatarFallback>
+            </Avatar>
             <div>
               <h1 className="font-display text-3xl md:text-4xl font-bold text-white">
                 {profile?.display_name || "My Profile"}
               </h1>
               <p className="text-white/60 text-sm">{user?.email}</p>
+              {profile?.bio && (
+                <p className="text-white/50 text-sm mt-1 max-w-md">{profile.bio}</p>
+              )}
             </div>
           </div>
         </div>
