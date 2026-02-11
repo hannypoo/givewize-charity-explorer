@@ -46,12 +46,13 @@ function scoreGeographic(charity: Charity, geo: string | undefined): DimensionRe
 
 function scoreFinancialEfficiency(charity: Charity, efficiencyPref: number | undefined): DimensionResult {
   const active = !!efficiencyPref && efficiencyPref > 1;
-  if (!active) return { score: 0.5, active: false, baseWeight: 2 };
+  if (!active) return { score: 0.5, active: false, baseWeight: 3 };
   const pep = Number(charity.program_expense_percentage) || 0;
-  if (pep === 0) return { score: 0.3, active: true, baseWeight: 2 };
-  const normalized = Math.min(1, pep / 100);
+  if (pep === 0) return { score: 0.1, active: true, baseWeight: 3 };
+  // Scale: 50%→0, 75%→0.5, 90%+→1.0, amplified by user preference
+  const normalized = Math.min(1, Math.max(0, (pep - 50) / 45));
   const weight = efficiencyPref! / 5;
-  return { score: normalized * weight + (1 - weight) * 0.5, active: true, baseWeight: 2 };
+  return { score: normalized * weight + (1 - weight) * 0.5, active: true, baseWeight: 3 };
 }
 
 function scoreKeyFactors(charity: Charity, factors: string[] | undefined): DimensionResult {
@@ -68,42 +69,62 @@ function scoreKeyFactors(charity: Charity, factors: string[] | undefined): Dimen
 }
 
 function scoreTransparency(charity: Charity, transparencyPref: string | undefined): DimensionResult {
-  if (!transparencyPref) return { score: 0.5, active: false, baseWeight: 2 };
+  if (!transparencyPref) return { score: 0.5, active: false, baseWeight: 3 };
   if (transparencyPref === "all") {
     let tp = 0;
     if (charity.complete_990_filed) tp++;
     if (charity.financials_published) tp++;
     if (charity.people_served_annually) tp++;
     if (charity.programs_list && charity.programs_list.length > 0) tp++;
-    return { score: tp / 4, active: true, baseWeight: 2 };
+    return { score: tp / 4, active: true, baseWeight: 3 };
   }
-  let s = 0.3;
+  let s = 0.1;
   if (transparencyPref === "financial" && charity.financials_published) s = 1;
   else if (transparencyPref === "impact" && charity.people_served_annually) s = 1;
   else if (transparencyPref === "programs" && charity.programs_list && charity.programs_list.length > 0) s = 1;
-  return { score: s, active: true, baseWeight: 2 };
+  return { score: s, active: true, baseWeight: 3 };
 }
 
 function scoreAge(charity: Charity, agePref: string | undefined): DimensionResult {
   const active = !!agePref && agePref !== "no-preference";
-  if (!active) return { score: 0.5, active: false, baseWeight: 2 };
+  if (!active) return { score: 0.5, active: false, baseWeight: 2.5 };
   const charityAge = charity.year_founded ? new Date().getFullYear() - charity.year_founded : 0;
-  let s = 0.3;
+  let s = 0.15;
   if (agePref === "established" && charityAge >= 10) s = 1;
   else if (agePref === "growing" && charityAge >= 5 && charityAge < 10) s = 1;
   else if (agePref === "new" && charityAge < 5) s = 1;
-  return { score: s, active: true, baseWeight: 2 };
+  // Partial credit for close matches
+  else if (agePref === "established" && charityAge >= 5) s = 0.5;
+  else if (agePref === "growing" && charityAge >= 3) s = 0.4;
+  return { score: s, active: true, baseWeight: 2.5 };
 }
 
 function scoreOrgSize(charity: Charity, sizePref: string | undefined): DimensionResult {
   const active = !!sizePref && sizePref !== "no-preference";
-  if (!active) return { score: 0.5, active: false, baseWeight: 2 };
+  if (!active) return { score: 0.5, active: false, baseWeight: 3 };
   const psa = charity.people_served_annually || 0;
-  let s = 0.3;
+  let s = 0.1;
   if (sizePref === "large" && psa >= 100000) s = 1;
   else if (sizePref === "medium" && psa >= 10000 && psa < 100000) s = 1;
   else if (sizePref === "small" && psa < 10000 && psa > 0) s = 1;
-  return { score: s, active: true, baseWeight: 2 };
+  // Partial credit for adjacent sizes
+  else if (sizePref === "large" && psa >= 50000) s = 0.5;
+  else if (sizePref === "medium" && (psa >= 5000 || psa >= 100000)) s = 0.4;
+  else if (sizePref === "small" && psa === 0) s = 0.6; // unknown size, might be small
+  return { score: s, active: true, baseWeight: 3 };
+}
+
+function scoreTaxBenefits(charity: Charity, taxPref: number | undefined): DimensionResult {
+  const active = !!taxPref && taxPref > 1;
+  if (!active) return { score: 0.5, active: false, baseWeight: 2 };
+  // Charities with a valid EIN are tax-deductible; those without may not be
+  const validEin = charity.ein && !charity.ein.includes("verify") && !charity.ein.includes("contact");
+  const has990 = charity.complete_990_filed;
+  const weight = taxPref! / 5;
+  let s = 0.2;
+  if (validEin && has990) s = 1.0;
+  else if (validEin) s = 0.7;
+  return { score: s * weight + (1 - weight) * 0.5, active: true, baseWeight: 2 };
 }
 
 function generateWhyMatch(charity: Charity, answers: QuizAnswers): string {
@@ -134,7 +155,10 @@ function generateWhyMatch(charity: Charity, answers: QuizAnswers): string {
   return sentence.charAt(0).toUpperCase() + sentence.slice(1) + ".";
 }
 
-export async function matchCharities(answers: QuizAnswers): Promise<MatchedCharity[]> {
+// Fewer results as specificity increases
+const RESULTS_PER_TIER: Record<number, number> = { 1: 8, 2: 5, 3: 3 };
+
+export async function matchCharities(answers: QuizAnswers, tier: 1 | 2 | 3 = 1): Promise<MatchedCharity[]> {
   const { data: charities, error } = await supabase
     .from("charities")
     .select("*");
@@ -150,6 +174,7 @@ export async function matchCharities(answers: QuizAnswers): Promise<MatchedChari
       scoreTransparency(charity, answers.transparency),
       scoreAge(charity, answers.age),
       scoreOrgSize(charity, answers.orgSize),
+      scoreTaxBenefits(charity, answers.taxBenefits),
     ];
 
     // Quality score — always contributes as a tiebreaker
@@ -177,7 +202,8 @@ export async function matchCharities(answers: QuizAnswers): Promise<MatchedChari
   });
 
   scored.sort((a, b) => b.rawScore - a.rawScore);
-  const top = scored.slice(0, 8);
+  const limit = RESULTS_PER_TIER[tier] || 8;
+  const top = scored.slice(0, limit);
 
   // Normalize against ALL charities for a meaningful spread
   const allScores = scored.map((s) => s.rawScore);

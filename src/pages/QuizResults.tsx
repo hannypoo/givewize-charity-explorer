@@ -63,7 +63,7 @@ const QuizResults = () => {
             if (data && data[0]) {
               const dbAnswers = data[0].answers as Answers;
               const quizAnswers = buildQuizAnswers(dbAnswers);
-              matchCharities(quizAnswers).then((results) => {
+              matchCharities(quizAnswers, tier).then((results) => {
                 setMatches(results);
                 setIsLoading(false);
               }).catch(() => {
@@ -82,7 +82,7 @@ const QuizResults = () => {
 
     const quizAnswers = buildQuizAnswers(rawAnswers);
 
-    matchCharities(quizAnswers)
+    matchCharities(quizAnswers, tier)
       .then(async (results) => {
         setMatches(results);
         setIsLoading(false);
