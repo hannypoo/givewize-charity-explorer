@@ -1,13 +1,29 @@
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Trash2 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { ProfileSectionNav } from "@/components/charities/ProfileSectionNav";
 import { useActiveSection } from "@/hooks/useActiveSection";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { ProfileOverview } from "@/components/profile/ProfileOverview";
 import { MyCharities } from "@/components/profile/MyCharities";
+import { GiftRegistry } from "@/components/profile/GiftRegistry";
 import { DonationReceipts } from "@/components/profile/DonationReceipts";
 import { QuizMatchesSection } from "@/components/profile/QuizMatchesSection";
 import { EmployerMatching } from "@/components/profile/EmployerMatching";
@@ -15,6 +31,7 @@ import { EmployerMatching } from "@/components/profile/EmployerMatching";
 const SECTIONS = [
   { id: "overview", label: "Overview" },
   { id: "my-charities", label: "My Charities" },
+  { id: "gift-registry", label: "Gift Registry" },
   { id: "donation-receipts", label: "Donation Receipts" },
   { id: "quiz-matches", label: "Quiz & Matches" },
   { id: "employer-matching", label: "Employer Matching" },
@@ -25,8 +42,23 @@ const sectionIds = SECTIONS.map((s) => s.id);
 const Profile = () => {
   usePageTitle("My Profile", "Manage your GiveWiZe profile, favorite charities, donation receipts, quiz results, and employer matching.");
   const { user, profile } = useAuth();
+  const navigate = useNavigate();
   const { activeSection, scrollToSection } = useActiveSection(sectionIds);
   const location = useLocation();
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    const { error } = await supabase.rpc("delete_user_account");
+    if (error) {
+      toast.error("Failed to delete account. Please try again.");
+      setDeleting(false);
+      return;
+    }
+    await supabase.auth.signOut();
+    toast.success("Your account has been deleted.");
+    navigate("/");
+  };
 
   // Handle hash navigation from other pages (e.g. /profile#employer-matching)
   useEffect(() => {
@@ -84,17 +116,59 @@ const Profile = () => {
             <MyCharities />
           </section>
 
-          <section id="donation-receipts" className="scroll-mt-28 animate-fade-in-up opacity-0" style={{ animationDelay: "160ms", animationFillMode: "forwards" }}>
+          <section id="gift-registry" className="scroll-mt-28 animate-fade-in-up opacity-0" style={{ animationDelay: "160ms", animationFillMode: "forwards" }}>
+            <GiftRegistry />
+          </section>
+
+          <section id="donation-receipts" className="scroll-mt-28 animate-fade-in-up opacity-0" style={{ animationDelay: "240ms", animationFillMode: "forwards" }}>
             <DonationReceipts />
           </section>
 
-          <section id="quiz-matches" className="scroll-mt-28 animate-fade-in-up opacity-0" style={{ animationDelay: "240ms", animationFillMode: "forwards" }}>
+          <section id="quiz-matches" className="scroll-mt-28 animate-fade-in-up opacity-0" style={{ animationDelay: "320ms", animationFillMode: "forwards" }}>
             <QuizMatchesSection />
           </section>
 
-          <section id="employer-matching" className="scroll-mt-28 animate-fade-in-up opacity-0" style={{ animationDelay: "320ms", animationFillMode: "forwards" }}>
+          <section id="employer-matching" className="scroll-mt-28 animate-fade-in-up opacity-0" style={{ animationDelay: "400ms", animationFillMode: "forwards" }}>
             <EmployerMatching />
           </section>
+
+          {/* Delete Account — at the very bottom */}
+          <div className="rounded-xl border border-destructive/20 bg-card p-6 shadow-soft animate-fade-in-up opacity-0" style={{ animationDelay: "480ms", animationFillMode: "forwards" }}>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h3 className="font-semibold text-foreground mb-1">Delete Account</h3>
+                <p className="text-sm text-muted-foreground">
+                  Permanently delete your account and all associated data including favorites, receipts, quiz results, and employer match requests. This action cannot be undone.
+                </p>
+              </div>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="shrink-0 border-destructive/30 text-destructive hover:bg-destructive/10 rounded-xl">
+                    <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+                    Delete
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will permanently delete your account and all your data, including favorites, donation receipts, quiz results, and employer match requests. This cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDeleteAccount}
+                      disabled={deleting}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      {deleting ? "Deleting..." : "Yes, delete my account"}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          </div>
         </div>
       </div>
     </Layout>

@@ -1,22 +1,10 @@
 import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { Mail, Calendar, Pencil, Heart, Receipt, Brain, Trash2, Camera, Loader2 } from "lucide-react";
+import { Mail, Calendar, Pencil, Heart, Receipt, Brain, Camera, Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFavorites } from "@/hooks/useFavorites";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,12 +14,10 @@ const BIO_MAX = 300;
 
 export function ProfileOverview() {
   const { user, profile, refreshProfile } = useAuth();
-  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [displayName, setDisplayName] = useState(profile?.display_name || "");
   const [bio, setBio] = useState(profile?.bio || "");
   const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { favorites } = useFavorites();
@@ -139,19 +125,6 @@ export function ProfileOverview() {
       await refreshProfile();
       setIsEditing(false);
     }
-  };
-
-  const handleDeleteAccount = async () => {
-    setDeleting(true);
-    const { error } = await supabase.rpc("delete_user_account");
-    if (error) {
-      toast.error("Failed to delete account. Please try again.");
-      setDeleting(false);
-      return;
-    }
-    await supabase.auth.signOut();
-    toast.success("Your account has been deleted.");
-    navigate("/");
   };
 
   const startEditing = () => {
@@ -317,44 +290,6 @@ export function ProfileOverview() {
             </div>
           </div>
         )}
-      </div>
-
-      {/* Delete Account */}
-      <div className="mt-8 rounded-xl border border-destructive/20 bg-card p-6 shadow-soft">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h3 className="font-semibold text-foreground mb-1">Delete Account</h3>
-            <p className="text-sm text-muted-foreground">
-              Permanently delete your account and all associated data including favorites, receipts, quiz results, and employer match requests. This action cannot be undone.
-            </p>
-          </div>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="outline" size="sm" className="shrink-0 border-destructive/30 text-destructive hover:bg-destructive/10 rounded-xl">
-                <Trash2 className="h-3.5 w-3.5 mr-1.5" />
-                Delete
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will permanently delete your account and all your data, including favorites, donation receipts, quiz results, and employer match requests. This cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleDeleteAccount}
-                  disabled={deleting}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                >
-                  {deleting ? "Deleting..." : "Yes, delete my account"}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
       </div>
     </div>
   );
