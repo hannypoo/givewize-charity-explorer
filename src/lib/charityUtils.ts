@@ -110,8 +110,8 @@ export function computeScoreDescriptions(charity: Charity): ScoreDescriptions {
   const met: string[] = [];
   const pending: string[] = [];
   const validEin = charity.ein && !charity.ein.includes("verify") && !charity.ein.includes("contact");
-  if (validEin) met.push("registered EIN");
-  else pending.push("EIN verification");
+  if (validEin) met.push("registered charity ID");
+  else pending.push("charity ID verification");
   if (charity.complete_990_filed) met.push("Form 990 filed");
   else pending.push("Form 990 status");
   if (charity.financials_published) met.push("financials published");

@@ -300,6 +300,7 @@ export function CommunityRatingAgent({ charity, onDonorReviewSubmit }: Community
     const cites: Citation[] = [];
     const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
     const ein = charity.ein?.replace("-", "") || "";
+    const isUsEin = /^\d{9}$/.test(ein);
 
     sourceRatings.forEach((s) => {
       if (s.normalizedRating !== null && s.sourceName !== "givewize_donors") {
@@ -307,7 +308,7 @@ export function CommunityRatingAgent({ charity, onDonorReviewSubmit }: Community
       }
     });
 
-    if (ein) cites.push({ name: "ProPublica Nonprofit Explorer - IRS 990 Filings", url: `https://projects.propublica.org/nonprofits/organizations/${ein}`, accessed: today });
+    if (isUsEin) cites.push({ name: "ProPublica Nonprofit Explorer - IRS 990 Filings", url: `https://projects.propublica.org/nonprofits/organizations/${ein}`, accessed: today });
     if (charity.website) cites.push({ name: `${charity.name} Official Website`, url: charity.website.startsWith("http") ? charity.website : `https://${charity.website}`, accessed: today });
     return cites;
   }, [sourceRatings, charity]);
