@@ -20,6 +20,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
+import { InviteFriend } from "@/components/profile/InviteFriend";
 import { toast } from "sonner";
 import { ProfileOverview } from "@/components/profile/ProfileOverview";
 import { MyCharities } from "@/components/profile/MyCharities";
@@ -132,8 +133,12 @@ const Profile = () => {
             <EmployerMatching />
           </section>
 
+          <section className="animate-fade-in-up opacity-0" style={{ animationDelay: "480ms", animationFillMode: "forwards" }}>
+            <InviteFriend />
+          </section>
+
           {/* Delete Account — at the very bottom */}
-          <div className="rounded-xl border border-destructive/20 bg-card p-6 shadow-soft animate-fade-in-up opacity-0" style={{ animationDelay: "480ms", animationFillMode: "forwards" }}>
+          <div className="rounded-xl border border-destructive/20 bg-card p-6 shadow-soft animate-fade-in-up opacity-0" style={{ animationDelay: "560ms", animationFillMode: "forwards" }}>
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h3 className="font-semibold text-foreground mb-1">Delete Account</h3>

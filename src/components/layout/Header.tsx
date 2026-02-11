@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, ArrowRight, User, LogOut, Heart, ChevronDown } from "lucide-react";
+import { Menu, X, ArrowRight, User, LogOut, Heart, ChevronDown, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
 import givewizeIcon from "@/assets/givewize-icon.svg";
+import { toast } from "sonner";
 
 const navLinks = [
   { to: "/", label: "Home" },
@@ -147,6 +148,24 @@ export function Header() {
                     <Heart className="h-4 w-4 text-muted-foreground" />
                     My Charities
                   </Link>
+                  <button
+                    onClick={async () => {
+                      setShowDropdown(false);
+                      const url = `${window.location.origin}/auth`;
+                      if (navigator.share) {
+                        try {
+                          await navigator.share({ title: "Join GiveWiZe", text: "Discover and support amazing charities with GiveWiZe!", url });
+                        } catch { /* user cancelled */ }
+                      } else {
+                        await navigator.clipboard.writeText(url);
+                        toast.success("Invite link copied to clipboard!");
+                      }
+                    }}
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors w-full text-left"
+                  >
+                    <UserPlus className="h-4 w-4 text-muted-foreground" />
+                    Invite a Friend
+                  </button>
                   <div className="border-t border-border my-1" />
                   <button onClick={handleSignOut} className="flex items-center gap-2 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors w-full text-left">
                     <LogOut className="h-4 w-4 text-muted-foreground" />
@@ -235,6 +254,24 @@ export function Header() {
                 </div>
                 <Button variant="outline" className="w-full rounded-xl font-medium" asChild>
                   <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)}>My Profile</Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full rounded-xl font-medium"
+                  onClick={async () => {
+                    setIsMobileMenuOpen(false);
+                    const url = `${window.location.origin}/auth`;
+                    if (navigator.share) {
+                      try {
+                        await navigator.share({ title: "Join GiveWiZe", text: "Discover and support amazing charities with GiveWiZe!", url });
+                      } catch { /* user cancelled */ }
+                    } else {
+                      await navigator.clipboard.writeText(url);
+                      toast.success("Invite link copied to clipboard!");
+                    }
+                  }}
+                >
+                  Invite a Friend
                 </Button>
                 <Button variant="outline" className="w-full rounded-xl font-medium" onClick={handleSignOut}>
                   Sign Out

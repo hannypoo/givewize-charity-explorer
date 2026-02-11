@@ -24,7 +24,9 @@ const Auth = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isResetting, setIsResetting] = useState(false);
-  const [recoveryMode, setRecoveryMode] = useState(false);
+  const [recoveryMode, setRecoveryMode] = useState(
+    () => window.location.hash.includes("type=recovery")
+  );
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
