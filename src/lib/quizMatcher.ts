@@ -213,7 +213,7 @@ export async function matchCharities(answers: QuizAnswers, tier: 1 | 2 | 3 = 1):
   // Absolute match percentage: raw score scaled by tier confidence.
   // Fewer answered questions → percentages compressed toward center (less certainty).
   // More answered questions → wider spread reflecting true match quality.
-  const confidence: Record<number, number> = { 1: 0.5, 2: 0.75, 3: 1.0 };
+  const confidence: Record<number, number> = { 1: 0.3, 2: 0.65, 3: 1.0 };
   const conf = confidence[tier] || 1;
   const center = 72;
 
