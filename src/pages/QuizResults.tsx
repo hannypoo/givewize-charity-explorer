@@ -357,9 +357,8 @@ const QuizResults = () => {
                   </Link>
                 </Button>
                 <Button
-                  variant="outline"
                   size="lg"
-                  className="border-white/25 text-white hover:bg-white/15 rounded-2xl"
+                  className="gradient-orange text-accent-foreground font-semibold rounded-2xl glow-orange"
                   onClick={handleRetake}
                 >
                   <RefreshCw className="mr-2 h-4 w-4" />

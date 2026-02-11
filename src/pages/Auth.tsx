@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Mail, KeyRound, User, ArrowRight, Loader2, Check, X } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Mail, KeyRound, User, Loader2, Check, X } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -199,18 +199,6 @@ const Auth = () => {
               </Button>
             </form>
 
-            <div className="mt-6 pt-6 border-t border-white/15 flex flex-col gap-3">
-              <Button
-                variant="outline"
-                className="w-full border-white/25 text-white hover:bg-white/15 rounded-2xl"
-                asChild
-              >
-                <Link to="/quiz">
-                  Take the Quiz
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
           </div>
         </div>
       </div>

@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { ShieldCheck, ThumbsUp, MessageCircle, ChevronDown } from "lucide-react";
+import { ShieldCheck, Clock, ThumbsUp, MessageCircle, ChevronDown, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { StarRating } from "./StarRating";
 import { supabase } from "@/integrations/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
 const VOTED_KEY = "givewize-helpful-votes";
 
@@ -40,12 +41,15 @@ export interface DonorReview {
   text: string;
   donation_amount?: number | null;
   helpful_count: number;
+  status?: string;
 }
 
 interface VerifiedDonorReviewsProps {
   charityName: string;
   reviews: DonorReview[];
   onSubmitReview?: (review: DonorReview) => void;
+  user?: User | null;
+  displayName?: string;
 }
 
 const REVIEW_CATEGORIES = [
@@ -79,12 +83,17 @@ function ReviewCard({ review, onHelpful, hasVoted }: { review: DonorReview; onHe
           <div>
             <div className="flex items-center gap-1.5">
               <span className="text-sm font-semibold text-foreground">{review.donor_name}</span>
-              {review.verified && (
+              {review.status === "pending" ? (
+                <span className="flex items-center gap-0.5 text-xs font-medium text-amber-500">
+                  <Clock className="h-3.5 w-3.5" />
+                  Pending Verification
+                </span>
+              ) : review.verified ? (
                 <span className="flex items-center gap-0.5 text-xs font-medium text-primary">
                   <ShieldCheck className="h-3.5 w-3.5" />
                   Verified Donor
                 </span>
-              )}
+              ) : null}
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">{dateStr}</span>
@@ -130,10 +139,10 @@ function ReviewCard({ review, onHelpful, hasVoted }: { review: DonorReview; onHe
 }
 
 // ── Review Form ──────────────────────────────────────────────────────────
-function ReviewForm({ onSubmit, charityName }: { onSubmit: (review: DonorReview) => void; charityName: string }) {
+function ReviewForm({ onSubmit, charityName, defaultName }: { onSubmit: (review: DonorReview) => void; charityName: string; defaultName?: string }) {
   const [categoryRatings, setCategoryRatings] = useState({ impact: 0, communication: 0, transparency: 0, experience: 0 });
   const [reviewText, setReviewText] = useState("");
-  const [donorName, setDonorName] = useState("");
+  const [donorName, setDonorName] = useState(defaultName || "");
   const [donationAmount, setDonationAmount] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -162,26 +171,28 @@ function ReviewForm({ onSubmit, charityName }: { onSubmit: (review: DonorReview)
     const review: DonorReview = {
       id: `donor_${Date.now()}`,
       donor_name: donorName.trim(),
-      verified: true,
+      verified: false,
       date: new Date().toISOString(),
       rating: Math.round(overallRating * 2) / 2,
       categories: categoryRatings,
       text: reviewText.trim(),
       donation_amount: donationAmount ? parseFloat(donationAmount) : null,
       helpful_count: 0,
+      status: "pending",
     };
     setTimeout(() => { onSubmit(review); setIsSubmitting(false); setSubmitted(true); }, 800);
   };
 
   if (submitted) {
     return (
-      <div className="rounded-xl border-2 border-success/30 bg-success/5 p-6 text-center">
-        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-success/10">
-          <ShieldCheck className="h-6 w-6 text-success" />
+      <div className="rounded-xl border-2 border-amber-500/30 bg-amber-500/5 p-6 text-center">
+        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/10">
+          <Clock className="h-6 w-6 text-amber-500" />
         </div>
         <h4 className="text-lg font-bold text-foreground">Thank you for your review!</h4>
         <p className="mt-1 text-sm text-muted-foreground">
-          Your verified donor review for {charityName} has been submitted.
+          Your review for {charityName} has been submitted and is pending verification.
+          It will become public once your donor status is confirmed.
         </p>
       </div>
     );
@@ -191,7 +202,7 @@ function ReviewForm({ onSubmit, charityName }: { onSubmit: (review: DonorReview)
     <form onSubmit={handleSubmit} className="rounded-xl border-2 border-primary/20 bg-card p-6">
       <div className="mb-4 flex items-center gap-2">
         <ShieldCheck className="h-5 w-5 text-primary" />
-        <h4 className="font-display font-bold text-foreground">Leave a Verified Donor Review</h4>
+        <h4 className="font-display font-bold text-foreground">Leave a Donor Review</h4>
       </div>
       <p className="mb-5 text-sm text-muted-foreground">
         Share your experience as a donor to {charityName}. Your review helps other donors give with confidence.
@@ -284,17 +295,17 @@ function ReviewForm({ onSubmit, charityName }: { onSubmit: (review: DonorReview)
 
       {/* Submit */}
       <Button type="submit" disabled={isSubmitting} className="w-full bg-primary hover:bg-primary/90">
-        {isSubmitting ? "Submitting..." : "Submit Verified Review"}
+        {isSubmitting ? "Submitting..." : "Submit Review"}
       </Button>
       <p className="mt-3 text-center text-xs text-muted-foreground">
-        By submitting, you confirm that you have donated to this charity and that your review reflects your genuine experience.
+        Your review will be visible to you immediately and become public once your donor status is verified.
       </p>
     </form>
   );
 }
 
 // ── Main Component ───────────────────────────────────────────────────────
-export function VerifiedDonorReviews({ charityName, reviews = [], onSubmitReview }: VerifiedDonorReviewsProps) {
+export function VerifiedDonorReviews({ charityName, reviews = [], onSubmitReview, user, displayName }: VerifiedDonorReviewsProps) {
   const [sortBy, setSortBy] = useState("newest");
   const [filterStars, setFilterStars] = useState(0);
   const [showForm, setShowForm] = useState(false);
@@ -367,7 +378,7 @@ export function VerifiedDonorReviews({ charityName, reviews = [], onSubmitReview
           <h3 className="font-display text-lg font-bold text-foreground">Verified Donor Reviews</h3>
           <span className="text-sm text-muted-foreground">({localReviews.length})</span>
         </div>
-        {!showForm && (
+        {!showForm && user && (
           <Button onClick={() => setShowForm(true)} size="sm" className="bg-primary hover:bg-primary/90">
             Write a Review
           </Button>
@@ -403,15 +414,24 @@ export function VerifiedDonorReviews({ charityName, reviews = [], onSubmitReview
         </div>
       )}
 
-      {/* Form */}
-      {showForm && (
+      {/* Auth gate / Form */}
+      {!user && (
+        <div className="rounded-xl border border-border bg-secondary p-5 text-center">
+          <LogIn className="mx-auto mb-2 h-6 w-6 text-muted-foreground" />
+          <p className="text-sm font-medium text-foreground">Want to leave a review?</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            <a href="/auth" className="font-medium text-primary hover:underline">Sign in</a> to share your donor experience.
+          </p>
+        </div>
+      )}
+      {showForm && user && (
         <div>
           <div className="mb-2 flex justify-end">
             <button onClick={() => setShowForm(false)} className="text-sm text-muted-foreground hover:text-foreground">
               Cancel
             </button>
           </div>
-          <ReviewForm onSubmit={handleSubmit} charityName={charityName} />
+          <ReviewForm onSubmit={handleSubmit} charityName={charityName} defaultName={displayName} />
         </div>
       )}
 
@@ -442,8 +462,8 @@ export function VerifiedDonorReviews({ charityName, reviews = [], onSubmitReview
             {localReviews.length === 0 ? (
               <div>
                 <p className="font-medium text-foreground">No donor reviews yet</p>
-                <p className="mt-1 text-sm">Be the first verified donor to leave a review!</p>
-                {!showForm && (
+                <p className="mt-1 text-sm">Be the first donor to leave a review!</p>
+                {!showForm && user && (
                   <Button onClick={() => setShowForm(true)} variant="outline" size="sm" className="mt-3">
                     Write the first review
                   </Button>

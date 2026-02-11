@@ -184,6 +184,8 @@ export type Database = {
           review_text: string
           donation_amount: number | null
           helpful_count: number
+          status: string
+          user_id: string | null
           created_at: string
           updated_at: string
         }
@@ -200,6 +202,8 @@ export type Database = {
           review_text: string
           donation_amount?: number | null
           helpful_count?: number
+          status?: string
+          user_id?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -216,6 +220,8 @@ export type Database = {
           review_text?: string
           donation_amount?: number | null
           helpful_count?: number
+          status?: string
+          user_id?: string | null
           created_at?: string
           updated_at?: string
         }

@@ -11,6 +11,7 @@ import { StarRating } from "./StarRating";
 import { VerifiedDonorReviews, type DonorReview } from "./VerifiedDonorReviews";
 import type { Tables } from "@/integrations/supabase/types";
 import { computeGivewizeScores } from "@/lib/charityUtils";
+import { useAuth } from "@/contexts/AuthContext";
 
 // ── Types ────────────────────────────────────────────────────────────────
 type Charity = Tables<"charities">;
@@ -83,6 +84,7 @@ function mapReviewRowToDonorReview(row: CommunityReviewRow): DonorReview {
     text: row.review_text,
     donation_amount: row.donation_amount ? Number(row.donation_amount) : null,
     helpful_count: row.helpful_count,
+    status: row.status,
   };
 }
 
@@ -181,6 +183,7 @@ function CitationsFooter({ citations }: { citations: Citation[] }) {
 export function CommunityRatingAgent({ charity, onDonorReviewSubmit }: CommunityRatingAgentProps) {
   const [showCriteria, setShowCriteria] = useState(false);
   const [activeTab, setActiveTab] = useState<"overview" | "sources" | "donors">("overview");
+  const { user, profile } = useAuth();
 
   // ── Fetch online review sources from Supabase ──────────────────────────
   const { data: onlineSourceRows = [] } = useQuery({
@@ -196,14 +199,25 @@ export function CommunityRatingAgent({ charity, onDonorReviewSubmit }: Community
   });
 
   // ── Fetch community reviews from Supabase ──────────────────────────────
+  // RLS ensures only approved + own pending reviews are returned,
+  // but we also filter explicitly for clarity.
   const { data: reviewRows = [], isLoading: reviewsLoading } = useQuery({
-    queryKey: ["community_reviews", charity.id],
+    queryKey: ["community_reviews", charity.id, user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("community_reviews")
         .select("*")
         .eq("charity_id", charity.id)
         .order("created_at", { ascending: false });
+
+      // Show approved reviews + current user's pending reviews
+      if (user) {
+        query = query.or(`status.eq.approved,user_id.eq.${user.id}`);
+      } else {
+        query = query.eq("status", "approved");
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       return data || [];
     },
@@ -318,7 +332,7 @@ export function CommunityRatingAgent({ charity, onDonorReviewSubmit }: Community
     const { error } = await supabase.from("community_reviews").insert({
       charity_id: charity.id,
       donor_name: review.donor_name,
-      verified: review.verified,
+      verified: false,
       rating: review.rating,
       rating_impact: review.categories.impact,
       rating_communication: review.categories.communication,
@@ -326,10 +340,14 @@ export function CommunityRatingAgent({ charity, onDonorReviewSubmit }: Community
       rating_experience: review.categories.experience,
       review_text: review.text,
       donation_amount: review.donation_amount,
+      status: "pending",
+      user_id: user?.id,
     });
 
     if (error) {
       toast.error("Failed to save your review. Please try again.");
+    } else {
+      toast.success("Review submitted! It will be visible once verified.");
     }
     onDonorReviewSubmit?.(review);
   };
@@ -435,6 +453,8 @@ export function CommunityRatingAgent({ charity, onDonorReviewSubmit }: Community
               charityName={charity.name}
               reviews={donorReviews}
               onSubmitReview={handleReviewSubmit}
+              user={user}
+              displayName={profile?.display_name}
             />
           )
         )}
