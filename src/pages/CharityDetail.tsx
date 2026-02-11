@@ -523,7 +523,7 @@ const CharityDetail = () => {
             {/* Impact & Outcomes */}
             <div className="bg-card rounded-xl p-6 md:p-8 shadow-soft">
               <h3 className="font-display text-xl font-semibold text-foreground mb-6">Impact & Outcomes</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-secondary rounded-xl p-5">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
@@ -545,11 +545,30 @@ const CharityDetail = () => {
                     <h4 className="font-medium text-foreground">People Served Annually</h4>
                   </div>
                   {charity.people_served_annually ? (
-                    <p className="text-2xl font-display font-bold text-foreground">{charity.people_served_annually.toLocaleString()}</p>
+                    <>
+                      <p className="text-2xl font-display font-bold text-foreground">{charity.people_served_annually.toLocaleString()}</p>
+                      {charity.target_population_size != null && charity.target_population_size > 0 && (
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {Math.round((charity.people_served_annually / charity.target_population_size) * 100)}% of target population
+                        </p>
+                      )}
+                    </>
                   ) : (
                     <p className="text-muted-foreground italic">Still to be Collected</p>
                   )}
                 </div>
+                {charity.target_population_size != null && charity.target_population_size > 0 && (
+                  <div className="bg-secondary rounded-xl p-5">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                        <Globe className="h-5 w-5 text-primary" />
+                      </div>
+                      <h4 className="font-medium text-foreground">Target Population Size</h4>
+                    </div>
+                    <p className="text-2xl font-display font-bold text-foreground">{charity.target_population_size.toLocaleString()}</p>
+                    <p className="text-sm text-muted-foreground mt-1">Estimated people in need</p>
+                  </div>
+                )}
                 <div className="bg-secondary rounded-xl p-5">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">

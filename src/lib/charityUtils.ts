@@ -55,18 +55,32 @@ export function computeGivewizeScores(charity: Charity): ComputedScores {
     else lg = 3.0;
   }
 
-  // Impact (0-5) — can score from people served OR documented programs
+  // Impact (0-5) — coverage-based if target_population_size available, else raw headcount
   // Floor of 3.0 so small focused orgs aren't heavily penalized
   let imp: number | null = null;
   if (charity.people_served_annually != null) {
     const ps = charity.people_served_annually;
-    if (ps >= 1000000) imp = 5.0;
-    else if (ps >= 500000) imp = 4.5;
-    else if (ps >= 100000) imp = 4.0;
-    else if (ps >= 10000) imp = 3.5;
-    else imp = 3.0;
-    if (charity.programs_list && charity.programs_list.length >= 8) imp = Math.min(5, imp + 0.5);
-    else if (charity.programs_list && charity.programs_list.length >= 4) imp = Math.min(5, imp + 0.25);
+    const tps = charity.target_population_size;
+
+    if (tps != null && tps > 0) {
+      // Coverage-based scoring
+      const coverage = ps / tps;
+      if (coverage >= 0.50) imp = 5.0;
+      else if (coverage >= 0.25) imp = 4.5;
+      else if (coverage >= 0.10) imp = 4.0;
+      else if (coverage >= 0.05) imp = 3.5;
+      else imp = 3.0;
+    } else {
+      // Fallback: raw headcount thresholds
+      if (ps >= 1_000_000) imp = 5.0;
+      else if (ps >= 500_000) imp = 4.5;
+      else if (ps >= 100_000) imp = 4.0;
+      else if (ps >= 10_000) imp = 3.5;
+      else imp = 3.0;
+    }
+    // Programs list bonus
+    if (charity.programs_list?.length >= 8) imp = Math.min(5, imp + 0.5);
+    else if (charity.programs_list?.length >= 4) imp = Math.min(5, imp + 0.25);
   } else if (charity.programs_list && charity.programs_list.length > 0) {
     // No people-served data but has documented programs — give partial credit
     if (charity.programs_list.length >= 8) imp = 4.0;
@@ -136,8 +150,16 @@ export function computeScoreDescriptions(charity: Charity): ScoreDescriptions {
   let impDesc: string | null = null;
   if (charity.people_served_annually != null) {
     const ps = charity.people_served_annually;
-    const scale = ps >= 1_000_000 ? "massive" : ps >= 100_000 ? "large-scale" : ps >= 10_000 ? "significant" : ps >= 1_000 ? "moderate" : "focused";
-    impDesc = `Serves ${ps.toLocaleString()} people annually, indicating ${scale} reach.`;
+    const tps = charity.target_population_size;
+
+    if (tps != null && tps > 0) {
+      const coveragePct = Math.round((ps / tps) * 100);
+      const quality = coveragePct >= 50 ? "exceptional" : coveragePct >= 25 ? "strong" : coveragePct >= 10 ? "meaningful" : coveragePct >= 5 ? "growing" : "emerging";
+      impDesc = `Reaches ${ps.toLocaleString()} of an estimated ${tps.toLocaleString()} people in need (${coveragePct}% coverage), indicating ${quality} impact.`;
+    } else {
+      const scale = ps >= 1_000_000 ? "massive" : ps >= 100_000 ? "large-scale" : ps >= 10_000 ? "significant" : ps >= 1_000 ? "moderate" : "focused";
+      impDesc = `Serves ${ps.toLocaleString()} people annually, indicating ${scale} reach.`;
+    }
     if (charity.programs_list && charity.programs_list.length > 0) {
       impDesc += ` Operates ${charity.programs_list.length} distinct program${charity.programs_list.length > 1 ? "s" : ""}.`;
     }

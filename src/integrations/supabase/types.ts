@@ -85,6 +85,7 @@ export type Database = {
           score_transparency: number | null
           state: string | null
           target_population: string | null
+          target_population_size: number | null
           updated_at: string
           website: string | null
           year_founded: number | null
@@ -123,6 +124,7 @@ export type Database = {
           score_transparency?: number | null
           state?: string | null
           target_population?: string | null
+          target_population_size?: number | null
           updated_at?: string
           website?: string | null
           year_founded?: number | null
@@ -161,6 +163,7 @@ export type Database = {
           score_transparency?: number | null
           state?: string | null
           target_population?: string | null
+          target_population_size?: number | null
           updated_at?: string
           website?: string | null
           year_founded?: number | null
