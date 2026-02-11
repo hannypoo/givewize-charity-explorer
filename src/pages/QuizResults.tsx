@@ -282,9 +282,8 @@ const QuizResults = () => {
                           </div>
 
                           <Button
-                            variant="outline"
                             size="sm"
-                            className="border-white/25 text-white hover:bg-white/15 rounded-xl"
+                            className="gradient-orange text-accent-foreground font-semibold rounded-xl"
                             asChild
                           >
                             <Link to={`/charities/${match.charity.id}`}>

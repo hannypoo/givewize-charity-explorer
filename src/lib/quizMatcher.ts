@@ -21,91 +21,89 @@ export interface MatchedCharity {
   whyMatch: string;
 }
 
-function scoreCategory(charity: Charity, causes: string[]): number {
-  if (!causes || causes.length === 0) return 0.5;
-  return causes.includes(charity.primary_category) ? 1.0 : 0.0;
+// Each scoring dimension returns 0–1 and reports whether it was actually answered
+interface DimensionResult {
+  score: number;
+  active: boolean; // true if the user answered this dimension
+  baseWeight: number; // how important this dimension is relative to others
 }
 
-function scoreGeographic(charity: Charity, geo: string | undefined): number {
-  if (!geo || geo === "no-preference") return 0.5;
-  return charity.geographic_scope === geo ? 1.0 : 0.2;
+function scoreCategory(charity: Charity, causes: string[] | undefined): DimensionResult {
+  const active = !!causes && causes.length > 0;
+  const score = active
+    ? (causes!.includes(charity.primary_category) ? 1.0 : 0.0)
+    : 0.5;
+  return { score, active, baseWeight: 5 };
 }
 
-function scoreFinancialEfficiency(charity: Charity, efficiencyPref: number | undefined): number {
-  if (!efficiencyPref || efficiencyPref <= 1) return 0.5;
+function scoreGeographic(charity: Charity, geo: string | undefined): DimensionResult {
+  const active = !!geo && geo !== "no-preference";
+  const score = active
+    ? (charity.geographic_scope === geo ? 1.0 : 0.2)
+    : 0.5;
+  return { score, active, baseWeight: 3 };
+}
+
+function scoreFinancialEfficiency(charity: Charity, efficiencyPref: number | undefined): DimensionResult {
+  const active = !!efficiencyPref && efficiencyPref > 1;
+  if (!active) return { score: 0.5, active: false, baseWeight: 2 };
   const pep = Number(charity.program_expense_percentage) || 0;
-  if (pep === 0) return 0.3;
+  if (pep === 0) return { score: 0.3, active: true, baseWeight: 2 };
   const normalized = Math.min(1, pep / 100);
-  const weight = efficiencyPref / 5;
-  return normalized * weight + (1 - weight) * 0.5;
+  const weight = efficiencyPref! / 5;
+  return { score: normalized * weight + (1 - weight) * 0.5, active: true, baseWeight: 2 };
 }
 
-function scoreKeyFactors(charity: Charity, factors: string[] | undefined): number {
-  if (!factors || factors.length === 0) return 0.5;
+function scoreKeyFactors(charity: Charity, factors: string[] | undefined): DimensionResult {
+  const active = !!factors && factors.length > 0;
+  if (!active) return { score: 0.5, active: false, baseWeight: 3 };
   let matches = 0;
-  if (factors.includes("high-efficiency") && Number(charity.program_expense_percentage) >= 80) matches++;
-  if (factors.includes("transparency") && charity.complete_990_filed && charity.financials_published) matches++;
-  if (factors.includes("community-ratings") && Number(charity.community_rating_average) >= 4.0) matches++;
-  if (factors.includes("annual-reports") && charity.annual_report_url) matches++;
-  if (factors.includes("established") && charity.year_founded && (new Date().getFullYear() - charity.year_founded) >= 20) matches++;
-  if (factors.includes("global-reach") && charity.geographic_scope === "global") matches++;
-  return factors.length > 0 ? matches / factors.length : 0.5;
+  if (factors!.includes("high-efficiency") && Number(charity.program_expense_percentage) >= 80) matches++;
+  if (factors!.includes("transparency") && charity.complete_990_filed && charity.financials_published) matches++;
+  if (factors!.includes("community-ratings") && Number(charity.community_rating_average) >= 4.0) matches++;
+  if (factors!.includes("annual-reports") && charity.annual_report_url) matches++;
+  if (factors!.includes("established") && charity.year_founded && (new Date().getFullYear() - charity.year_founded) >= 20) matches++;
+  if (factors!.includes("global-reach") && charity.geographic_scope === "global") matches++;
+  return { score: matches / factors!.length, active: true, baseWeight: 3 };
 }
 
-function scoreTransparencyAgeLongevity(
-  charity: Charity,
-  agePref: string | undefined,
-  transparencyPref: string | undefined,
-  taxPref: number | undefined,
-  sizePref: string | undefined
-): number {
-  let score = 0;
-  let count = 0;
-
-  // Age preference
-  if (agePref && agePref !== "no-preference") {
-    count++;
-    const charityAge = charity.year_founded ? new Date().getFullYear() - charity.year_founded : 0;
-    if (agePref === "established" && charityAge >= 10) score += 1;
-    else if (agePref === "growing" && charityAge >= 5 && charityAge < 10) score += 1;
-    else if (agePref === "new" && charityAge < 5) score += 1;
-    else score += 0.3;
-  }
-
-  // Transparency preference
-  if (transparencyPref && transparencyPref !== "all") {
-    count++;
-    if (transparencyPref === "financial" && charity.financials_published) score += 1;
-    else if (transparencyPref === "impact" && charity.people_served_annually) score += 1;
-    else if (transparencyPref === "programs" && charity.programs_list && charity.programs_list.length > 0) score += 1;
-    else score += 0.3;
-  } else if (transparencyPref === "all") {
-    count++;
+function scoreTransparency(charity: Charity, transparencyPref: string | undefined): DimensionResult {
+  if (!transparencyPref) return { score: 0.5, active: false, baseWeight: 2 };
+  if (transparencyPref === "all") {
     let tp = 0;
     if (charity.complete_990_filed) tp++;
     if (charity.financials_published) tp++;
     if (charity.people_served_annually) tp++;
     if (charity.programs_list && charity.programs_list.length > 0) tp++;
-    score += tp / 4;
+    return { score: tp / 4, active: true, baseWeight: 2 };
   }
+  let s = 0.3;
+  if (transparencyPref === "financial" && charity.financials_published) s = 1;
+  else if (transparencyPref === "impact" && charity.people_served_annually) s = 1;
+  else if (transparencyPref === "programs" && charity.programs_list && charity.programs_list.length > 0) s = 1;
+  return { score: s, active: true, baseWeight: 2 };
+}
 
-  // Tax benefits preference
-  if (taxPref && taxPref >= 3) {
-    count++;
-    score += charity.ein ? 1 : 0;
-  }
+function scoreAge(charity: Charity, agePref: string | undefined): DimensionResult {
+  const active = !!agePref && agePref !== "no-preference";
+  if (!active) return { score: 0.5, active: false, baseWeight: 2 };
+  const charityAge = charity.year_founded ? new Date().getFullYear() - charity.year_founded : 0;
+  let s = 0.3;
+  if (agePref === "established" && charityAge >= 10) s = 1;
+  else if (agePref === "growing" && charityAge >= 5 && charityAge < 10) s = 1;
+  else if (agePref === "new" && charityAge < 5) s = 1;
+  return { score: s, active: true, baseWeight: 2 };
+}
 
-  // Organization size preference
-  if (sizePref && sizePref !== "no-preference") {
-    count++;
-    const psa = charity.people_served_annually || 0;
-    if (sizePref === "large" && psa >= 100000) score += 1;
-    else if (sizePref === "medium" && psa >= 10000 && psa < 100000) score += 1;
-    else if (sizePref === "small" && psa < 10000 && psa > 0) score += 1;
-    else score += 0.3;
-  }
-
-  return count > 0 ? score / count : 0.5;
+function scoreOrgSize(charity: Charity, sizePref: string | undefined): DimensionResult {
+  const active = !!sizePref && sizePref !== "no-preference";
+  if (!active) return { score: 0.5, active: false, baseWeight: 2 };
+  const psa = charity.people_served_annually || 0;
+  let s = 0.3;
+  if (sizePref === "large" && psa >= 100000) s = 1;
+  else if (sizePref === "medium" && psa >= 10000 && psa < 100000) s = 1;
+  else if (sizePref === "small" && psa < 10000 && psa > 0) s = 1;
+  return { score: s, active: true, baseWeight: 2 };
 }
 
 function generateWhyMatch(charity: Charity, answers: QuizAnswers): string {
@@ -144,30 +142,52 @@ export async function matchCharities(answers: QuizAnswers): Promise<MatchedChari
   if (error || !charities) return [];
 
   const scored = charities.map((charity) => {
-    const catScore = scoreCategory(charity, answers.causes || []);
-    const geoScore = scoreGeographic(charity, answers.geographic);
-    const finScore = scoreFinancialEfficiency(charity, answers.efficiency);
-    const factorScore = scoreKeyFactors(charity, answers.keyFactors);
-    const comboScore = scoreTransparencyAgeLongevity(
-      charity, answers.age, answers.transparency, answers.taxBenefits, answers.orgSize
-    );
+    const dimensions: DimensionResult[] = [
+      scoreCategory(charity, answers.causes),
+      scoreGeographic(charity, answers.geographic),
+      scoreFinancialEfficiency(charity, answers.efficiency),
+      scoreKeyFactors(charity, answers.keyFactors),
+      scoreTransparency(charity, answers.transparency),
+      scoreAge(charity, answers.age),
+      scoreOrgSize(charity, answers.orgSize),
+    ];
 
-    const totalScore =
-      catScore * 0.30 +
-      geoScore * 0.15 +
-      finScore * 0.15 +
-      factorScore * 0.15 +
-      comboScore * 0.25;
+    // Quality score — always contributes as a tiebreaker
+    const gwScore = getGivewizeScore(charity);
+    const qualityDim: DimensionResult = { score: gwScore / 5, active: true, baseWeight: 1.5 };
+    dimensions.push(qualityDim);
 
-    const matchPercent = Math.round(Math.min(99, Math.max(50, totalScore * 100)));
+    // Dynamic weighting: only active (answered) dimensions get their full weight.
+    // Inactive dimensions get a tiny weight so they don't dominate.
+    let totalWeight = 0;
+    let weightedSum = 0;
+    for (const dim of dimensions) {
+      const w = dim.active ? dim.baseWeight : 0.1;
+      weightedSum += dim.score * w;
+      totalWeight += w;
+    }
+
+    const rawScore = totalWeight > 0 ? weightedSum / totalWeight : 0.5;
 
     return {
       charity,
-      matchPercent,
+      rawScore,
       whyMatch: generateWhyMatch(charity, answers),
     };
   });
 
-  scored.sort((a, b) => b.matchPercent - a.matchPercent);
-  return scored.slice(0, 8);
+  scored.sort((a, b) => b.rawScore - a.rawScore);
+  const top = scored.slice(0, 8);
+
+  // Normalize against ALL charities for a meaningful spread
+  const allScores = scored.map((s) => s.rawScore);
+  const maxAll = Math.max(...allScores);
+  const minAll = Math.min(...allScores);
+  const range = maxAll - minAll || 0.01;
+
+  return top.map((s) => ({
+    charity: s.charity,
+    matchPercent: Math.round(55 + ((s.rawScore - minAll) / range) * 40),
+    whyMatch: s.whyMatch,
+  }));
 }
