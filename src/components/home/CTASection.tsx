@@ -37,7 +37,7 @@ export function CTASection() {
           <Button
             size="lg"
             variant="outline"
-            className="text-base px-10 py-6 border-white/25 text-white hover:bg-white/15 rounded-2xl"
+            className="text-base px-10 py-6 border-white/25 bg-transparent text-white hover:bg-white/15 rounded-2xl"
             asChild
           >
             <Link to="/charities">Browse Charities</Link>

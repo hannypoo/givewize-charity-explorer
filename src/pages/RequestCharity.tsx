@@ -93,7 +93,7 @@ const RequestCharity = () => {
                       setReason("");
                     }}
                     variant="outline"
-                    className="border-white/25 text-white hover:bg-white/15 rounded-2xl"
+                    className="border-white/25 bg-transparent text-white hover:bg-white/15 rounded-2xl"
                   >
                     Submit Another
                   </Button>
