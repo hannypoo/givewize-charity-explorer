@@ -173,6 +173,7 @@ const CharityDetail = () => {
 
   const location = [charity.city, charity.state, charity.country].filter(Boolean).join(", ");
   const age = charity.year_founded ? new Date().getFullYear() - charity.year_founded : null;
+  const isUsTaxDeductible = charity.ein ? /^\d{2}-\d{7}$/.test(charity.ein) : false;
 
   return (
     <Layout>
@@ -309,7 +310,7 @@ const CharityDetail = () => {
             </div>
 
             {/* Quick Stats Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               <div className="bg-card rounded-xl p-5 shadow-soft">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
@@ -352,6 +353,25 @@ const CharityDetail = () => {
                   <p className="font-display text-lg font-bold text-foreground line-clamp-1">{location}</p>
                 ) : (
                   <p className="text-sm text-muted-foreground italic">Still to be Collected</p>
+                )}
+              </div>
+              <div className="bg-card rounded-xl p-5 shadow-soft">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${isUsTaxDeductible ? "bg-primary/10" : "bg-amber-500/10"}`}>
+                    <Shield className={`h-5 w-5 ${isUsTaxDeductible ? "text-primary" : "text-amber-500"}`} />
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground mb-1">Tax Deductible</p>
+                {isUsTaxDeductible ? (
+                  <>
+                    <p className="font-display text-lg font-bold text-foreground">Yes (US)</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">EIN: {charity.ein}</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-display text-lg font-bold text-amber-500">Verify</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">International org — check with your tax advisor</p>
+                  </>
                 )}
               </div>
             </div>
