@@ -10,7 +10,7 @@ export interface QuizAnswers {
   efficiency?: number;
   age?: string;
   transparency?: string;
-  taxBenefits?: number;
+  donorExperience?: string[];
   orgSize?: string;
   keyFactors?: string[];
 }
@@ -114,17 +114,15 @@ function scoreOrgSize(charity: Charity, sizePref: string | undefined): Dimension
   return { score: s, active: true, baseWeight: 3 };
 }
 
-function scoreTaxBenefits(charity: Charity, taxPref: number | undefined): DimensionResult {
-  const active = !!taxPref && taxPref > 1;
-  if (!active) return { score: 0.5, active: false, baseWeight: 2 };
-  // Charities with a valid EIN are tax-deductible; those without may not be
-  const validEin = charity.ein && !charity.ein.includes("verify") && !charity.ein.includes("contact");
-  const has990 = charity.complete_990_filed;
-  const weight = taxPref! / 5;
-  let s = 0.2;
-  if (validEin && has990) s = 1.0;
-  else if (validEin) s = 0.7;
-  return { score: s * weight + (1 - weight) * 0.5, active: true, baseWeight: 2 };
+function scoreDonorExperience(charity: Charity, features: string[] | undefined): DimensionResult {
+  const active = !!features && features.length > 0;
+  if (!active) return { score: 0.5, active: false, baseWeight: 3 };
+  let matches = 0;
+  if (features!.includes("donation-tracking") && charity.allows_donation_tracking) matches++;
+  if (features!.includes("donor-perks") && charity.offers_donor_perks) matches++;
+  if (features!.includes("recipient-contact") && charity.allows_donor_recipient_contact) matches++;
+  if (features!.includes("annual-reports") && charity.annual_report_url) matches++;
+  return { score: matches / features!.length, active: true, baseWeight: 3 };
 }
 
 function generateWhyMatch(charity: Charity, answers: QuizAnswers): string {
@@ -145,6 +143,13 @@ function generateWhyMatch(charity: Charity, answers: QuizAnswers): string {
   }
   if (charity.complete_990_filed && charity.financials_published) {
     reasons.push("strong financial transparency");
+  }
+  if (answers.donorExperience?.length) {
+    const featureHits: string[] = [];
+    if (answers.donorExperience.includes("donation-tracking") && charity.allows_donation_tracking) featureHits.push("donation tracking");
+    if (answers.donorExperience.includes("donor-perks") && charity.offers_donor_perks) featureHits.push("donor perks");
+    if (answers.donorExperience.includes("recipient-contact") && charity.allows_donor_recipient_contact) featureHits.push("recipient contact");
+    if (featureHits.length > 0) reasons.push(`offers ${featureHits.join(" and ")}`);
   }
 
   if (reasons.length === 0) {
@@ -174,7 +179,7 @@ export async function matchCharities(answers: QuizAnswers, tier: 1 | 2 | 3 = 1):
       scoreTransparency(charity, answers.transparency),
       scoreAge(charity, answers.age),
       scoreOrgSize(charity, answers.orgSize),
-      scoreTaxBenefits(charity, answers.taxBenefits),
+      scoreDonorExperience(charity, answers.donorExperience),
     ];
 
     // Quality score — always contributes as a tiebreaker

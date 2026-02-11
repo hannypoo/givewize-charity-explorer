@@ -136,11 +136,18 @@ export const quizQuestions: QuizQuestion[] = [
     ],
   },
   {
-    id: "taxBenefits",
-    question: "How important are tax benefits?",
-    subtitle: "Getting a tax deduction for your donation",
-    type: "scale",
+    id: "donorExperience",
+    question: "What donor experience features matter to you?",
+    subtitle: "Select all that apply",
+    type: "cards",
+    multiSelect: true,
+    maxSelections: 4,
     tier: 3,
-    scaleLabels: { low: "Not important", high: "Very important" },
+    options: [
+      { id: "donation-tracking", label: "Donation Tracking" },
+      { id: "donor-perks", label: "Donor Perks" },
+      { id: "recipient-contact", label: "Recipient Contact" },
+      { id: "annual-reports", label: "Annual Reports" },
+    ],
   },
 ];

@@ -122,7 +122,7 @@ const QuizResults = () => {
       efficiency: typeof answers.efficiency === "number" ? answers.efficiency : undefined,
       age: typeof answers.age === "string" ? answers.age : undefined,
       transparency: typeof answers.transparency === "string" ? answers.transparency : undefined,
-      taxBenefits: typeof answers.taxBenefits === "number" ? answers.taxBenefits : undefined,
+      donorExperience: Array.isArray(answers.donorExperience) ? answers.donorExperience : undefined,
       orgSize: typeof answers.orgSize === "string" ? answers.orgSize : undefined,
       keyFactors: Array.isArray(answers.keyFactors) ? answers.keyFactors : undefined,
     };
