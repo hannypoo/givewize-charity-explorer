@@ -67,7 +67,7 @@ export function GiftRegistry() {
               <div className="flex items-start gap-3 mb-3">
                 <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
                   {charity.logo_url ? (
-                    <img src={charity.logo_url} alt="" loading="lazy" className="h-7 w-7 object-contain rounded" />
+                    <img src={charity.logo_url} alt={`${charity.name} logo`} loading="lazy" className="h-7 w-7 object-contain rounded" />
                   ) : (
                     <Building2 className="h-4 w-4 text-muted-foreground" />
                   )}
