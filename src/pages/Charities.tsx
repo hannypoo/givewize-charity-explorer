@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useLocation } from "react-router-dom";
 import { Filter, ChevronRight, X, ArrowUpDown, Info, Heart, Building2 } from "lucide-react";
 import { getCategoryIcon } from "@/components/charities/CategoryIcon";
 import { Layout } from "@/components/layout/Layout";
@@ -63,6 +63,7 @@ function getParamNumber(params: URLSearchParams, key: string, fallback = 0): num
 
 const Charities = () => {
   usePageTitle("Explore Charities", "Browse and filter vetted charities by category, rating, and impact. Find organizations that align with your values.");
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Initialize state from URL params on mount
@@ -115,6 +116,17 @@ const Charities = () => {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     resultsRef.current?.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
   }, [currentPage]);
+
+  // Scroll to hash target (e.g. #zs-list) after data loads
+  useEffect(() => {
+    const hash = location.hash.replace("#", "");
+    if (hash && zsListCharities.length > 0) {
+      const timer = setTimeout(() => {
+        document.getElementById(hash)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [location.hash, zsListCharities]);
 
   const filters: FilterState = {
     searchQuery: debouncedSearch,
@@ -491,7 +503,7 @@ const Charities = () => {
 
         {/* Z's List */}
         {zsListCharities.length > 0 && (
-          <div className="container pb-16">
+          <div id="zs-list" className="container pb-16 scroll-mt-20">
             <div className="rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 p-6 md:p-8">
               <div className="flex items-center gap-3 mb-2">
                 <Heart className="h-5 w-5 text-orange-light fill-orange-light" />

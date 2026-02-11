@@ -46,9 +46,10 @@ const faqGroups: FAQGroup[] = [
         question: "Who is behind GiveWiZe?",
         answer: (
           <p>
-            GiveWiZe was created by a family inspired by Z's journey with a rare disease.
-            That experience taught us how hard it can be to find trustworthy charities —
-            and motivated us to build something that helps everyone give with confidence.
+            GiveWiZe was created by Hannah Hoffmaster, a single mom inspired by her son
+            Ezra's journey with a rare disease. That experience taught her how hard it can
+            be to find trustworthy charities — and motivated her to build something that
+            helps everyone give with confidence.
           </p>
         ),
       },
@@ -129,22 +130,22 @@ const faqGroups: FAQGroup[] = [
         ),
       },
       {
-        question: "What is the Gift Registry?",
+        question: "Will GiveWiZe have a Gift Registry?",
         answer: (
           <p>
-            The Gift Registry lets you create a list of charities you care about and share it with
-            friends and family. Instead of traditional gifts, they can "donate on your behalf" to
-            causes that matter to you.
+            Yes! A Gift Registry is one of our planned features. It will let you create a list of
+            charities you care about and share it with friends and family so they can donate to
+            meaningful causes instead of traditional gifts. Stay tuned!
           </p>
         ),
       },
       {
-        question: "How does employer matching work?",
+        question: "Will GiveWiZe support employer matching?",
         answer: (
           <p>
-            If your employer matches charitable donations, you can set up your employer information
-            in your profile. Then, from any charity's detail page, you can submit an employer match
-            request to potentially double your impact.
+            Employer match integration is on our roadmap. In the future, you'll be able to set up
+            your employer information in your profile and submit match requests directly from a
+            charity's page to potentially double your impact. We'll announce it when it's ready!
           </p>
         ),
       },
@@ -198,8 +199,8 @@ const faqGroups: FAQGroup[] = [
           <p>
             Z's List is a curated collection of charities that are personally important to Z and
             the family behind GiveWiZe. These organizations represent causes close to our hearts —
-            from rare disease research to education access. You can find Z's List on the{" "}
-            <Link to="/charities" className="text-orange-light hover:underline">Explore page</Link>.
+            from rare disease research to education access. You can find{" "}
+            <Link to="/charities#zs-list" className="text-orange-light hover:underline">Z's List on the Explore page</Link>.
           </p>
         ),
       },

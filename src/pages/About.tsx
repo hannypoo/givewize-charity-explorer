@@ -90,7 +90,7 @@ const About = () => {
                 <img
                   src={zPhoto}
                   alt="Ezra"
-                  className="w-full h-64 md:h-80 object-cover"
+                  className="w-full h-80 md:h-96 object-cover object-[center_30%]"
                 />
               </div>
               <div className="flex items-center gap-3 mb-6">
