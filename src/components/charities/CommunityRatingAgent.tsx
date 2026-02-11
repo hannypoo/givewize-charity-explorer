@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   Star, Users, ShieldCheck, MessageSquare, ChevronDown, ExternalLink,
-  Target, Eye, Megaphone, Award, Loader2,
+  Target, Megaphone, Award, Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -47,11 +47,10 @@ const SOURCE_CONFIG: Record<string, { icon: React.ReactNode; weight: number }> =
 };
 
 const CRITERIA_WEIGHTS = [
-  { key: "online_reputation", name: "Online Reputation", weight: 0.30, desc: "Aggregated scores from Charity Navigator, BBB Wise Giving Alliance, GuideStar, and GreatNonprofits", icon: <Award className="h-4 w-4" /> },
-  { key: "donor_satisfaction", name: "Donor Satisfaction", weight: 0.25, desc: "Average rating from verified GiveWiZe donor reviews", icon: <Users className="h-4 w-4" /> },
-  { key: "transparency", name: "Transparency", weight: 0.20, desc: "Financial openness, 990 filings, published audits, and accountability policies", icon: <Eye className="h-4 w-4" /> },
-  { key: "impact", name: "Perceived Impact", weight: 0.15, desc: "Public perception of effectiveness based on published outcomes and community feedback", icon: <Target className="h-4 w-4" /> },
-  { key: "communication", name: "Communication", weight: 0.10, desc: "Responsiveness to donors, updates on programs, and engagement quality", icon: <Megaphone className="h-4 w-4" /> },
+  { key: "online_reputation", name: "Online Reputation", weight: 0.35, desc: "Aggregated scores from Charity Navigator, BBB Wise Giving Alliance, GuideStar, and GreatNonprofits", icon: <Award className="h-4 w-4" /> },
+  { key: "donor_satisfaction", name: "Donor Satisfaction", weight: 0.30, desc: "Average rating from verified GiveWiZe donor reviews", icon: <Users className="h-4 w-4" /> },
+  { key: "impact", name: "Perceived Impact", weight: 0.20, desc: "Public perception of effectiveness based on published outcomes and community feedback", icon: <Target className="h-4 w-4" /> },
+  { key: "communication", name: "Communication", weight: 0.15, desc: "Responsiveness to donors, updates on programs, and engagement quality", icon: <Megaphone className="h-4 w-4" /> },
 ];
 
 // ── Helpers ───────────────────────────────────────────────────────────────
@@ -105,6 +104,7 @@ function SourceRatingCard({ source, showNote = false }: { source: SourceRating; 
               <span className="text-xs text-muted-foreground">
                 {source.ratingScale === "pass_fail" ? `${source.rawRating}/${source.maxRating} standards`
                   : source.ratingScale === "seal" ? `${getGuideStarSealLabel(source.rawRating!)} Seal`
+                  : source.maxRating > 5 ? `${source.rawRating}/${source.maxRating} score`
                   : `${source.rawRating}/${source.maxRating}`}
               </span>
               {source.reviewCount > 0 && <span className="text-xs text-muted-foreground">({source.reviewCount} reviews)</span>}
@@ -233,7 +233,7 @@ export function CommunityRatingAgent({ charity, onDonorReviewSubmit }: Community
   const donorReviews: DonorReview[] = useMemo(() => reviewRows.map(mapReviewRowToDonorReview), [reviewRows]);
 
   // ── Compute weighted community rating ──────────────────────────────────
-  const computedRating = useMemo(() => {
+  const { computedRating, formulaComponents } = useMemo(() => {
     const ext = sourceRatings.filter((s) => s.sourceName !== "givewize_donors" && s.normalizedRating !== null);
     const onlineRep = ext.length > 0
       ? ext.reduce((s, r) => s + r.normalizedRating! * r.weight, 0) / ext.reduce((s, r) => s + r.weight, 0)
@@ -243,22 +243,23 @@ export function CommunityRatingAgent({ charity, onDonorReviewSubmit }: Community
       ? donorReviews.reduce((s, r) => s + r.rating, 0) / donorReviews.length
       : Number(charity.community_rating_average) || 0;
 
-    let tp = 0;
-    if (charity.complete_990_filed) tp++;
-    if (charity.annual_report_url) tp++;
-    if (charity.financials_published) tp++;
-    tp += Math.min(2, tp);
-    tp = Math.min(5, tp);
-
     const computed = computeGivewizeScores(charity);
     const impactScore = computed.impact != null ? computed.impact : (computed.overall * 0.8);
     const commScore = donorReviews.length > 0
       ? donorReviews.reduce((s, r) => s + (r.categories?.communication || 0), 0) / donorReviews.length
       : donorSat * 0.9;
 
-    return Math.min(5, Math.max(0,
-      onlineRep * 0.30 + donorSat * 0.25 + tp * 0.20 + impactScore * 0.15 + commScore * 0.10
-    ));
+    return {
+      computedRating: Math.min(5, Math.max(0,
+        onlineRep * 0.35 + donorSat * 0.30 + impactScore * 0.20 + commScore * 0.15
+      )),
+      formulaComponents: {
+        online_reputation: onlineRep,
+        donor_satisfaction: donorSat,
+        impact: impactScore,
+        communication: commScore,
+      },
+    };
   }, [sourceRatings, charity, donorReviews]);
 
   // ── Category averages ──────────────────────────────────────────────────
@@ -279,7 +280,10 @@ export function CommunityRatingAgent({ charity, onDonorReviewSubmit }: Community
     const parts = [`${name} holds a community rating of ${computedRating.toFixed(1)} out of 5 stars, based on aggregated data from ${sc} independent source${sc !== 1 ? "s" : ""}${rc > 0 ? ` and ${rc} verified donor review${rc !== 1 ? "s" : ""}` : ""}. Overall community sentiment is ${sentiment}.`];
 
     const cnSource = sourceRatings.find((s) => s.sourceName === "charity_navigator");
-    if (cnSource?.normalizedRating) parts.push(`Charity Navigator rates this organization ${cnSource.rawRating} out of ${cnSource.maxRating} stars, reflecting ${cnSource.rawRating! >= 3 ? "strong" : "moderate"} financial health and accountability.`);
+    if (cnSource?.normalizedRating) {
+      const cnLabel = cnSource.maxRating > 5 ? `${cnSource.rawRating}/${cnSource.maxRating}` : `${cnSource.rawRating} out of ${cnSource.maxRating} stars`;
+      parts.push(`Charity Navigator rates this organization ${cnLabel}, reflecting ${cnSource.normalizedRating >= 3.75 ? "strong" : "moderate"} financial health and accountability.`);
+    }
 
     const bbb = sourceRatings.find((s) => s.sourceName === "bbb_wise_giving");
     if (bbb?.normalizedRating) parts.push(`The BBB Wise Giving Alliance reports this charity meets ${bbb.rawRating} of ${bbb.maxRating} accountability standards.`);
@@ -356,22 +360,16 @@ export function CommunityRatingAgent({ charity, onDonorReviewSubmit }: Community
           </div>
         </div>
 
-        {categoryAverages && (
-          <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {([
-              { key: "impact", label: "Impact", icon: <Target className="h-4 w-4 text-primary" /> },
-              { key: "communication", label: "Communication", icon: <Megaphone className="h-4 w-4 text-primary" /> },
-              { key: "transparency", label: "Transparency", icon: <Eye className="h-4 w-4 text-primary" /> },
-              { key: "experience", label: "Experience", icon: <Star className="h-4 w-4 text-primary" /> },
-            ] as const).map((cat) => (
-              <div key={cat.key} className="rounded-lg border border-border bg-card/80 p-2 text-center">
-                <div className="flex justify-center">{cat.icon}</div>
-                <div className="mt-0.5 text-xs font-medium text-muted-foreground">{cat.label}</div>
-                <div className="text-sm font-bold text-foreground">{categoryAverages[cat.key].toFixed(1)}</div>
-              </div>
-            ))}
-          </div>
-        )}
+        <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {CRITERIA_WEIGHTS.map((c) => (
+            <div key={c.key} className="rounded-lg border border-border bg-card/80 p-2 text-center">
+              <div className="flex justify-center">{c.icon}</div>
+              <div className="mt-0.5 text-xs font-medium text-muted-foreground">{c.name}</div>
+              <div className="text-sm font-bold text-foreground">{formulaComponents[c.key as keyof typeof formulaComponents].toFixed(1)}</div>
+              <div className="text-[10px] text-muted-foreground/60">{(c.weight * 100).toFixed(0)}%</div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Tabs */}
