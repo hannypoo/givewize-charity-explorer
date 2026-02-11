@@ -210,15 +210,18 @@ export async function matchCharities(answers: QuizAnswers, tier: 1 | 2 | 3 = 1):
   const limit = RESULTS_PER_TIER[tier] || 8;
   const top = scored.slice(0, limit);
 
-  // Normalize against ALL charities for a meaningful spread
-  const allScores = scored.map((s) => s.rawScore);
-  const maxAll = Math.max(...allScores);
-  const minAll = Math.min(...allScores);
-  const range = maxAll - minAll || 0.01;
+  // Absolute match percentage: raw score scaled by tier confidence.
+  // Fewer answered questions → percentages compressed toward center (less certainty).
+  // More answered questions → wider spread reflecting true match quality.
+  const confidence: Record<number, number> = { 1: 0.5, 2: 0.75, 3: 1.0 };
+  const conf = confidence[tier] || 1;
+  const center = 72;
 
   return top.map((s) => ({
     charity: s.charity,
-    matchPercent: Math.round(55 + ((s.rawScore - minAll) / range) * 40),
+    matchPercent: Math.round(
+      Math.min(97, Math.max(45, center + (s.rawScore * 100 - center) * conf)),
+    ),
     whyMatch: s.whyMatch,
   }));
 }
