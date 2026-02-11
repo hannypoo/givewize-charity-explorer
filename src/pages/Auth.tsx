@@ -13,7 +13,7 @@ const Auth = () => {
   usePageTitle("Sign In", "Sign in or create an account to save favorites, track donations, and get personalized charity matches.");
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, isLoading: authLoading, signIn, signUp } = useAuth();
+  const { user, isLoading: authLoading, signIn, signUp, resetPassword } = useAuth();
 
   const [tab, setTab] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
@@ -156,6 +156,26 @@ const Auth = () => {
                   />
                 </div>
                 {errors.password && <p className="text-xs text-red-400 mt-1">{errors.password}</p>}
+                {tab === "signin" && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                        toast.error("Enter your email address first, then click Forgot Password.");
+                        return;
+                      }
+                      try {
+                        await resetPassword(email);
+                        toast.success("Password reset email sent! Check your inbox.");
+                      } catch {
+                        toast.error("Failed to send reset email. Try again.");
+                      }
+                    }}
+                    className="text-xs text-white/50 hover:text-white/80 transition-colors mt-1"
+                  >
+                    Forgot password?
+                  </button>
+                )}
               </div>
 
               {tab === "signup" && (
