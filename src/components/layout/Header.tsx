@@ -4,7 +4,7 @@ import { Menu, X, ArrowRight, User, LogOut, Heart, ChevronDown } from "lucide-re
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
-import givewizeIcon from "@/assets/givewize-icon.jpg";
+import givewizeIcon from "@/assets/givewize-icon.svg";
 
 const navLinks = [
   { to: "/", label: "Home" },
