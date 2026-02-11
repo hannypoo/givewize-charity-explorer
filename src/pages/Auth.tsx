@@ -22,6 +22,7 @@ const Auth = () => {
   const [displayName, setDisplayName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isResetting, setIsResetting] = useState(false);
 
   const redirectTo = (location.state as { from?: string })?.from || "/profile";
 
@@ -159,21 +160,26 @@ const Auth = () => {
                 {tab === "signin" && (
                   <button
                     type="button"
+                    disabled={isResetting}
                     onClick={async () => {
                       if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
                         toast.error("Enter your email address first, then click Forgot Password.");
                         return;
                       }
+                      setIsResetting(true);
                       try {
                         await resetPassword(email);
                         toast.success("Password reset email sent! Check your inbox.");
-                      } catch {
-                        toast.error("Failed to send reset email. Try again.");
+                      } catch (err: any) {
+                        console.error("Reset password error:", err);
+                        toast.error(err?.message || "Failed to send reset email. Try again.");
+                      } finally {
+                        setIsResetting(false);
                       }
                     }}
-                    className="text-xs text-white/50 hover:text-white/80 transition-colors mt-1"
+                    className="text-xs text-white/50 hover:text-white/80 transition-colors mt-1 disabled:opacity-50"
                   >
-                    Forgot password?
+                    {isResetting ? "Sending reset email..." : "Forgot password?"}
                   </button>
                 )}
               </div>
