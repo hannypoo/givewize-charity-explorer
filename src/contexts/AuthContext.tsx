@@ -16,6 +16,8 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  isPasswordRecovery: boolean;
+  clearPasswordRecovery: () => void;
   refreshProfile: () => Promise<void>;
 }
 
@@ -46,6 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
 
   const fetchProfile = useCallback(async (userId: string) => {
     const { data } = await supabase
@@ -65,6 +68,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       async (event, newSession) => {
         setSession(newSession);
         setUser(newSession?.user ?? null);
+
+        if (event === "PASSWORD_RECOVERY") {
+          setIsPasswordRecovery(true);
+        }
 
         if (newSession?.user) {
           // Use setTimeout to avoid potential deadlock with Supabase auth
@@ -108,6 +115,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error;
   };
 
+  const clearPasswordRecovery = () => setIsPasswordRecovery(false);
+
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -118,7 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, profile, isLoading, signUp, signIn, signOut, resetPassword, refreshProfile }}>
+    <AuthContext.Provider value={{ user, session, profile, isLoading, signUp, signIn, signOut, resetPassword, isPasswordRecovery, clearPasswordRecovery, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

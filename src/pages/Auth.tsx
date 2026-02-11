@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Mail, KeyRound, User, Loader2, Check, X } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
@@ -14,7 +14,7 @@ const Auth = () => {
   usePageTitle("Sign In", "Sign in or create an account to save favorites, track donations, and get personalized charity matches.");
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, isLoading: authLoading, signIn, signUp, resetPassword } = useAuth();
+  const { user, isLoading: authLoading, signIn, signUp, resetPassword, isPasswordRecovery, clearPasswordRecovery } = useAuth();
 
   const [tab, setTab] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
@@ -24,26 +24,13 @@ const Auth = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isResetting, setIsResetting] = useState(false);
-  const [recoveryMode, setRecoveryMode] = useState(
-    () => window.location.hash.includes("type=recovery")
-  );
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
   const redirectTo = (location.state as { from?: string })?.from || "/profile";
 
-  // Listen for PASSWORD_RECOVERY event
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
-        setRecoveryMode(true);
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, []);
-
   // Already logged in — redirect away (but not if resetting password)
-  if (!authLoading && user && !recoveryMode) {
+  if (!authLoading && user && !isPasswordRecovery) {
     navigate(redirectTo, { replace: true });
     return null;
   }
@@ -103,7 +90,7 @@ const Auth = () => {
 
         <div className="container relative flex flex-col items-center justify-center py-20 md:py-28">
           <div className="glass-dark rounded-2xl p-8 md:p-10 max-w-sm w-full animate-fade-in-up" style={{ animationDuration: "0.4s" }}>
-            {recoveryMode ? (
+            {isPasswordRecovery ? (
               <>
                 <h2 className="text-xl font-bold text-white mb-2">Set New Password</h2>
                 <p className="text-white/50 text-sm mb-6">Enter your new password below.</p>
@@ -123,7 +110,7 @@ const Auth = () => {
                       const { error } = await supabase.auth.updateUser({ password: newPassword });
                       if (error) throw error;
                       toast.success("Password updated successfully!");
-                      setRecoveryMode(false);
+                      clearPasswordRecovery();
                       navigate("/profile", { replace: true });
                     } catch (err: any) {
                       toast.error(err?.message || "Failed to update password.");
