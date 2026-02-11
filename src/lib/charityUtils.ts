@@ -226,8 +226,5 @@ export function getKeyStandoutBadge(charity: Charity): { label: string; color: s
   if (charity.community_rating_average != null && Number(charity.community_rating_average) >= 4.0) {
     return { label: "Community Favorite", color: "bg-amber-100 text-amber-800" };
   }
-  if (charity.ein) {
-    return { label: "Tax Deductible", color: "bg-sky-100 text-sky-800" };
-  }
   return null;
 }

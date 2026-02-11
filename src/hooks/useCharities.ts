@@ -65,9 +65,6 @@ export function useCharities(filters: CharityFilters = defaultFilters) {
       if (filters.keyFactors.includes("established")) {
         query = query.lte("year_founded", new Date().getFullYear() - 20);
       }
-      if (filters.keyFactors.includes("tax-deductible")) {
-        query = query.not("ein", "is", null);
-      }
       if (filters.keyFactors.includes("annual-report")) {
         query = query.not("annual_report_url", "is", null);
       }

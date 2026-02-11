@@ -16,7 +16,6 @@ const keyFactorOptions = [
   { value: "high-efficiency", label: "High Efficiency (80%+)" },
   { value: "transparent", label: "Transparent Finances" },
   { value: "established", label: "Established (20+ yrs)" },
-  { value: "tax-deductible", label: "Tax Deductible" },
   { value: "annual-report", label: "Annual Report" },
 ];
 

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import {
-  Receipt, TrendingUp, Eye, FileText, Building2,
+  TrendingUp, Eye, FileText, Building2,
   Users, Star, Shield, Globe, MapPin, Layers,
   HeartHandshake, Mail, CreditCard, Gift, Sparkles,
 } from "lucide-react";
@@ -26,15 +26,6 @@ interface SpecialFeature {
 function getCharacteristics(charity: Charity): Characteristic[] {
   const chars: Characteristic[] = [];
   const givewizeScore = getGivewizeScore(charity);
-
-  if (charity.ein) {
-    chars.push({
-      label: "Tax Deductible",
-      description: "Donations to this organization are tax-deductible under IRS regulations.",
-      icon: <Receipt className="h-5 w-5" />,
-      color: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    });
-  }
 
   if (charity.program_expense_percentage != null && charity.program_expense_percentage >= 80) {
     chars.push({
