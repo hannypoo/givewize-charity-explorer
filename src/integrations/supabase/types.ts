@@ -14,6 +14,56 @@ export type Database = {
   }
   public: {
     Tables: {
+      charity_info_requests: {
+        Row: {
+          id: string
+          charity_request_id: string
+          token: string
+          contact_email: string
+          missing_fields: string[]
+          missing_fields_labels: Json
+          submitted_data: Json | null
+          status: string
+          expires_at: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          charity_request_id: string
+          token: string
+          contact_email: string
+          missing_fields?: string[]
+          missing_fields_labels?: Json
+          submitted_data?: Json | null
+          status?: string
+          expires_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          charity_request_id?: string
+          token?: string
+          contact_email?: string
+          missing_fields?: string[]
+          missing_fields_labels?: Json
+          submitted_data?: Json | null
+          status?: string
+          expires_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "charity_info_requests_charity_request_id_fkey"
+            columns: ["charity_request_id"]
+            isOneToOne: false
+            referencedRelation: "charity_requests"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       charity_requests: {
         Row: {
           id: string
@@ -24,6 +74,14 @@ export type Database = {
           reason: string | null
           status: string
           admin_notes: string | null
+          ein: string | null
+          country: string | null
+          charity_contact_email: string | null
+          verification_status: string | null
+          propublica_data: Json | null
+          computed_scores: Json | null
+          auto_approved: boolean | null
+          charity_id: string | null
           created_at: string
         }
         Insert: {
@@ -35,6 +93,14 @@ export type Database = {
           reason?: string | null
           status?: string
           admin_notes?: string | null
+          ein?: string | null
+          country?: string | null
+          charity_contact_email?: string | null
+          verification_status?: string | null
+          propublica_data?: Json | null
+          computed_scores?: Json | null
+          auto_approved?: boolean | null
+          charity_id?: string | null
           created_at?: string
         }
         Update: {
@@ -46,6 +112,14 @@ export type Database = {
           reason?: string | null
           status?: string
           admin_notes?: string | null
+          ein?: string | null
+          country?: string | null
+          charity_contact_email?: string | null
+          verification_status?: string | null
+          propublica_data?: Json | null
+          computed_scores?: Json | null
+          auto_approved?: boolean | null
+          charity_id?: string | null
           created_at?: string
         }
         Relationships: []

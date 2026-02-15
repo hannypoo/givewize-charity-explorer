@@ -26,6 +26,7 @@ const RequestCharity = lazy(() => import("./pages/RequestCharity"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Terms = lazy(() => import("./pages/Terms"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const SubmitCharityInfo = lazy(() => import("./pages/SubmitCharityInfo"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -98,6 +99,7 @@ const App = () => (
             <Route path="/request-charity" element={<RequestCharity />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
+            <Route path="/submit-charity-info/:token" element={<SubmitCharityInfo />} />
             <Route path="/admin/import" element={<ImportCharities />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
