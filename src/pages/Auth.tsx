@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Mail, KeyRound, User, Loader2, Check, X } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
@@ -28,10 +28,23 @@ const Auth = () => {
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
   const redirectTo = (location.state as { from?: string })?.from || "/profile";
-  const isRecoveryFromUrl = new URLSearchParams(window.location.search).get("mode") === "recovery";
+  const [hasCode] = useState(() => new URLSearchParams(window.location.search).has("code"));
+  const [waitingForRecovery, setWaitingForRecovery] = useState(hasCode);
 
-  // Already logged in — redirect away (but not if resetting password)
-  if (!authLoading && user && !isPasswordRecovery && !isRecoveryFromUrl) {
+  // If we landed here with a code param, wait briefly for PASSWORD_RECOVERY event
+  useEffect(() => {
+    if (!hasCode) return;
+    const timer = setTimeout(() => setWaitingForRecovery(false), 3000);
+    return () => clearTimeout(timer);
+  }, [hasCode]);
+
+  // Clear the wait if recovery mode is detected
+  useEffect(() => {
+    if (isPasswordRecovery) setWaitingForRecovery(false);
+  }, [isPasswordRecovery]);
+
+  // Already logged in — redirect away (but not if resetting password or waiting for recovery event)
+  if (!authLoading && user && !isPasswordRecovery && !waitingForRecovery) {
     navigate(redirectTo, { replace: true });
     return null;
   }
