@@ -1,27 +1,13 @@
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { Trash2 } from "lucide-react";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { ProfileSectionNav } from "@/components/charities/ProfileSectionNav";
 import { useActiveSection } from "@/hooks/useActiveSection";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { supabase } from "@/integrations/supabase/client";
 import { InviteFriend } from "@/components/profile/InviteFriend";
-import { toast } from "sonner";
+import { ReauthDeleteDialog } from "@/components/profile/ReauthDeleteDialog";
 import { ProfileOverview } from "@/components/profile/ProfileOverview";
 import { MyCharities } from "@/components/profile/MyCharities";
 import { GiftRegistry } from "@/components/profile/GiftRegistry";
@@ -43,23 +29,8 @@ const sectionIds = SECTIONS.map((s) => s.id);
 const Profile = () => {
   usePageTitle("My Profile", "Manage your GiveWiZe profile, favorite charities, donation receipts, quiz results, and employer matching.");
   const { user, profile } = useAuth();
-  const navigate = useNavigate();
   const { activeSection, scrollToSection } = useActiveSection(sectionIds);
   const location = useLocation();
-  const [deleting, setDeleting] = useState(false);
-
-  const handleDeleteAccount = async () => {
-    setDeleting(true);
-    const { error } = await supabase.rpc("delete_user_account");
-    if (error) {
-      toast.error("Failed to delete account. Please try again.");
-      setDeleting(false);
-      return;
-    }
-    await supabase.auth.signOut();
-    toast.success("Your account has been deleted.");
-    navigate("/");
-  };
 
   // Handle hash navigation from other pages (e.g. /profile#employer-matching)
   useEffect(() => {
@@ -146,32 +117,7 @@ const Profile = () => {
                   Permanently delete your account and all associated data including favorites, receipts, quiz results, and employer match requests. This action cannot be undone.
                 </p>
               </div>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="shrink-0 border-destructive/30 text-destructive hover:bg-destructive/10 rounded-xl">
-                    <Trash2 className="h-3.5 w-3.5 mr-1.5" />
-                    Delete
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This will permanently delete your account and all your data, including favorites, donation receipts, quiz results, and employer match requests. This cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleDeleteAccount}
-                      disabled={deleting}
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    >
-                      {deleting ? "Deleting..." : "Yes, delete my account"}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+              <ReauthDeleteDialog />
             </div>
           </div>
         </div>

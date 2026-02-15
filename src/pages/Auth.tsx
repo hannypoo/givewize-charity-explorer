@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Mail, KeyRound, User, Loader2, Check, X } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 
 const Auth = () => {
   usePageTitle("Sign In", "Sign in or create an account to save favorites, track donations, and get personalized charity matches.");
