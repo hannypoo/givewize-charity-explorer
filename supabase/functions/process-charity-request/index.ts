@@ -13,11 +13,19 @@ const NTEE_TO_CATEGORY: Record<string, string> = {
   F: "mental-health",
   I: "human-rights",
   R: "human-rights",
+  J: "human-rights",       // Employment/jobs
   K: "hunger-food-security",
   L: "housing-homelessness",
+  N: "community-development", // Recreation/sports
   O: "child-welfare",
+  P: "community-development", // Human services (broad)
   Q: "international-development",
+  S: "community-development", // Community improvement
+  T: "community-development", // Philanthropy/voluntarism
+  U: "education",             // Science & technology
+  W: "community-development", // Public/societal benefit
   X: "faith-based",
+  Y: "community-development", // Mutual/membership benefit
 };
 
 function nteeToCategorySlug(nteeCode: string | null | undefined): string {
@@ -202,9 +210,15 @@ function mapPropublicaToCharity(data: PropublicaOrg): MappedCharity {
   const name = org.name ?? "Unknown Organization";
   const nteeCode = org.ntee_code ?? "";
   let geographicScope = "national";
+
+  // Detect global scope from name, NTEE code, or mission content
+  const nameLower = name.toLowerCase();
+  const missionLower = (latest?.mission || org.mission || "").toLowerCase();
+  const globalKeywords = ["international", "global", "worldwide", "world", "countries"];
   if (
-    name.toLowerCase().includes("international") ||
-    nteeCode.toUpperCase().startsWith("Q")
+    nteeCode.toUpperCase().startsWith("Q") ||
+    globalKeywords.some(kw => nameLower.includes(kw)) ||
+    globalKeywords.some(kw => missionLower.includes(kw))
   ) {
     geographicScope = "global";
   }
@@ -259,21 +273,117 @@ function mapPropublicaToCharity(data: PropublicaOrg): MappedCharity {
   };
 }
 
-// ── Missing fields check ────────────────────────────────────────────
+// ── Website scraping ────────────────────────────────────────────────
 
+async function scrapeWebsite(url: string): Promise<{
+  mission?: string;
+  description?: string;
+  programs?: string[];
+  targetPopulation?: string;
+}> {
+  const result: {
+    mission?: string;
+    description?: string;
+    programs?: string[];
+    targetPopulation?: string;
+  } = {};
+
+  try {
+    const res = await fetch(url, {
+      headers: { "User-Agent": "GiveWiZe Charity Bot/1.0" },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) return result;
+
+    const html = await res.text();
+
+    // Extract meta description
+    const metaDescMatch = html.match(
+      /<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i
+    ) ?? html.match(
+      /<meta[^>]+content=["']([^"']+)["'][^>]+name=["']description["']/i
+    );
+    if (metaDescMatch?.[1]) {
+      result.description = metaDescMatch[1].trim();
+    }
+
+    // Extract OG description (often more detailed)
+    const ogDescMatch = html.match(
+      /<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i
+    ) ?? html.match(
+      /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:description["']/i
+    );
+    if (ogDescMatch?.[1] && (!result.description || ogDescMatch[1].length > result.description.length)) {
+      result.description = ogDescMatch[1].trim();
+    }
+
+    // Look for mission statement patterns in page text
+    // Strip HTML tags for text search
+    const textContent = html
+      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ");
+
+    // Look for "our mission" or "mission statement" sections
+    const missionPatterns = [
+      /(?:our\s+mission|mission\s+statement)[:\s]+([^.]+\.[^.]*\.)/i,
+      /(?:our\s+mission|mission\s+statement)[:\s]+([^.]+\.)/i,
+      /mission[:\s]+(?:to\s+)([^.]+\.)/i,
+    ];
+    for (const pattern of missionPatterns) {
+      const match = textContent.match(pattern);
+      if (match?.[1] && match[1].length > 20 && match[1].length < 500) {
+        result.mission = match[1].trim();
+        break;
+      }
+    }
+
+    // Look for programs/services in list items near keywords
+    const programSection = textContent.match(
+      /(?:programs?|services?|what\s+we\s+do|our\s+work)[:\s]+([\s\S]{50,800}?)(?:learn\s+more|read\s+more|contact|donate|©)/i
+    );
+    if (programSection?.[1]) {
+      // Try to split into individual programs
+      const lines = programSection[1]
+        .split(/[•\-–—|]|\d+\.\s/)
+        .map((s: string) => s.trim())
+        .filter((s: string) => s.length > 5 && s.length < 100);
+      if (lines.length >= 2) {
+        result.programs = lines.slice(0, 10);
+      }
+    }
+
+    // Look for target population
+    const popPatterns = [
+      /(?:we\s+serve|serving|helping|supporting)\s+([^.]{10,100})/i,
+      /(?:target\s+population|who\s+we\s+serve)[:\s]+([^.]+\.)/i,
+    ];
+    for (const pattern of popPatterns) {
+      const match = textContent.match(pattern);
+      if (match?.[1] && match[1].length > 10) {
+        result.targetPopulation = match[1].trim();
+        break;
+      }
+    }
+  } catch (e) {
+    console.error("Website scrape failed:", e);
+  }
+
+  return result;
+}
+
+// ── Missing fields check ────────────────────────────────────────────
+// Only fields that we truly can't find online and need the charity to provide
 function findMissingFields(charity: MappedCharity): string[] {
   const missing: string[] = [];
-  if (!charity.mission_statement) missing.push("mission_statement");
-  if (!charity.website) missing.push("website");
-  if (!charity.primary_category || charity.primary_category === "community-development") {
-    missing.push("primary_category");
-  }
   if (charity.program_expense_percentage == null) missing.push("program_expense_percentage");
-  if (charity.year_founded == null) missing.push("year_founded");
+  if (charity.admin_expense_percentage == null) missing.push("admin_expense_percentage");
+  if (charity.fundraising_expense_percentage == null) missing.push("fundraising_expense_percentage");
   if (charity.people_served_annually == null) missing.push("people_served_annually");
   if (!charity.programs_list) missing.push("programs_list");
   if (!charity.target_population) missing.push("target_population");
-  if (!charity.full_description) missing.push("full_description");
+  if (!charity.annual_report_url) missing.push("annual_report_url");
   return missing;
 }
 
@@ -447,8 +557,40 @@ Deno.serve(async (req: Request) => {
     if (request.charity_website) {
       mappedCharity.website = request.charity_website;
     }
-    if (request.charity_name && mappedCharity.name === "Unknown Organization") {
+    // Prefer the user-submitted name (the common/public name) over
+    // ProPublica's legal corporate name (e.g. "charity: water" vs "Charity Global Inc")
+    if (request.charity_name) {
+      const oldName = mappedCharity.name;
       mappedCharity.name = request.charity_name;
+      // Also fix the full_description if it references the legal name
+      if (mappedCharity.full_description && oldName !== request.charity_name) {
+        mappedCharity.full_description = mappedCharity.full_description.replace(oldName, request.charity_name);
+      }
+    }
+
+    // ── 5b. Scrape the charity website for missing data ───────────
+    if (mappedCharity.website) {
+      const scraped = await scrapeWebsite(mappedCharity.website);
+      if (scraped.mission && !mappedCharity.mission_statement) {
+        mappedCharity.mission_statement = scraped.mission;
+      }
+      if (scraped.description) {
+        if (!mappedCharity.mission_statement) {
+          mappedCharity.mission_statement = scraped.description;
+        }
+        if (!mappedCharity.full_description) {
+          mappedCharity.full_description = scraped.description;
+        } else if (scraped.description.length > 50) {
+          // Prepend website description to the ProPublica-generated one
+          mappedCharity.full_description = scraped.description + " " + mappedCharity.full_description;
+        }
+      }
+      if (scraped.programs && !mappedCharity.programs_list) {
+        mappedCharity.programs_list = scraped.programs;
+      }
+      if (scraped.targetPopulation && !mappedCharity.target_population) {
+        mappedCharity.target_population = scraped.targetPopulation;
+      }
     }
 
     // Check if there's submitted info-request data to merge
@@ -502,18 +644,11 @@ Deno.serve(async (req: Request) => {
       verificationStatus === "verified" || verificationStatus === "probable";
 
     const missingFields = findMissingFields(mappedCharity);
-    const contactEmail = request.charity_contact_email ?? null;
-    // Consider profile "complete enough" if 3 or fewer fields are missing
-    const isProfileComplete = missingFields.length <= 3;
 
     let decision: string;
 
-    if (scores.overall < 2.0 || verificationStatus === "unverified") {
-      // ── Flag for review — low score or unverified ───────────────
-      const reasons: string[] = [];
-      if (scores.overall < 2.0) reasons.push(`low score (${scores.overall})`);
-      if (verificationStatus === "unverified") reasons.push("unverified organization");
-
+    if (verificationStatus === "unverified") {
+      // ── Flag for review — unverified organization ───────────────
       await supabase
         .from("charity_requests")
         .update({
@@ -521,39 +656,12 @@ Deno.serve(async (req: Request) => {
           computed_scores: scores,
           verification_status: verificationStatus,
           propublica_data: propublicaData,
-          admin_notes: `Flagged for manual review: ${reasons.join(", ")}`,
+          admin_notes: "Flagged for manual review: unverified organization",
         })
         .eq("id", charity_request_id);
 
       decision = "needs_review";
-    } else if (missingFields.length > 3 && contactEmail) {
-      // ── Request info — too many missing fields, ask the charity ──
-      try {
-        await supabase.functions.invoke("send-info-request", {
-          body: {
-            charity_request_id,
-            contact_email: contactEmail,
-            charity_name: mappedCharity.name,
-            missing_fields: missingFields,
-          },
-        });
-      } catch (e) {
-        console.error("Failed to invoke send-info-request:", e);
-      }
-
-      await supabase
-        .from("charity_requests")
-        .update({
-          status: "needs_info",
-          computed_scores: scores,
-          verification_status: verificationStatus,
-          propublica_data: propublicaData,
-          admin_notes: `Requested additional info for: ${missingFields.join(", ")}`,
-        })
-        .eq("id", charity_request_id);
-
-      decision = "needs_info";
-    } else if (isVerifiedOrProbable && scores.overall >= 2.0 && hasNameAndCategory) {
+    } else if (isVerifiedOrProbable && hasNameAndCategory) {
       // ── Auto-approve: profile is complete enough ────────────────
       const { data: inserted, error: insertError } = await supabase
         .from("charities")
