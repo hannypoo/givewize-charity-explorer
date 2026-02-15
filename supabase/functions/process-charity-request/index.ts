@@ -65,10 +65,11 @@ function computeGivewizeScores(charity: CharityLike): ComputedScores {
 
   // Transparency (0-5) -- always computable from checklist
   let tp = 0;
+  const einStr = charity.ein ? String(charity.ein) : "";
   const validEin =
-    charity.ein &&
-    !charity.ein.includes("verify") &&
-    !charity.ein.includes("contact");
+    einStr.length > 0 &&
+    !einStr.includes("verify") &&
+    !einStr.includes("contact");
   if (validEin) tp += 1.0;
   if (charity.complete_990_filed) tp += 1.0;
   if (charity.financials_published) tp += 1.0;
@@ -241,7 +242,7 @@ function mapPropublicaToCharity(data: PropublicaOrg): MappedCharity {
 
   return {
     name,
-    ein: org.ein ?? null,
+    ein: org.ein ? String(org.ein) : null,
     city: org.city ?? null,
     state: org.state ?? null,
     country: "USA",
