@@ -28,9 +28,10 @@ const Auth = () => {
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
   const redirectTo = (location.state as { from?: string })?.from || "/profile";
+  const isRecoveryFromUrl = new URLSearchParams(window.location.search).get("mode") === "recovery";
 
   // Already logged in — redirect away (but not if resetting password)
-  if (!authLoading && user && !isPasswordRecovery) {
+  if (!authLoading && user && !isPasswordRecovery && !isRecoveryFromUrl) {
     navigate(redirectTo, { replace: true });
     return null;
   }
@@ -90,7 +91,7 @@ const Auth = () => {
 
         <div className="container relative flex flex-col items-center justify-center py-20 md:py-28">
           <div className="glass-dark rounded-2xl p-8 md:p-10 max-w-sm w-full animate-fade-in-up" style={{ animationDuration: "0.4s" }}>
-            {isPasswordRecovery ? (
+            {(isPasswordRecovery || isRecoveryFromUrl) ? (
               <>
                 <h2 className="text-xl font-bold text-white mb-2">Set New Password</h2>
                 <p className="text-white/50 text-sm mb-6">Enter your new password below.</p>
