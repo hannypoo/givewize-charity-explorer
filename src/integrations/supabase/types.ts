@@ -157,6 +157,7 @@ export type Database = {
           score_longevity: number | null
           score_overall: number | null
           score_transparency: number | null
+          secondary_categories: string[] | null
           state: string | null
           target_population: string | null
           target_population_size: number | null
@@ -196,6 +197,7 @@ export type Database = {
           score_longevity?: number | null
           score_overall?: number | null
           score_transparency?: number | null
+          secondary_categories?: string[] | null
           state?: string | null
           target_population?: string | null
           target_population_size?: number | null
@@ -235,6 +237,7 @@ export type Database = {
           score_longevity?: number | null
           score_overall?: number | null
           score_transparency?: number | null
+          secondary_categories?: string[] | null
           state?: string | null
           target_population?: string | null
           target_population_size?: number | null

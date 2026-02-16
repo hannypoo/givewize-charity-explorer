@@ -93,6 +93,14 @@ export const CharityCard = memo(function CharityCard({ charity }: CharityCardPro
             <span className="inline-block text-xs font-semibold text-accent bg-white/80 rounded-full px-3 py-1">
               {charity.categoryLabel}
             </span>
+            {(charity._row.secondary_categories || []).slice(0, 2).map((cat) => (
+              <span
+                key={cat}
+                className="inline-block text-xs font-medium text-white/70 bg-white/15 rounded-full px-2.5 py-0.5"
+              >
+                {categoryLabels[cat] || cat}
+              </span>
+            ))}
             {badge && (
               <span className={`inline-block text-xs font-semibold rounded-full px-2.5 py-0.5 ${badge.color}`}>
                 {badge.label}

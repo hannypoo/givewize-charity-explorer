@@ -30,9 +30,11 @@ interface DimensionResult {
 
 function scoreCategory(charity: Charity, causes: string[] | undefined): DimensionResult {
   const active = !!causes && causes.length > 0;
-  const score = active
-    ? (causes!.includes(charity.primary_category) ? 1.0 : 0.0)
-    : 0.5;
+  if (!active) return { score: 0.5, active: false, baseWeight: 5 };
+
+  const allCategories = [charity.primary_category, ...(charity.secondary_categories || [])];
+  const matchCount = causes!.filter(c => allCategories.includes(c)).length;
+  const score = matchCount > 0 ? Math.min(1.0, 0.7 + matchCount * 0.15) : 0.0;
   return { score, active, baseWeight: 5 };
 }
 
@@ -130,6 +132,9 @@ function generateWhyMatch(charity: Charity, answers: QuizAnswers): string {
 
   if (answers.causes?.includes(charity.primary_category)) {
     reasons.push(`matches your interest in ${charity.primary_category.replace(/-/g, " ")}`);
+  } else if (answers.causes?.some(c => (charity.secondary_categories || []).includes(c))) {
+    const matched = answers.causes!.filter(c => (charity.secondary_categories || []).includes(c));
+    reasons.push(`also works in ${matched[0].replace(/-/g, " ")}`);
   }
   if (answers.geographic && answers.geographic !== "no-preference" && charity.geographic_scope === answers.geographic) {
     reasons.push(`aligns with your ${charity.geographic_scope} impact preference`);

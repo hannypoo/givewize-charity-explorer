@@ -36,9 +36,11 @@ export function useCharities(filters: CharityFilters = defaultFilters) {
         );
       }
 
-      // Category filter
+      // Category filter — match primary OR any secondary category
       if (filters.selectedCategories.length > 0) {
-        query = query.in("primary_category", filters.selectedCategories);
+        query = query.or(
+          `primary_category.in.(${filters.selectedCategories.join(",")}),secondary_categories.ov.{${filters.selectedCategories.join(",")}}`
+        );
       }
 
       // Geographic scope filter

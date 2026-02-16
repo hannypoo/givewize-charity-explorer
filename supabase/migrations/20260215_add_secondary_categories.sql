@@ -1,0 +1,60 @@
+-- Add secondary_categories column to charities
+ALTER TABLE charities ADD COLUMN IF NOT EXISTS secondary_categories text[] DEFAULT '{}';
+
+-- Fix miscategorized primary categories
+UPDATE charities SET primary_category = 'education' WHERE name = 'Scholarship America' AND primary_category = 'medical-health';
+UPDATE charities SET primary_category = 'education' WHERE name = 'Single Parent Scholarship Fund' AND primary_category = 'medical-health';
+UPDATE charities SET primary_category = 'child-welfare' WHERE name = 'Prevent Child Abuse America' AND primary_category = 'medical-health';
+UPDATE charities SET primary_category = 'child-welfare' WHERE name = 'Zero Abuse Project' AND primary_category = 'medical-health';
+UPDATE charities SET primary_category = 'mental-health' WHERE name = 'Crisis Text Line' AND primary_category = 'medical-health';
+UPDATE charities SET primary_category = 'mental-health' WHERE name = 'National Alliance on Mental Illness (NAMI)' AND primary_category = 'medical-health';
+
+-- Assign secondary categories
+UPDATE charities SET secondary_categories = '{mental-health}' WHERE name = '1in6';
+UPDATE charities SET secondary_categories = '{child-welfare}' WHERE name = 'Alex''s Lemonade Stand Foundation';
+UPDATE charities SET secondary_categories = '{community-development,international-development}' WHERE name = 'All Hands and Hearts';
+UPDATE charities SET secondary_categories = '{medical-health}' WHERE name = 'American Red Cross';
+UPDATE charities SET secondary_categories = '{international-development}' WHERE name = 'Amnesty International USA';
+UPDATE charities SET secondary_categories = '{child-welfare}' WHERE name = 'Ashley House';
+UPDATE charities SET secondary_categories = '{disability-services}' WHERE name = 'Autism Society of America';
+UPDATE charities SET secondary_categories = '{international-development}' WHERE name = 'charity: water';
+UPDATE charities SET secondary_categories = '{faith-based,child-welfare}' WHERE name = 'Compassion International, Inc.';
+UPDATE charities SET secondary_categories = '{child-welfare}' WHERE name = 'Crisis Text Line';
+UPDATE charities SET secondary_categories = '{rare-diseases}' WHERE name = 'CURE Epilepsy';
+UPDATE charities SET secondary_categories = '{medical-health,international-development}' WHERE name = 'Direct Relief';
+UPDATE charities SET secondary_categories = '{international-development,emergency-relief}' WHERE name = 'Doctors Without Borders (MSF)';
+UPDATE charities SET secondary_categories = '{disability-services}' WHERE name = 'Epilepsy Foundation';
+UPDATE charities SET secondary_categories = '{medical-health}' WHERE name = 'Everylife Foundation';
+UPDATE charities SET secondary_categories = '{medical-health}' WHERE name = 'Genetic Alliance';
+UPDATE charities SET secondary_categories = '{medical-health}' WHERE name = 'Global Genes';
+UPDATE charities SET secondary_categories = '{international-development}' WHERE name = 'Human Rights Watch';
+UPDATE charities SET secondary_categories = '{international-development,emergency-relief}' WHERE name = 'International Rescue Committee';
+UPDATE charities SET secondary_categories = '{disability-services,education}' WHERE name = 'Learning Disabilities Association of America';
+UPDATE charities SET secondary_categories = '{child-welfare}' WHERE name = 'Make-A-Wish Foundation of America';
+UPDATE charities SET secondary_categories = '{senior-services}' WHERE name = 'Meals on Wheels America';
+UPDATE charities SET secondary_categories = '{medical-health}' WHERE name = 'National Alliance on Mental Illness (NAMI)';
+UPDATE charities SET secondary_categories = '{human-rights,mental-health}' WHERE name = 'National Domestic Violence Hotline';
+UPDATE charities SET secondary_categories = '{medical-health}' WHERE name = 'National Organization for Rare Disorders (NORD)';
+UPDATE charities SET secondary_categories = '{senior-services}' WHERE name = 'National Osteoporosis Foundation';
+UPDATE charities SET secondary_categories = '{medical-health,disability-services}' WHERE name = 'Nicolaides-Baraitser Syndrome Support & Research';
+UPDATE charities SET secondary_categories = '{child-welfare}' WHERE name = 'No Kid Hungry';
+UPDATE charities SET secondary_categories = '{rare-diseases,disability-services}' WHERE name = 'Osteogenesis Imperfecta Foundation';
+UPDATE charities SET secondary_categories = '{rare-diseases}' WHERE name = 'Paget Foundation';
+UPDATE charities SET secondary_categories = '{international-development}' WHERE name = 'Partners In Health';
+UPDATE charities SET secondary_categories = '{international-development}' WHERE name = 'Pencils of Promise';
+UPDATE charities SET secondary_categories = '{mental-health}' WHERE name = 'Prevent Child Abuse America';
+UPDATE charities SET secondary_categories = '{human-rights,mental-health}' WHERE name = 'RAINN (Rape, Abuse & Incest National Network)';
+UPDATE charities SET secondary_categories = '{medical-health}' WHERE name = 'Rare Disease Foundation';
+UPDATE charities SET secondary_categories = '{international-development,medical-health}' WHERE name = 'Rare Diseases International (RDI)';
+UPDATE charities SET secondary_categories = '{international-development}' WHERE name = 'Room to Read';
+UPDATE charities SET secondary_categories = '{community-development}' WHERE name = 'Scholarship America';
+UPDATE charities SET secondary_categories = '{child-welfare}' WHERE name = 'Seattle Children''s Hospital';
+UPDATE charities SET secondary_categories = '{community-development}' WHERE name = 'Single Parent Scholarship Fund';
+UPDATE charities SET secondary_categories = '{child-welfare}' WHERE name = 'St. Jude Children''s Research Hospital';
+UPDATE charities SET secondary_categories = '{veterans}' WHERE name = 'Team Rubicon';
+UPDATE charities SET secondary_categories = '{disability-services}' WHERE name = 'The Arc of the United States';
+UPDATE charities SET secondary_categories = '{medical-health,disability-services}' WHERE name = 'The Ehlers-Danlos Society';
+UPDATE charities SET secondary_categories = '{mental-health,human-rights}' WHERE name = 'The Trevor Project';
+UPDATE charities SET secondary_categories = '{emergency-relief,international-development}' WHERE name = 'World Central Kitchen';
+UPDATE charities SET secondary_categories = '{environment-climate}' WHERE name = 'World Wildlife Fund';
+UPDATE charities SET secondary_categories = '{human-rights}' WHERE name = 'Zero Abuse Project';

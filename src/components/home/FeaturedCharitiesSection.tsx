@@ -48,12 +48,15 @@ export function FeaturedCharitiesSection() {
   const charities = useMemo(() => {
     if (allCharities.length === 0) return [];
 
-    // Group by category, pick the best from each
+    // Group by category (primary + secondary), pick the best from each
     const bestByCategory = new Map<string, CharityRow>();
     for (const c of allCharities) {
-      const existing = bestByCategory.get(c.primary_category);
-      if (!existing || (getCombinedRating(c) ?? 0) > (getCombinedRating(existing) ?? 0)) {
-        bestByCategory.set(c.primary_category, c);
+      const cats = [c.primary_category, ...(c.secondary_categories || [])];
+      for (const cat of cats) {
+        const existing = bestByCategory.get(cat);
+        if (!existing || (getCombinedRating(c) ?? 0) > (getCombinedRating(existing) ?? 0)) {
+          bestByCategory.set(cat, c);
+        }
       }
     }
 
@@ -63,9 +66,14 @@ export function FeaturedCharitiesSection() {
     const offset = (dayOfYear * 4) % categories.length;
 
     const picks: CharityRow[] = [];
-    for (let i = 0; i < 4 && i < categories.length; i++) {
+    const seen = new Set<string>();
+    for (let i = 0; picks.length < 4 && i < categories.length; i++) {
       const cat = categories[(offset + i) % categories.length];
-      picks.push(bestByCategory.get(cat)!);
+      const charity = bestByCategory.get(cat)!;
+      if (!seen.has(charity.id)) {
+        seen.add(charity.id);
+        picks.push(charity);
+      }
     }
 
     // Sort the 4 picks by combined rating descending
