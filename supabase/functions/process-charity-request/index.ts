@@ -989,7 +989,15 @@ Deno.serve(async (req: Request) => {
     }
 
     // ── 6. Score ────────────────────────────────────────────────────
-    const scores = computeGivewizeScores(mappedCharity);
+    // Don't let scraped program headings alone generate an impact score —
+    // only count programs_list for impact if people_served_annually is also set
+    const scoringInput: CharityLike = {
+      ...mappedCharity,
+      programs_list: mappedCharity.people_served_annually != null
+        ? mappedCharity.programs_list
+        : null,
+    };
+    const scores = computeGivewizeScores(scoringInput);
 
     // ── 7. Decide ───────────────────────────────────────────────────
     const hasNameAndCategory =
