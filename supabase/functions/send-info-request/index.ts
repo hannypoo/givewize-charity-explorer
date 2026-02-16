@@ -192,7 +192,7 @@ Deno.serve(async (req: Request) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "GiveWiZe <onboarding@givewize.com>",
+        from: "GiveWiZe <noreply@givewize.org>",
         to: contact_email,
         subject: `Complete your ${charity_name} profile on GiveWiZe`,
         html,
