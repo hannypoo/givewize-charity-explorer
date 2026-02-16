@@ -81,12 +81,9 @@ export function computeGivewizeScores(charity: Charity): ComputedScores {
     // Programs list bonus
     if (charity.programs_list?.length >= 8) imp = Math.min(5, imp + 0.5);
     else if (charity.programs_list?.length >= 4) imp = Math.min(5, imp + 0.25);
-  } else if (charity.programs_list && charity.programs_list.length > 0) {
-    // No people-served data but has documented programs — give partial credit
-    if (charity.programs_list.length >= 8) imp = 4.0;
-    else if (charity.programs_list.length >= 4) imp = 3.5;
-    else imp = 3.0;
   }
+  // Note: programs_list alone (without people_served data) does not generate
+  // an impact score — scraped program names aren't sufficient impact evidence.
 
   // Overall: weighted average of available components only
   // Weights: Financial Efficiency 35%, Transparency 30%, Impact 25%, Longevity 10%
