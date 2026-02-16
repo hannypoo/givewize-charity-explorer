@@ -35,6 +35,8 @@ const ZS_LIST_IDS = [
   "efe593bf-28dd-42b0-a08f-cc20df79f96c", // CURE Epilepsy
   "a4ff3f2d-6367-4ebc-a4a6-fb967ed4dc47", // Osteogenesis Imperfecta Foundation
   "9a171061-36ea-4d16-b55a-9546fc83004a", // DonorsChoose
+  "df1d8d70-2571-481c-9fc0-411514de1e98", // Make-A-Wish Foundation of America
+  "114107bf-a06f-487e-bb28-4e9a8fafa3c9", // Ashley House
 ];
 
 const categoryLabelMap = new Map(
