@@ -526,18 +526,40 @@ async function scrapeCharityNavigator(ein: string): Promise<CNData | null> {
       } catch { /* JSON parse failed, fall through to regex */ }
     }
 
-    // Fallback: regex extraction from rendered HTML
+    // Fallback: extract raw dollar amounts from embedded JSON and compute percentages
+    // CN embeds data like: "totalProgramExpense":18434435,"totalFundraisingExpense":991654,"totalAdministrativeExpense":2361818
+    // These are escaped JSON strings in the HTML (\" not ")
+    if (result.programExpPct == null || result.adminExpPct == null || result.fundraisingExpPct == null) {
+      const totalExpMatch = html.match(/totalExpense\\?":\s*(\d+)/);
+      const progExpMatch = html.match(/totalProgramExpense\\?":\s*(\d+)/);
+      const adminExpMatch = html.match(/totalAdministrativeExpense\\?":\s*(\d+)/);
+      const fundExpMatch = html.match(/totalFundraisingExpense\\?":\s*(\d+)/);
+
+      const totalExp = totalExpMatch ? parseInt(totalExpMatch[1], 10) : 0;
+      if (totalExp > 0) {
+        if (result.programExpPct == null && progExpMatch) {
+          result.programExpPct = (parseInt(progExpMatch[1], 10) / totalExp) * 100;
+        }
+        if (result.adminExpPct == null && adminExpMatch) {
+          result.adminExpPct = (parseInt(adminExpMatch[1], 10) / totalExp) * 100;
+        }
+        if (result.fundraisingExpPct == null && fundExpMatch) {
+          result.fundraisingExpPct = (parseInt(fundExpMatch[1], 10) / totalExp) * 100;
+        }
+      }
+    }
+
+    // Fallback: regex for rendered percentage text (e.g. "Program Expense Ratio: 81.28%")
     if (result.programExpPct == null) {
-      // "Program Expenses" or "Program" followed by a percentage
-      const progMatch = html.match(/program\s*(?:expenses?)?[^%]*?([\d.]+)\s*%/i);
+      const progMatch = html.match(/program\s*(?:expenses?|expense\s*ratio)?[:\s]*?([\d.]+)\s*%/i);
       if (progMatch?.[1]) result.programExpPct = parseFloat(progMatch[1]);
     }
     if (result.adminExpPct == null) {
-      const adminMatch = html.match(/admin(?:istrative)?\s*(?:expenses?)?[^%]*?([\d.]+)\s*%/i);
+      const adminMatch = html.match(/admin(?:istrative)?\s*(?:expenses?|expense\s*ratio)?[:\s]*?([\d.]+)\s*%/i);
       if (adminMatch?.[1]) result.adminExpPct = parseFloat(adminMatch[1]);
     }
     if (result.fundraisingExpPct == null) {
-      const fundMatch = html.match(/fundraising\s*(?:expenses?)?[^%]*?([\d.]+)\s*%/i);
+      const fundMatch = html.match(/fundraising\s*(?:expenses?|expense\s*ratio)?[:\s]*?([\d.]+)\s*%/i);
       if (fundMatch?.[1]) result.fundraisingExpPct = parseFloat(fundMatch[1]);
     }
 
