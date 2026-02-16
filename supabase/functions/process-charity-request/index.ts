@@ -351,10 +351,12 @@ const ENRICHMENT_SYSTEM_PROMPT = `You are a charity data extraction specialist. 
 - logoUrl: string | null (og:image or primary logo URL)
 - annualReportUrl: string | null (link to annual report PDF/page)
 - hasDonateButton: boolean (whether the site has a donate link/button)
+- contactEmail: string | null (general contact email like info@, contact@, hello@ — NOT personal emails)
 
 Rules:
 - For programs, extract ONLY actual program/service names, not navigation items, taglines, or generic headings
 - Mission should be their stated mission, not marketing copy
+- For contactEmail, prefer general organizational emails (info@, contact@, hello@, support@). Do NOT extract personal emails or specific staff emails.
 - Return null for any field you cannot confidently determine
 - Do NOT fabricate or infer data that isn't explicitly present`;
 
@@ -413,6 +415,7 @@ async function enrichWithClaude(
     if (data.logoUrl) { result.logoUrl = data.logoUrl; metrics.fields_extracted.push("logoUrl"); }
     if (data.annualReportUrl) { result.annualReportUrl = data.annualReportUrl; metrics.fields_extracted.push("annualReportUrl"); }
     if (typeof data.hasDonateButton === "boolean") { result.hasDonateButton = data.hasDonateButton; metrics.fields_extracted.push("hasDonateButton"); }
+    if (data.contactEmail && typeof data.contactEmail === "string") { result.contactEmail = data.contactEmail; metrics.fields_extracted.push("contactEmail"); }
 
     return { result, metrics };
   } catch (e) {
@@ -534,6 +537,7 @@ interface WebsiteScrapResult {
   logoUrl?: string;
   annualReportUrl?: string;
   hasDonateButton?: boolean;
+  contactEmail?: string;
 }
 
 function extractTextContent(html: string): string {
@@ -752,7 +756,7 @@ async function scrapeWebsite(
     const baseUrl = url.replace(/\/+$/, "");
 
     // Fetch homepage + common subpages in parallel
-    const pagePaths = ["", "/about", "/programs", "/what-we-do", "/services", "/our-work"];
+    const pagePaths = ["", "/about", "/contact", "/programs", "/what-we-do", "/services", "/our-work"];
     const pageResults = await Promise.all(
       pagePaths.map((path) => fetchPage(`${baseUrl}${path}`)),
     );
@@ -1598,7 +1602,8 @@ Deno.serve(async (req: Request) => {
 
         // ── 9. Email charity about remaining missing fields ──────────
         let emailSent = false;
-        if (missingFields.length > 0 && request.charity_contact_email) {
+        const charityEmail = request.charity_contact_email || websiteScraped.contactEmail || null;
+        if (missingFields.length > 0 && charityEmail) {
           try {
             const emailRes = await fetch(
               `${supabaseUrl}/functions/v1/send-info-request`,
@@ -1610,7 +1615,7 @@ Deno.serve(async (req: Request) => {
                 },
                 body: JSON.stringify({
                   charity_request_id,
-                  contact_email: request.charity_contact_email,
+                  contact_email: charityEmail,
                   missing_fields: missingFields,
                   charity_name: mappedCharity.name,
                   mission_statement: mappedCharity.mission_statement,
@@ -1634,7 +1639,7 @@ Deno.serve(async (req: Request) => {
                     .eq("id", charity_request_id);
                 }
               } catch { /* response already consumed or parse error — non-critical */ }
-              console.log(`Info request email sent to ${request.charity_contact_email}`);
+              console.log(`Info request email sent to ${charityEmail}`);
             } else {
               const errData = await emailRes.json();
               console.error("send-info-request failed:", errData);
@@ -1658,8 +1663,8 @@ Deno.serve(async (req: Request) => {
         decision = "auto_approved";
         const notes = [`Auto-approved. Charity ID: ${charityId}. Score: ${scores.overall}`];
         if (reviewNotes) notes.push(reviewNotes);
-        if (emailSent) notes.push(`Info request emailed to ${request.charity_contact_email} for: ${missingFields.join(", ")}`);
-        else if (missingFields.length > 0 && !request.charity_contact_email) notes.push(`Missing data (${missingFields.join(", ")}) but no contact email`);
+        if (emailSent) notes.push(`Info request emailed to ${charityEmail}${!request.charity_contact_email ? " (scraped from website)" : ""} for: ${missingFields.join(", ")}`);
+        else if (missingFields.length > 0 && !charityEmail) notes.push(`Missing data (${missingFields.join(", ")}) but no contact email`);
         if (requesterNotified) notes.push(`Requester notified at ${request.requester_email}`);
 
         await supabase
