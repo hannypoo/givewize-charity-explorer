@@ -85,8 +85,9 @@ async function personalizeEmailWithClaude(
   if (!raw) return { html: null, metrics };
 
   metrics.used_claude = true;
-  // Strip any markdown fences
-  const cleaned = raw.replace(/^```(?:html)?\s*\n?/i, "").replace(/\n?```\s*$/i, "");
+  // Strip markdown fences if present (try multiple strategies)
+  const fenceMatch = raw.match(/```(?:html)?\s*\n?([\s\S]*?)\n?```/i);
+  const cleaned = fenceMatch?.[1]?.trim() ?? raw.trim();
   return { html: cleaned, metrics };
 }
 

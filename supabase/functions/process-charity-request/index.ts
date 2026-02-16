@@ -320,6 +320,27 @@ function truncateForLlm(text: string, maxChars = 40000): string {
   return text.slice(0, maxChars) + "\n...[truncated]";
 }
 
+/** Extract a JSON object from a Claude response that may contain markdown fences or preamble text. */
+function extractJsonFromResponse(raw: string): unknown | null {
+  // Strategy 1: Try parsing the raw string directly
+  try { return JSON.parse(raw); } catch { /* continue */ }
+
+  // Strategy 2: Strip markdown code fences (```json ... ```)
+  const fenceMatch = raw.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/i);
+  if (fenceMatch?.[1]) {
+    try { return JSON.parse(fenceMatch[1].trim()); } catch { /* continue */ }
+  }
+
+  // Strategy 3: Find the first { ... } block in the response
+  const braceStart = raw.indexOf("{");
+  const braceEnd = raw.lastIndexOf("}");
+  if (braceStart !== -1 && braceEnd > braceStart) {
+    try { return JSON.parse(raw.slice(braceStart, braceEnd + 1)); } catch { /* continue */ }
+  }
+
+  return null;
+}
+
 // ── Agent 1: Profile Enrichment Agent ────────────────────────────────
 
 const ENRICHMENT_SYSTEM_PROMPT = `You are a charity data extraction specialist. Given raw HTML from a nonprofit's website pages, extract structured data. Return ONLY valid JSON with these fields:
@@ -372,22 +393,26 @@ async function enrichWithClaude(
   }
 
   try {
-    // Strip markdown code fences if present
-    const cleaned = raw.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "");
-    const parsed = JSON.parse(cleaned);
+    const parsed = extractJsonFromResponse(raw);
+    if (!parsed || typeof parsed !== "object") {
+      console.error("Agent 1: Could not extract JSON from response:", raw.slice(0, 200));
+      return { result: {}, metrics };
+    }
     metrics.used_claude = true;
+    // deno-lint-ignore no-explicit-any
+    const data = parsed as any;
 
     const result: WebsiteScrapResult = {};
-    if (parsed.mission) { result.mission = parsed.mission; metrics.fields_extracted.push("mission"); }
-    if (parsed.description) { result.description = parsed.description; metrics.fields_extracted.push("description"); }
-    if (parsed.programs && Array.isArray(parsed.programs) && parsed.programs.length > 0) {
-      result.programs = parsed.programs.slice(0, 12);
+    if (data.mission) { result.mission = data.mission; metrics.fields_extracted.push("mission"); }
+    if (data.description) { result.description = data.description; metrics.fields_extracted.push("description"); }
+    if (data.programs && Array.isArray(data.programs) && data.programs.length > 0) {
+      result.programs = data.programs.slice(0, 12);
       metrics.fields_extracted.push("programs");
     }
-    if (parsed.targetPopulation) { result.targetPopulation = parsed.targetPopulation; metrics.fields_extracted.push("targetPopulation"); }
-    if (parsed.logoUrl) { result.logoUrl = parsed.logoUrl; metrics.fields_extracted.push("logoUrl"); }
-    if (parsed.annualReportUrl) { result.annualReportUrl = parsed.annualReportUrl; metrics.fields_extracted.push("annualReportUrl"); }
-    if (typeof parsed.hasDonateButton === "boolean") { result.hasDonateButton = parsed.hasDonateButton; metrics.fields_extracted.push("hasDonateButton"); }
+    if (data.targetPopulation) { result.targetPopulation = data.targetPopulation; metrics.fields_extracted.push("targetPopulation"); }
+    if (data.logoUrl) { result.logoUrl = data.logoUrl; metrics.fields_extracted.push("logoUrl"); }
+    if (data.annualReportUrl) { result.annualReportUrl = data.annualReportUrl; metrics.fields_extracted.push("annualReportUrl"); }
+    if (typeof data.hasDonateButton === "boolean") { result.hasDonateButton = data.hasDonateButton; metrics.fields_extracted.push("hasDonateButton"); }
 
     return { result, metrics };
   } catch (e) {
@@ -476,28 +501,27 @@ async function reviewProfileWithClaude(
 
   if (!raw) return { review: null, metrics };
 
-  try {
-    const cleaned = raw.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "");
-    const parsed = JSON.parse(cleaned);
-
-    const review: ReviewResult = {
-      overall_quality: parsed.overall_quality ?? "needs_review",
-      confidence_score: typeof parsed.confidence_score === "number" ? parsed.confidence_score : 50,
-      red_flags: Array.isArray(parsed.red_flags) ? parsed.red_flags : [],
-      suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions : [],
-      category_correct: parsed.category_correct !== false,
-      suggested_category: parsed.suggested_category ?? null,
-    };
-
-    metrics.overall_quality = review.overall_quality;
-    metrics.confidence_score = review.confidence_score;
-    metrics.red_flags = review.red_flags;
-
-    return { review, metrics };
-  } catch (e) {
-    console.error("Failed to parse Claude review response:", e);
+  // deno-lint-ignore no-explicit-any
+  const parsed = extractJsonFromResponse(raw) as any;
+  if (!parsed || typeof parsed !== "object") {
+    console.error("Agent 2: Could not extract JSON from response:", raw.slice(0, 500));
     return { review: null, metrics };
   }
+
+  const review: ReviewResult = {
+    overall_quality: parsed.overall_quality ?? "needs_review",
+    confidence_score: typeof parsed.confidence_score === "number" ? parsed.confidence_score : 50,
+    red_flags: Array.isArray(parsed.red_flags) ? parsed.red_flags : [],
+    suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions : [],
+    category_correct: parsed.category_correct !== false,
+    suggested_category: parsed.suggested_category ?? null,
+  };
+
+  metrics.overall_quality = review.overall_quality;
+  metrics.confidence_score = review.confidence_score;
+  metrics.red_flags = review.red_flags;
+
+  return { review, metrics };
 }
 
 // ── Website scraping ────────────────────────────────────────────────
