@@ -275,12 +275,16 @@ const Charities = () => {
                 decision.
               </p>
             </div>
-            <p className="mt-3 text-sm text-white/50">
-              Don't see a charity you're looking for?{" "}
-              <Link to="/request-charity" className="text-orange-light hover:underline font-medium">
-                Request one →
+            <div className="mt-4 flex items-center gap-3">
+              <Link
+                to="/request-charity"
+                className="inline-flex items-center gap-2 bg-white/10 border border-white/20 hover:bg-white/20 text-white text-sm font-medium px-4 py-2 rounded-xl transition-all duration-300"
+              >
+                <Building2 className="h-4 w-4 text-orange-light" />
+                Request a Charity
               </Link>
-            </p>
+              <span className="text-sm text-white/40">Don't see one you're looking for?</span>
+            </div>
           </div>
         </div>
         <div className="container py-8">
