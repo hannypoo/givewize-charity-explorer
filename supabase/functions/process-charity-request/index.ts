@@ -1096,7 +1096,43 @@ Deno.serve(async (req: Request) => {
             .eq("id", charityId);
         }
 
+        // ── 9. Email charity about remaining missing fields ──────────
+        let emailSent = false;
+        if (missingFields.length > 0 && request.charity_contact_email) {
+          try {
+            const emailRes = await fetch(
+              `${supabaseUrl}/functions/v1/send-info-request`,
+              {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${supabaseServiceKey}`,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  charity_request_id,
+                  contact_email: request.charity_contact_email,
+                  missing_fields: missingFields,
+                  charity_name: mappedCharity.name,
+                }),
+              },
+            );
+            if (emailRes.ok) {
+              emailSent = true;
+              console.log(`Info request email sent to ${request.charity_contact_email}`);
+            } else {
+              const errData = await emailRes.json();
+              console.error("send-info-request failed:", errData);
+            }
+          } catch (e) {
+            console.error("Failed to invoke send-info-request:", e);
+          }
+        }
+
         decision = "auto_approved";
+        const notes = [`Auto-approved. Charity ID: ${charityId}. Score: ${scores.overall}`];
+        if (emailSent) notes.push(`Info request emailed to ${request.charity_contact_email} for: ${missingFields.join(", ")}`);
+        else if (missingFields.length > 0 && !request.charity_contact_email) notes.push(`Missing data (${missingFields.join(", ")}) but no contact email`);
+
         await supabase
           .from("charity_requests")
           .update({
@@ -1106,7 +1142,7 @@ Deno.serve(async (req: Request) => {
             computed_scores: scores,
             verification_status: verificationStatus,
             propublica_data: propublicaData,
-            admin_notes: `Auto-approved. Charity ID: ${charityId}. Score: ${scores.overall}`,
+            admin_notes: notes.join(". "),
           })
           .eq("id", charity_request_id);
 
@@ -1116,6 +1152,7 @@ Deno.serve(async (req: Request) => {
             charity_name: mappedCharity.name,
             score: scores.overall,
             charity_id: charityId,
+            email_sent: emailSent,
           }),
           { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
