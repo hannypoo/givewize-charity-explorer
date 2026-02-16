@@ -275,6 +275,231 @@ function mapPropublicaToCharity(data: PropublicaOrg): MappedCharity {
   };
 }
 
+// ── Claude API helper ────────────────────────────────────────────────
+
+async function callClaude(
+  systemPrompt: string,
+  userMessage: string,
+  maxTokens = 1024,
+): Promise<string | null> {
+  const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
+  if (!apiKey) {
+    console.error("ANTHROPIC_API_KEY not set");
+    return null;
+  }
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-5-20250929",
+        max_tokens: maxTokens,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userMessage }],
+      }),
+      signal: AbortSignal.timeout(30000),
+    });
+    if (!res.ok) {
+      console.error("Claude API error:", res.status, await res.text());
+      return null;
+    }
+    const data = await res.json();
+    return data.content?.[0]?.text ?? null;
+  } catch (e) {
+    console.error("Claude API call failed:", e);
+    return null;
+  }
+}
+
+function truncateForLlm(text: string, maxChars = 40000): string {
+  if (text.length <= maxChars) return text;
+  return text.slice(0, maxChars) + "\n...[truncated]";
+}
+
+// ── Agent 1: Profile Enrichment Agent ────────────────────────────────
+
+const ENRICHMENT_SYSTEM_PROMPT = `You are a charity data extraction specialist. Given raw HTML from a nonprofit's website pages, extract structured data. Return ONLY valid JSON with these fields:
+- mission: string | null (the organization's mission statement, 1-3 sentences)
+- description: string | null (a brief description of what they do)
+- programs: string[] | null (list of distinct program/service names, max 12)
+- targetPopulation: string | null (who they serve)
+- logoUrl: string | null (og:image or primary logo URL)
+- annualReportUrl: string | null (link to annual report PDF/page)
+- hasDonateButton: boolean (whether the site has a donate link/button)
+
+Rules:
+- For programs, extract ONLY actual program/service names, not navigation items, taglines, or generic headings
+- Mission should be their stated mission, not marketing copy
+- Return null for any field you cannot confidently determine
+- Do NOT fabricate or infer data that isn't explicitly present`;
+
+interface EnrichmentMetrics {
+  used_claude: boolean;
+  fields_extracted: string[];
+  fallback_used: boolean;
+  duration_ms: number;
+}
+
+async function enrichWithClaude(
+  pages: { url: string; html: string }[],
+): Promise<{ result: WebsiteScrapResult; metrics: EnrichmentMetrics }> {
+  const metrics: EnrichmentMetrics = {
+    used_claude: false,
+    fields_extracted: [],
+    fallback_used: false,
+    duration_ms: 0,
+  };
+
+  const start = Date.now();
+  const combinedHtml = pages
+    .map((p) => `--- PAGE: ${p.url} ---\n${p.html}`)
+    .join("\n\n");
+  const truncated = truncateForLlm(combinedHtml);
+
+  const raw = await callClaude(
+    ENRICHMENT_SYSTEM_PROMPT,
+    `Extract structured charity data from these website pages:\n\n${truncated}`,
+    1024,
+  );
+  metrics.duration_ms = Date.now() - start;
+
+  if (!raw) {
+    return { result: {}, metrics };
+  }
+
+  try {
+    // Strip markdown code fences if present
+    const cleaned = raw.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "");
+    const parsed = JSON.parse(cleaned);
+    metrics.used_claude = true;
+
+    const result: WebsiteScrapResult = {};
+    if (parsed.mission) { result.mission = parsed.mission; metrics.fields_extracted.push("mission"); }
+    if (parsed.description) { result.description = parsed.description; metrics.fields_extracted.push("description"); }
+    if (parsed.programs && Array.isArray(parsed.programs) && parsed.programs.length > 0) {
+      result.programs = parsed.programs.slice(0, 12);
+      metrics.fields_extracted.push("programs");
+    }
+    if (parsed.targetPopulation) { result.targetPopulation = parsed.targetPopulation; metrics.fields_extracted.push("targetPopulation"); }
+    if (parsed.logoUrl) { result.logoUrl = parsed.logoUrl; metrics.fields_extracted.push("logoUrl"); }
+    if (parsed.annualReportUrl) { result.annualReportUrl = parsed.annualReportUrl; metrics.fields_extracted.push("annualReportUrl"); }
+    if (typeof parsed.hasDonateButton === "boolean") { result.hasDonateButton = parsed.hasDonateButton; metrics.fields_extracted.push("hasDonateButton"); }
+
+    return { result, metrics };
+  } catch (e) {
+    console.error("Failed to parse Claude enrichment response:", e);
+    return { result: {}, metrics };
+  }
+}
+
+// ── Agent 2: Quality Review Agent ─────────────────────────────────
+
+const REVIEW_SYSTEM_PROMPT = `You are a nonprofit profile quality reviewer for GiveWiZe, a charity discovery platform. Review this charity profile and assess its quality and accuracy.
+
+Return ONLY valid JSON with:
+- overall_quality: "excellent" | "good" | "needs_review" | "poor"
+- confidence_score: number 0-100 (how confident you are in the profile's accuracy)
+- red_flags: string[] (any concerning issues found)
+- suggestions: string[] (improvements that could be made)
+- category_correct: boolean (is the assigned category appropriate for this org?)
+- suggested_category: string | null (only if category_correct is false, use one of: rare-diseases, medical-health, education, hunger-food-security, animal-welfare, child-welfare, environment-climate, emergency-relief, housing-homelessness, mental-health, veterans, arts-culture, human-rights, disability-services, senior-services, community-development, faith-based, international-development)
+
+Quality criteria:
+- "excellent": Has mission, expense data, programs, and consistent data
+- "good": Has mission and at least one of expense data or programs
+- "needs_review": Missing critical data or data seems inconsistent
+- "poor": Very sparse or data appears inaccurate/suspicious
+
+Red flag examples: expense ratios don't sum near 100%, mission seems auto-generated, name doesn't match described activities, suspiciously high people_served numbers`;
+
+interface ReviewMetrics {
+  overall_quality: string;
+  confidence_score: number;
+  red_flags: string[];
+  category_overridden: boolean;
+  duration_ms: number;
+}
+
+interface ReviewResult {
+  overall_quality: string;
+  confidence_score: number;
+  red_flags: string[];
+  suggestions: string[];
+  category_correct: boolean;
+  suggested_category: string | null;
+}
+
+async function reviewProfileWithClaude(
+  profile: MappedCharity,
+  scores: ComputedScores,
+  verificationStatus: string,
+): Promise<{ review: ReviewResult | null; metrics: ReviewMetrics }> {
+  const metrics: ReviewMetrics = {
+    overall_quality: "unknown",
+    confidence_score: 0,
+    red_flags: [],
+    category_overridden: false,
+    duration_ms: 0,
+  };
+
+  const start = Date.now();
+
+  const profileSummary = JSON.stringify({
+    name: profile.name,
+    ein: profile.ein,
+    category: profile.primary_category,
+    mission: profile.mission_statement,
+    description: profile.full_description,
+    programs: profile.programs_list,
+    target_population: profile.target_population,
+    website: profile.website,
+    year_founded: profile.year_founded,
+    geographic_scope: profile.geographic_scope,
+    program_expense_pct: profile.program_expense_percentage,
+    admin_expense_pct: profile.admin_expense_percentage,
+    fundraising_expense_pct: profile.fundraising_expense_percentage,
+    people_served_annually: profile.people_served_annually,
+    scores,
+    verification_status: verificationStatus,
+  }, null, 2);
+
+  const raw = await callClaude(
+    REVIEW_SYSTEM_PROMPT,
+    `Review this charity profile:\n\n${profileSummary}`,
+    1024,
+  );
+  metrics.duration_ms = Date.now() - start;
+
+  if (!raw) return { review: null, metrics };
+
+  try {
+    const cleaned = raw.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "");
+    const parsed = JSON.parse(cleaned);
+
+    const review: ReviewResult = {
+      overall_quality: parsed.overall_quality ?? "needs_review",
+      confidence_score: typeof parsed.confidence_score === "number" ? parsed.confidence_score : 50,
+      red_flags: Array.isArray(parsed.red_flags) ? parsed.red_flags : [],
+      suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions : [],
+      category_correct: parsed.category_correct !== false,
+      suggested_category: parsed.suggested_category ?? null,
+    };
+
+    metrics.overall_quality = review.overall_quality;
+    metrics.confidence_score = review.confidence_score;
+    metrics.red_flags = review.red_flags;
+
+    return { review, metrics };
+  } catch (e) {
+    console.error("Failed to parse Claude review response:", e);
+    return { review: null, metrics };
+  }
+}
+
 // ── Website scraping ────────────────────────────────────────────────
 
 interface WebsiteScrapResult {
@@ -315,28 +540,15 @@ async function fetchPage(url: string): Promise<string | null> {
   }
 }
 
-async function scrapeWebsite(url: string): Promise<WebsiteScrapResult> {
+async function scrapeWebsiteRegex(
+  baseUrl: string,
+  homeHtml: string,
+  aboutHtml: string | null,
+  programsHtml: string | null,
+): Promise<WebsiteScrapResult> {
   const result: WebsiteScrapResult = {};
 
   try {
-    // Normalize base URL
-    const baseUrl = url.replace(/\/+$/, "");
-
-    // Fetch homepage + common subpages in parallel
-    const [homeHtml, aboutHtml, ...programPages] = await Promise.all([
-      fetchPage(baseUrl),
-      fetchPage(`${baseUrl}/about`),
-      fetchPage(`${baseUrl}/programs`),
-      fetchPage(`${baseUrl}/what-we-do`),
-      fetchPage(`${baseUrl}/services`),
-      fetchPage(`${baseUrl}/our-work`),
-    ]);
-    // Use the first programs/services page that returned content
-    const programsHtml = programPages.find((p) => p && p.length > 500) ?? null;
-
-    if (!homeHtml) return result;
-
-    // ── Extract from homepage ────────────────────────────────────
     const html = homeHtml;
 
     // Extract meta description
@@ -367,9 +579,7 @@ async function scrapeWebsite(url: string): Promise<WebsiteScrapResult> {
     );
     if (ogImageMatch?.[1]) {
       let imgUrl = ogImageMatch[1].trim();
-      // Make relative URLs absolute
       if (imgUrl.startsWith("/")) imgUrl = baseUrl + imgUrl;
-      // Only use if it looks like a valid image URL
       if (imgUrl.match(/^https?:\/\/.+\.(png|jpg|jpeg|svg|webp|gif)/i) || imgUrl.match(/^https?:\/\//)) {
         result.logoUrl = imgUrl;
       }
@@ -392,10 +602,8 @@ async function scrapeWebsite(url: string): Promise<WebsiteScrapResult> {
       result.annualReportUrl = reportUrl;
     }
 
-    // ── Extract text content from all pages ──────────────────────
+    // Extract text content from all pages
     const textContent = extractTextContent(html);
-
-    // Combine about page text for richer extraction
     const aboutText = aboutHtml ? extractTextContent(aboutHtml) : "";
     const combinedText = textContent + " " + aboutText;
 
@@ -413,7 +621,7 @@ async function scrapeWebsite(url: string): Promise<WebsiteScrapResult> {
       }
     }
 
-    // ── Extract programs from subpages first, then homepage ─────────
+    // Extract programs from subpages first, then homepage
     const programsText = programsHtml ? extractTextContent(programsHtml) : "";
     const programSearchText = programsText.length > 200 ? programsText : combinedText;
 
@@ -446,14 +654,13 @@ async function scrapeWebsite(url: string): Promise<WebsiteScrapResult> {
         const text = m[1].replace(/<[^>]+>/g, "").replace(/&\w+;/g, " ").trim();
         if (text.length > 3 && text.length < 80) headings.push(text);
       }
-      // Filter out generic/noisy headings
       const filtered = headings.filter(
         (h) =>
           !/^(menu|navigation|footer|header|home|contact|donate|search|follow|©|info|action|submit|sign up|subscribe|get started|back to top)$/i.test(h) &&
-          !/^\d+$/.test(h) && // just numbers
-          !h.includes("©") && // copyright
-          !/^(we |our |you |interested|typical|learn more|read more)/i.test(h) && // taglines
-          h.split(" ").length <= 8, // too long = probably a sentence, not a program name
+          !/^\d+$/.test(h) &&
+          !h.includes("©") &&
+          !/^(we |our |you |interested|typical|learn more|read more)/i.test(h) &&
+          h.split(" ").length <= 8,
       );
       if (filtered.length >= 2) {
         result.programs = filtered.slice(0, 12);
@@ -500,10 +707,62 @@ async function scrapeWebsite(url: string): Promise<WebsiteScrapResult> {
       }
     }
   } catch (e) {
-    console.error("Website scrape failed:", e);
+    console.error("Website regex scrape failed:", e);
   }
 
   return result;
+}
+
+async function scrapeWebsite(
+  url: string,
+): Promise<{ result: WebsiteScrapResult; enrichmentMetrics: EnrichmentMetrics }> {
+  const defaultMetrics: EnrichmentMetrics = {
+    used_claude: false,
+    fields_extracted: [],
+    fallback_used: false,
+    duration_ms: 0,
+  };
+
+  try {
+    // Normalize base URL
+    const baseUrl = url.replace(/\/+$/, "");
+
+    // Fetch homepage + common subpages in parallel
+    const pagePaths = ["", "/about", "/programs", "/what-we-do", "/services", "/our-work"];
+    const pageResults = await Promise.all(
+      pagePaths.map((path) => fetchPage(`${baseUrl}${path}`)),
+    );
+    const [homeHtml, aboutHtml, ...programPages] = pageResults;
+    const programsHtml = programPages.find((p) => p && p.length > 500) ?? null;
+
+    if (!homeHtml) return { result: {}, enrichmentMetrics: defaultMetrics };
+
+    // Build pages array for Claude (only pages that returned content)
+    const fetchedPages: { url: string; html: string }[] = [];
+    pagePaths.forEach((path, i) => {
+      if (pageResults[i]) {
+        fetchedPages.push({ url: `${baseUrl}${path}`, html: pageResults[i]! });
+      }
+    });
+
+    // ── Agent 1: Try Claude extraction first ──────────────────────
+    const { result: claudeResult, metrics } = await enrichWithClaude(fetchedPages);
+
+    // Check if Claude returned useful data (at least 2 fields)
+    if (metrics.used_claude && metrics.fields_extracted.length >= 2) {
+      console.log(`Agent 1: Claude extracted ${metrics.fields_extracted.length} fields: ${metrics.fields_extracted.join(", ")}`);
+      return { result: claudeResult, enrichmentMetrics: metrics };
+    }
+
+    // ── Fallback: regex extraction ────────────────────────────────
+    console.log("Agent 1: Falling back to regex extraction");
+    metrics.fallback_used = true;
+    const regexResult = await scrapeWebsiteRegex(baseUrl, homeHtml, aboutHtml, programsHtml);
+    return { result: regexResult, enrichmentMetrics: metrics };
+  } catch (e) {
+    console.error("Website scrape failed:", e);
+    return { result: {}, enrichmentMetrics: defaultMetrics };
+  }
 }
 
 // ── Charity Navigator scraping ───────────────────────────────────────
@@ -883,8 +1142,15 @@ Deno.serve(async (req: Request) => {
     }
 
     // ── 5b. Parallel enrichment: website + Charity Navigator ────────
+    const pipelineStart = Date.now();
     let cnData: CNData | null = null;
     let websiteScraped: WebsiteScrapResult = {};
+    let enrichmentMetrics: EnrichmentMetrics = {
+      used_claude: false,
+      fields_extracted: [],
+      fallback_used: false,
+      duration_ms: 0,
+    };
 
     {
       const enrichmentPromises: Promise<void>[] = [];
@@ -892,8 +1158,9 @@ Deno.serve(async (req: Request) => {
       // Scrape charity website
       if (mappedCharity.website) {
         enrichmentPromises.push(
-          scrapeWebsite(mappedCharity.website).then((result) => {
+          scrapeWebsite(mappedCharity.website).then(({ result, enrichmentMetrics: m }) => {
             websiteScraped = result;
+            enrichmentMetrics = m;
           }),
         );
       }
@@ -999,6 +1266,49 @@ Deno.serve(async (req: Request) => {
     };
     const scores = computeGivewizeScores(scoringInput);
 
+    // ── 6b. Agent 2: Quality review ─────────────────────────────────
+    const { review, metrics: reviewMetrics } = await reviewProfileWithClaude(
+      mappedCharity,
+      scores,
+      verificationStatus,
+    );
+
+    let reviewOverrodeDecision = false;
+    if (review) {
+      console.log(`Agent 2: Quality=${review.overall_quality}, Confidence=${review.confidence_score}, RedFlags=${review.red_flags.length}`);
+
+      // Override category if Agent 2 says it's wrong
+      if (!review.category_correct && review.suggested_category) {
+        console.log(`Agent 2: Overriding category from "${mappedCharity.primary_category}" to "${review.suggested_category}"`);
+        mappedCharity.primary_category = review.suggested_category;
+        reviewMetrics.category_overridden = true;
+      }
+
+      // Override to needs_review if quality is poor or confidence is very low
+      if (review.overall_quality === "poor" || review.confidence_score < 40) {
+        reviewOverrodeDecision = true;
+      }
+    }
+
+    // ── Compute data completeness ───────────────────────────────────
+    const allFields = [
+      mappedCharity.mission_statement,
+      mappedCharity.full_description,
+      mappedCharity.program_expense_percentage,
+      mappedCharity.admin_expense_percentage,
+      mappedCharity.fundraising_expense_percentage,
+      mappedCharity.programs_list,
+      mappedCharity.target_population,
+      mappedCharity.people_served_annually,
+      mappedCharity.annual_report_url,
+      mappedCharity.logo_url,
+      mappedCharity.website,
+      mappedCharity.year_founded,
+    ];
+    const dataCompleteness = Math.round(
+      (allFields.filter((f) => f != null && f !== undefined).length / allFields.length) * 100,
+    ) / 100;
+
     // ── 7. Decide ───────────────────────────────────────────────────
     const hasNameAndCategory =
       !!mappedCharity.name &&
@@ -1012,6 +1322,34 @@ Deno.serve(async (req: Request) => {
 
     let decision: string;
 
+    // Build review summary for admin_notes
+    const reviewNotes = review
+      ? `AI Review: quality=${review.overall_quality}, confidence=${review.confidence_score}` +
+        (review.red_flags.length > 0 ? `, flags=[${review.red_flags.join("; ")}]` : "") +
+        (review.suggestions.length > 0 ? `, suggestions=[${review.suggestions.join("; ")}]` : "") +
+        (reviewMetrics.category_overridden ? `, category overridden to ${mappedCharity.primary_category}` : "")
+      : "";
+
+    // Build pipeline_metrics (populated incrementally, finalized before each update)
+    const buildPipelineMetrics = () => ({
+      agent1_enrichment: {
+        used_claude: enrichmentMetrics.used_claude,
+        fields_extracted: enrichmentMetrics.fields_extracted,
+        fallback_used: enrichmentMetrics.fallback_used,
+        duration_ms: enrichmentMetrics.duration_ms,
+      },
+      agent2_review: {
+        overall_quality: reviewMetrics.overall_quality,
+        confidence_score: reviewMetrics.confidence_score,
+        red_flags: reviewMetrics.red_flags,
+        category_overridden: reviewMetrics.category_overridden,
+        duration_ms: reviewMetrics.duration_ms,
+      },
+      agent3_email: null as { used_claude: boolean; fallback_used: boolean; duration_ms: number } | null,
+      total_pipeline_ms: Date.now() - pipelineStart,
+      data_completeness: dataCompleteness,
+    });
+
     if (verificationStatus === "unverified") {
       // ── Flag for review — unverified organization ───────────────
       await supabase
@@ -1021,7 +1359,23 @@ Deno.serve(async (req: Request) => {
           computed_scores: scores,
           verification_status: verificationStatus,
           propublica_data: propublicaData,
-          admin_notes: "Flagged for manual review: unverified organization",
+          admin_notes: `Flagged for manual review: unverified organization. ${reviewNotes}`.trim(),
+          pipeline_metrics: buildPipelineMetrics(),
+        })
+        .eq("id", charity_request_id);
+
+      decision = "needs_review";
+    } else if (reviewOverrodeDecision) {
+      // ── Agent 2 flagged as poor quality / low confidence ────────
+      await supabase
+        .from("charity_requests")
+        .update({
+          status: "needs_review",
+          computed_scores: scores,
+          verification_status: verificationStatus,
+          propublica_data: propublicaData,
+          admin_notes: `Flagged by AI Quality Review: ${reviewNotes}`.trim(),
+          pipeline_metrics: buildPipelineMetrics(),
         })
         .eq("id", charity_request_id);
 
@@ -1073,6 +1427,7 @@ Deno.serve(async (req: Request) => {
           .update({
             status: "needs_review",
             admin_notes: `Auto-approve insert failed: ${insertError.message}`,
+            pipeline_metrics: buildPipelineMetrics(),
           })
           .eq("id", charity_request_id);
       } else {
@@ -1113,11 +1468,27 @@ Deno.serve(async (req: Request) => {
                   contact_email: request.charity_contact_email,
                   missing_fields: missingFields,
                   charity_name: mappedCharity.name,
+                  mission_statement: mappedCharity.mission_statement,
+                  programs_list: mappedCharity.programs_list,
                 }),
               },
             );
             if (emailRes.ok) {
               emailSent = true;
+              // Capture Agent 3 metrics from response
+              try {
+                const emailData = await emailRes.json();
+                if (emailData.agent3_metrics) {
+                  const pm = buildPipelineMetrics();
+                  pm.agent3_email = emailData.agent3_metrics;
+                  pm.total_pipeline_ms = Date.now() - pipelineStart;
+                  // Update pipeline_metrics with agent3 data
+                  await supabase
+                    .from("charity_requests")
+                    .update({ pipeline_metrics: pm })
+                    .eq("id", charity_request_id);
+                }
+              } catch { /* response already consumed or parse error — non-critical */ }
               console.log(`Info request email sent to ${request.charity_contact_email}`);
             } else {
               const errData = await emailRes.json();
@@ -1130,6 +1501,7 @@ Deno.serve(async (req: Request) => {
 
         decision = "auto_approved";
         const notes = [`Auto-approved. Charity ID: ${charityId}. Score: ${scores.overall}`];
+        if (reviewNotes) notes.push(reviewNotes);
         if (emailSent) notes.push(`Info request emailed to ${request.charity_contact_email} for: ${missingFields.join(", ")}`);
         else if (missingFields.length > 0 && !request.charity_contact_email) notes.push(`Missing data (${missingFields.join(", ")}) but no contact email`);
 
@@ -1143,6 +1515,7 @@ Deno.serve(async (req: Request) => {
             verification_status: verificationStatus,
             propublica_data: propublicaData,
             admin_notes: notes.join(". "),
+            pipeline_metrics: buildPipelineMetrics(),
           })
           .eq("id", charity_request_id);
 
@@ -1166,9 +1539,10 @@ Deno.serve(async (req: Request) => {
           computed_scores: scores,
           verification_status: verificationStatus,
           propublica_data: propublicaData,
-          admin_notes: missingFields.length > 0
+          admin_notes: (missingFields.length > 0
             ? `Missing data (${missingFields.join(", ")}) but no contact email to request info`
-            : "Flagged for manual review",
+            : "Flagged for manual review") + (reviewNotes ? `. ${reviewNotes}` : ""),
+          pipeline_metrics: buildPipelineMetrics(),
         })
         .eq("id", charity_request_id);
 
