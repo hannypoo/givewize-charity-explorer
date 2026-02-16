@@ -70,7 +70,7 @@ export type Database = {
           charity_name: string
           charity_website: string | null
           requester_name: string | null
-          requester_email: string
+          requester_email: string | null
           reason: string | null
           status: string
           admin_notes: string | null
@@ -89,7 +89,7 @@ export type Database = {
           charity_name: string
           charity_website?: string | null
           requester_name?: string | null
-          requester_email: string
+          requester_email?: string | null
           reason?: string | null
           status?: string
           admin_notes?: string | null

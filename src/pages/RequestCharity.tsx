@@ -51,7 +51,7 @@ const RequestCharity = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!charityName.trim() || !requesterEmail.trim()) return;
+    if (!charityName.trim()) return;
 
     setSubmitting(true);
     try {
@@ -61,7 +61,7 @@ const RequestCharity = () => {
         .insert({
           charity_name: charityName.trim(),
           charity_website: charityWebsite.trim() || null,
-          requester_email: requesterEmail.trim(),
+          requester_email: requesterEmail.trim() || null,
           requester_name: requesterName.trim() || null,
           reason: reason.trim() || null,
           ein: ein.trim() || null,
@@ -130,9 +130,11 @@ const RequestCharity = () => {
           <CheckCircle2 className="h-12 w-12 text-green-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-2">Thank you!</h2>
           <p className="text-white/60 leading-relaxed">
-            We'll review your suggestion and contact you at{" "}
-            <span className="text-white font-medium">{submittedEmail}</span>{" "}
-            if we need more information.
+            {submittedEmail
+              ? <>We'll review your suggestion and contact you at{" "}
+                  <span className="text-white font-medium">{submittedEmail}</span>{" "}
+                  if we need more information.</>
+              : "We'll review your suggestion. Thank you for helping us grow our directory!"}
           </p>
         </>
       );
@@ -204,11 +206,11 @@ const RequestCharity = () => {
             </h2>
             <p className="text-white/60 leading-relaxed">
               {result.message ||
-                "Your request has been saved. Our team will review it and notify you at"}{" "}
-              {!result.message && (
-                <span className="text-white font-medium">{submittedEmail}</span>
-              )}
-              {!result.message && " when it's been processed."}
+                (submittedEmail
+                  ? <>Your request has been saved. Our team will review it and notify you at{" "}
+                      <span className="text-white font-medium">{submittedEmail}</span>{" "}
+                      when it's been processed.</>
+                  : "Your request has been saved. Our team will review it shortly.")}
             </p>
           </>
         );
@@ -333,12 +335,11 @@ const RequestCharity = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="requesterEmail" className="block text-sm font-medium text-white/80 mb-1.5">
-                      Your Email <span className="text-orange-light">*</span>
+                      Your Email
                     </label>
                     <input
                       id="requesterEmail"
                       type="email"
-                      required
                       value={requesterEmail}
                       onChange={(e) => setRequesterEmail(e.target.value)}
                       placeholder="you@example.com"
@@ -390,7 +391,7 @@ const RequestCharity = () => {
 
                 <Button
                   type="submit"
-                  disabled={submitting || !charityName.trim() || !requesterEmail.trim()}
+                  disabled={submitting || !charityName.trim()}
                   className="w-full gradient-orange text-accent-foreground font-semibold rounded-2xl glow-orange hover:scale-[1.01] transition-all duration-300 disabled:opacity-50"
                 >
                   {submitting ? (

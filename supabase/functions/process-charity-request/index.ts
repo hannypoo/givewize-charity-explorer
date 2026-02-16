@@ -983,6 +983,127 @@ function findMissingFields(charity: MappedCharity): string[] {
   return missing;
 }
 
+// ── Requester notification email ─────────────────────────────────────
+
+function buildRequesterNotificationHtml(
+  charityName: string,
+  score: number | null,
+  siteUrl: string,
+  charityId: string,
+): string {
+  const scoreHtml = score != null
+    ? `<p style="margin:0 0 20px;color:#cbd5e1;font-size:15px;line-height:1.7;">
+        Their GiveWiZe Score is <span style="color:#f97316;font-weight:600;">${score.toFixed(1)}/5.0</span>.
+      </p>`
+    : "";
+
+  const profileUrl = `${siteUrl}/charity/${charityId}`;
+
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${charityName} has been added to GiveWiZe</title>
+</head>
+<body style="margin:0;padding:0;background-color:#0f1225;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0f1225;">
+    <tr>
+      <td align="center" style="padding:40px 20px;">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.3);">
+          <!-- Header -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#1a1f3a 0%,#2d1b69 100%);padding:32px 40px;text-align:center;">
+              <span style="font-size:28px;font-weight:700;color:#ffffff;letter-spacing:0.5px;">Give<span style="color:#f97316;">Wi</span>Ze</span>
+            </td>
+          </tr>
+          <!-- Body -->
+          <tr>
+            <td style="background-color:#1e2340;padding:40px;">
+              <p style="margin:0 0 20px;color:#f1f5f9;font-size:16px;line-height:1.6;">
+                Great news!
+              </p>
+              <p style="margin:0 0 20px;color:#cbd5e1;font-size:15px;line-height:1.7;">
+                The charity you requested, <span style="color:#ffffff;font-weight:600;">${charityName}</span>, has been verified and added to GiveWiZe.
+              </p>
+              ${scoreHtml}
+              <p style="margin:0 0 28px;color:#cbd5e1;font-size:15px;line-height:1.7;">
+                You can now view their full profile, compare them with other organizations, and share them with friends.
+              </p>
+              <!-- CTA Button -->
+              <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 28px;">
+                <tr>
+                  <td align="center" style="border-radius:9999px;background-color:#f97316;">
+                    <a href="${profileUrl}" target="_blank" style="display:inline-block;padding:14px 36px;color:#ffffff;font-size:16px;font-weight:600;text-decoration:none;border-radius:9999px;">
+                      View Charity Profile
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin:0;color:#94a3b8;font-size:13px;line-height:1.5;text-align:center;">
+                Thank you for helping us grow our directory.
+              </p>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="background-color:#161936;padding:24px 40px;text-align:center;">
+              <p style="margin:0;color:#64748b;font-size:13px;line-height:1.5;">
+                You received this because you requested a charity on GiveWiZe.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`.trim();
+}
+
+async function notifyRequester(
+  requesterEmail: string,
+  charityName: string,
+  score: number | null,
+  charityId: string,
+): Promise<boolean> {
+  const resendApiKey = Deno.env.get("RESEND_API_KEY");
+  const siteUrl = Deno.env.get("SITE_URL") || "https://givewize.com";
+  if (!resendApiKey) {
+    console.error("RESEND_API_KEY not set, skipping requester notification");
+    return false;
+  }
+
+  try {
+    const html = buildRequesterNotificationHtml(charityName, score, siteUrl, charityId);
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${resendApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "GiveWiZe <noreply@givewize.org>",
+        to: requesterEmail,
+        subject: `${charityName} has been added to GiveWiZe!`,
+        html,
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      console.error("Failed to notify requester:", err);
+      return false;
+    }
+    console.log(`Requester notification sent to ${requesterEmail}`);
+    return true;
+  } catch (e) {
+    console.error("Requester notification error:", e);
+    return false;
+  }
+}
+
 // ── Main handler ────────────────────────────────────────────────────
 
 Deno.serve(async (req: Request) => {
@@ -1523,11 +1644,23 @@ Deno.serve(async (req: Request) => {
           }
         }
 
+        // ── 10. Notify requester via email (if they provided one) ──────
+        let requesterNotified = false;
+        if (request.requester_email) {
+          requesterNotified = await notifyRequester(
+            request.requester_email,
+            mappedCharity.name,
+            scores.overall,
+            charityId,
+          );
+        }
+
         decision = "auto_approved";
         const notes = [`Auto-approved. Charity ID: ${charityId}. Score: ${scores.overall}`];
         if (reviewNotes) notes.push(reviewNotes);
         if (emailSent) notes.push(`Info request emailed to ${request.charity_contact_email} for: ${missingFields.join(", ")}`);
         else if (missingFields.length > 0 && !request.charity_contact_email) notes.push(`Missing data (${missingFields.join(", ")}) but no contact email`);
+        if (requesterNotified) notes.push(`Requester notified at ${request.requester_email}`);
 
         await supabase
           .from("charity_requests")
