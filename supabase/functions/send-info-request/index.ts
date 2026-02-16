@@ -79,7 +79,7 @@ function buildEmailHtml(
                 </tr>
               </table>
               <p style="margin:0 0 0;color:#94a3b8;font-size:13px;line-height:1.5;text-align:center;">
-                This link expires in 14 days.
+                This link expires in 30 days.
               </p>
             </td>
           </tr>
@@ -145,9 +145,9 @@ Deno.serve(async (req: Request) => {
       missingFieldsLabels[field] = FIELD_LABELS[field] || field;
     }
 
-    // Calculate expiration (14 days from now)
+    // Calculate expiration (30 days from now)
     const expiresAt = new Date(
-      Date.now() + 14 * 24 * 60 * 60 * 1000
+      Date.now() + 30 * 24 * 60 * 60 * 1000
     ).toISOString();
 
     // Insert request record into charity_info_requests
