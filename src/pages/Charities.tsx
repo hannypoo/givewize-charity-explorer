@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { Link, useSearchParams, useLocation } from "react-router-dom";
-import { Filter, ChevronRight, X, ArrowUpDown, Info, Heart, Building2 } from "lucide-react";
+import { Filter, ChevronRight, X, ArrowUpDown, Info, Heart, Building2, Search } from "lucide-react";
 import { getCategoryIcon } from "@/components/charities/CategoryIcon";
 import { Layout } from "@/components/layout/Layout";
 import { CharityFilters } from "@/components/charities/CharityFilters";
@@ -277,7 +277,27 @@ const Charities = () => {
                 decision.
               </p>
             </div>
-            <div className="mt-4 flex items-center gap-3">
+            <div className="mt-5 relative max-w-xl">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                placeholder="Search charities by name..."
+                aria-label="Search charities"
+                className="w-full bg-white/10 border border-white/20 rounded-xl pl-11 pr-10 py-2.5 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-orange-light/50 focus:border-transparent"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => handleSearchChange("")}
+                  aria-label="Clear search"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-white/15 text-white/40 hover:text-white/70 transition-colors"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+            <div className="mt-3 flex items-center gap-3">
               <Link
                 to="/request-charity"
                 className="inline-flex items-center gap-2 bg-white/10 border border-white/20 hover:bg-white/20 text-white text-sm font-medium px-4 py-2 rounded-xl transition-all duration-300"
