@@ -175,6 +175,7 @@ interface MappedCharity {
   people_served_annually: number | null;
   target_population: string | null;
   programs_list: string[] | null;
+  logo_url: string | null;
 }
 
 function formatEin(raw: unknown): string | null {
@@ -270,32 +271,68 @@ function mapPropublicaToCharity(data: PropublicaOrg): MappedCharity {
     people_served_annually: null,
     target_population: null,
     programs_list: null,
+    logo_url: null,
   };
 }
 
 // ── Website scraping ────────────────────────────────────────────────
 
-async function scrapeWebsite(url: string): Promise<{
+interface WebsiteScrapResult {
   mission?: string;
   description?: string;
   programs?: string[];
   targetPopulation?: string;
-}> {
-  const result: {
-    mission?: string;
-    description?: string;
-    programs?: string[];
-    targetPopulation?: string;
-  } = {};
+  logoUrl?: string;
+  annualReportUrl?: string;
+  hasDonateButton?: boolean;
+}
 
+function extractTextContent(html: string): string {
+  return html
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#?\w+;/gi, " ")
+    .replace(/\s+/g, " ");
+}
+
+async function fetchPage(url: string): Promise<string | null> {
   try {
     const res = await fetch(url, {
       headers: { "User-Agent": "GiveWiZe Charity Bot/1.0" },
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(5000),
+      redirect: "follow",
     });
-    if (!res.ok) return result;
+    if (!res.ok) return null;
+    return await res.text();
+  } catch {
+    return null;
+  }
+}
 
-    const html = await res.text();
+async function scrapeWebsite(url: string): Promise<WebsiteScrapResult> {
+  const result: WebsiteScrapResult = {};
+
+  try {
+    // Normalize base URL
+    const baseUrl = url.replace(/\/+$/, "");
+
+    // Fetch homepage + /about + /programs in parallel
+    const [homeHtml, aboutHtml, programsHtml] = await Promise.all([
+      fetchPage(baseUrl),
+      fetchPage(`${baseUrl}/about`),
+      fetchPage(`${baseUrl}/programs`),
+    ]);
+
+    if (!homeHtml) return result;
+
+    // ── Extract from homepage ────────────────────────────────────
+    const html = homeHtml;
 
     // Extract meta description
     const metaDescMatch = html.match(
@@ -317,13 +354,45 @@ async function scrapeWebsite(url: string): Promise<{
       result.description = ogDescMatch[1].trim();
     }
 
-    // Look for mission statement patterns in page text
-    // Strip HTML tags for text search
-    const textContent = html
-      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
-      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
-      .replace(/<[^>]+>/g, " ")
-      .replace(/\s+/g, " ");
+    // Extract og:image for logo
+    const ogImageMatch = html.match(
+      /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i
+    ) ?? html.match(
+      /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i
+    );
+    if (ogImageMatch?.[1]) {
+      let imgUrl = ogImageMatch[1].trim();
+      // Make relative URLs absolute
+      if (imgUrl.startsWith("/")) imgUrl = baseUrl + imgUrl;
+      // Only use if it looks like a valid image URL
+      if (imgUrl.match(/^https?:\/\/.+\.(png|jpg|jpeg|svg|webp|gif)/i) || imgUrl.match(/^https?:\/\//)) {
+        result.logoUrl = imgUrl;
+      }
+    }
+
+    // Check for donate button/link
+    const donatePattern = /<a[^>]+href=["'][^"']*donat[^"']*["'][^>]*>/i;
+    const donateButtonPattern = /(?:donate|give\s+now|support\s+us|make\s+a\s+(?:gift|donation))/i;
+    result.hasDonateButton = donatePattern.test(html) || donateButtonPattern.test(html);
+
+    // Search for annual report links
+    const annualReportMatch = html.match(
+      /<a[^>]+href=["']([^"']*annual[_-]?report[^"']*)["']/i
+    ) ?? html.match(
+      /<a[^>]+href=["']([^"']*\.pdf[^"']*)["'][^>]*>[^<]*annual\s*report/i
+    );
+    if (annualReportMatch?.[1]) {
+      let reportUrl = annualReportMatch[1].trim();
+      if (reportUrl.startsWith("/")) reportUrl = baseUrl + reportUrl;
+      result.annualReportUrl = reportUrl;
+    }
+
+    // ── Extract text content from all pages ──────────────────────
+    const textContent = extractTextContent(html);
+
+    // Combine about page text for richer extraction
+    const aboutText = aboutHtml ? extractTextContent(aboutHtml) : "";
+    const combinedText = textContent + " " + aboutText;
 
     // Look for "our mission" or "mission statement" sections
     const missionPatterns = [
@@ -332,19 +401,21 @@ async function scrapeWebsite(url: string): Promise<{
       /mission[:\s]+(?:to\s+)([^.]+\.)/i,
     ];
     for (const pattern of missionPatterns) {
-      const match = textContent.match(pattern);
+      const match = combinedText.match(pattern);
       if (match?.[1] && match[1].length > 20 && match[1].length < 500) {
         result.mission = match[1].trim();
         break;
       }
     }
 
-    // Look for programs/services in list items near keywords
-    const programSection = textContent.match(
+    // ── Extract programs from /programs page first, then homepage ─
+    const programsText = programsHtml ? extractTextContent(programsHtml) : "";
+    const programSearchText = programsText.length > 200 ? programsText : combinedText;
+
+    const programSection = programSearchText.match(
       /(?:programs?|services?|what\s+we\s+do|our\s+work)[:\s]+([\s\S]{50,800}?)(?:learn\s+more|read\s+more|contact|donate|©)/i
     );
     if (programSection?.[1]) {
-      // Try to split into individual programs
       const lines = programSection[1]
         .split(/[•\-–—|]|\d+\.\s/)
         .map((s: string) => s.trim())
@@ -354,13 +425,38 @@ async function scrapeWebsite(url: string): Promise<{
       }
     }
 
+    // If /programs page exists but no structured list found, try extracting headings
+    if (!result.programs && programsHtml) {
+      const headingMatches = programsHtml.matchAll(/<h[2-4][^>]*>([^<]{5,80})<\/h[2-4]>/gi);
+      const headings: string[] = [];
+      for (const m of headingMatches) {
+        const text = m[1].replace(/&\w+;/g, " ").trim();
+        if (text.length > 5 && text.length < 80) headings.push(text);
+      }
+      if (headings.length >= 2) {
+        result.programs = headings.slice(0, 10);
+      }
+    }
+
+    // Look for annual report on about page too
+    if (!result.annualReportUrl && aboutHtml) {
+      const aboutReportMatch = aboutHtml.match(
+        /<a[^>]+href=["']([^"']*annual[_-]?report[^"']*)["']/i
+      );
+      if (aboutReportMatch?.[1]) {
+        let reportUrl = aboutReportMatch[1].trim();
+        if (reportUrl.startsWith("/")) reportUrl = baseUrl + reportUrl;
+        result.annualReportUrl = reportUrl;
+      }
+    }
+
     // Look for target population
     const popPatterns = [
       /(?:we\s+serve|serving|helping|supporting)\s+([^.]{10,100})/i,
       /(?:target\s+population|who\s+we\s+serve)[:\s]+([^.]+\.)/i,
     ];
     for (const pattern of popPatterns) {
-      const match = textContent.match(pattern);
+      const match = combinedText.match(pattern);
       if (match?.[1] && match[1].length > 10) {
         result.targetPopulation = match[1].trim();
         break;
@@ -371,6 +467,164 @@ async function scrapeWebsite(url: string): Promise<{
   }
 
   return result;
+}
+
+// ── Charity Navigator scraping ───────────────────────────────────────
+
+interface CNData {
+  starRating: number | null;       // 0-4 scale
+  programExpPct: number | null;    // e.g. 85.3
+  adminExpPct: number | null;
+  fundraisingExpPct: number | null;
+  reviewCount: number;
+}
+
+async function scrapeCharityNavigator(ein: string): Promise<CNData | null> {
+  const einNoDash = ein.replace(/-/g, "");
+  const url = `https://www.charitynavigator.org/ein/${einNoDash}`;
+
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Accept": "text/html,application/xhtml+xml",
+      },
+      signal: AbortSignal.timeout(6000),
+    });
+    if (!res.ok) return null;
+
+    const html = await res.text();
+    const result: CNData = {
+      starRating: null,
+      programExpPct: null,
+      adminExpPct: null,
+      fundraisingExpPct: null,
+      reviewCount: 0,
+    };
+
+    // Try __NEXT_DATA__ JSON blob first (Next.js structured data)
+    const nextDataMatch = html.match(/<script[^>]+id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
+    if (nextDataMatch?.[1]) {
+      try {
+        const nextData = JSON.parse(nextDataMatch[1]);
+        // Navigate the Next.js page props to find charity data
+        const props = nextData?.props?.pageProps;
+        if (props) {
+          // Star rating
+          if (props.overallRating != null) result.starRating = Number(props.overallRating);
+          else if (props.currentRating?.overall != null) result.starRating = Number(props.currentRating.overall);
+          else if (props.charity?.currentRating?.overall != null) result.starRating = Number(props.charity.currentRating.overall);
+
+          // Expense percentages
+          const financials = props.financials ?? props.charity?.financials;
+          if (financials) {
+            if (financials.programExpenses != null) result.programExpPct = Number(financials.programExpenses);
+            if (financials.adminExpenses != null) result.adminExpPct = Number(financials.adminExpenses);
+            if (financials.fundraisingExpenses != null) result.fundraisingExpPct = Number(financials.fundraisingExpenses);
+          }
+        }
+      } catch { /* JSON parse failed, fall through to regex */ }
+    }
+
+    // Fallback: regex extraction from rendered HTML
+    if (result.programExpPct == null) {
+      // "Program Expenses" or "Program" followed by a percentage
+      const progMatch = html.match(/program\s*(?:expenses?)?[^%]*?([\d.]+)\s*%/i);
+      if (progMatch?.[1]) result.programExpPct = parseFloat(progMatch[1]);
+    }
+    if (result.adminExpPct == null) {
+      const adminMatch = html.match(/admin(?:istrative)?\s*(?:expenses?)?[^%]*?([\d.]+)\s*%/i);
+      if (adminMatch?.[1]) result.adminExpPct = parseFloat(adminMatch[1]);
+    }
+    if (result.fundraisingExpPct == null) {
+      const fundMatch = html.match(/fundraising\s*(?:expenses?)?[^%]*?([\d.]+)\s*%/i);
+      if (fundMatch?.[1]) result.fundraisingExpPct = parseFloat(fundMatch[1]);
+    }
+
+    // Star rating from HTML (e.g. "4 star" or "3-Star")
+    if (result.starRating == null) {
+      const starMatch = html.match(/(\d)\s*[-\s]?\s*star/i);
+      if (starMatch?.[1]) result.starRating = parseInt(starMatch[1], 10);
+    }
+
+    // Validate expense percentages (should be between 0 and 100)
+    if (result.programExpPct != null && (result.programExpPct < 0 || result.programExpPct > 100)) result.programExpPct = null;
+    if (result.adminExpPct != null && (result.adminExpPct < 0 || result.adminExpPct > 100)) result.adminExpPct = null;
+    if (result.fundraisingExpPct != null && (result.fundraisingExpPct < 0 || result.fundraisingExpPct > 100)) result.fundraisingExpPct = null;
+
+    // Only return if we got at least some useful data
+    if (result.starRating != null || result.programExpPct != null) {
+      return result;
+    }
+    return null;
+  } catch (e) {
+    console.error("Charity Navigator scrape failed:", e);
+    return null;
+  }
+}
+
+// ── Online review sources insertion ──────────────────────────────────
+
+// deno-lint-ignore no-explicit-any
+async function insertOnlineReviewSources(
+  supabase: any,
+  charityId: string,
+  cnData: CNData | null,
+  ein: string | null,
+): Promise<void> {
+  const einNoDash = ein ? ein.replace(/-/g, "") : null;
+
+  const rows = [
+    {
+      charity_id: charityId,
+      source_name: "charity_navigator",
+      display_name: "Charity Navigator",
+      rating: cnData?.starRating != null ? cnData.starRating : null,
+      max_rating: 4,
+      rating_scale: "numeric",
+      review_count: cnData?.reviewCount ?? 0,
+      source_url: einNoDash ? `https://www.charitynavigator.org/ein/${einNoDash}` : null,
+      note: cnData?.starRating != null ? `${cnData.starRating} out of 4 stars` : null,
+    },
+    {
+      charity_id: charityId,
+      source_name: "guidestar",
+      display_name: "GuideStar / Candid",
+      rating: null,
+      max_rating: 4,
+      rating_scale: "seal",
+      review_count: 0,
+      source_url: einNoDash ? `https://www.guidestar.org/profile/${einNoDash}` : null,
+      note: null,
+    },
+    {
+      charity_id: charityId,
+      source_name: "bbb_wise_giving",
+      display_name: "BBB Wise Giving Alliance",
+      rating: null,
+      max_rating: 1,
+      rating_scale: "pass_fail",
+      review_count: 0,
+      source_url: null,
+      note: null,
+    },
+    {
+      charity_id: charityId,
+      source_name: "greatnonprofits",
+      display_name: "GreatNonprofits",
+      rating: null,
+      max_rating: 5,
+      rating_scale: "numeric",
+      review_count: 0,
+      source_url: einNoDash ? `https://greatnonprofits.org/org/${einNoDash}` : null,
+      note: null,
+    },
+  ];
+
+  const { error } = await supabase.from("online_review_sources").insert(rows);
+  if (error) {
+    console.error("Failed to insert online_review_sources:", error);
+  }
 }
 
 // ── Missing fields check ────────────────────────────────────────────
@@ -550,6 +804,7 @@ Deno.serve(async (req: Request) => {
         people_served_annually: null,
         target_population: null,
         programs_list: null,
+        logo_url: null,
       };
     }
 
@@ -568,28 +823,71 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    // ── 5b. Scrape the charity website for missing data ───────────
-    if (mappedCharity.website) {
-      const scraped = await scrapeWebsite(mappedCharity.website);
-      if (scraped.mission && !mappedCharity.mission_statement) {
-        mappedCharity.mission_statement = scraped.mission;
+    // ── 5b. Parallel enrichment: website + Charity Navigator ────────
+    let cnData: CNData | null = null;
+    let websiteScraped: WebsiteScrapResult = {};
+
+    {
+      const enrichmentPromises: Promise<void>[] = [];
+
+      // Scrape charity website
+      if (mappedCharity.website) {
+        enrichmentPromises.push(
+          scrapeWebsite(mappedCharity.website).then((result) => {
+            websiteScraped = result;
+          }),
+        );
       }
-      if (scraped.description) {
-        if (!mappedCharity.mission_statement) {
-          mappedCharity.mission_statement = scraped.description;
-        }
-        if (!mappedCharity.full_description) {
-          mappedCharity.full_description = scraped.description;
-        } else if (scraped.description.length > 50) {
-          // Prepend website description to the ProPublica-generated one
-          mappedCharity.full_description = scraped.description + " " + mappedCharity.full_description;
-        }
+
+      // Scrape Charity Navigator for expense data and star rating
+      if (mappedCharity.ein) {
+        enrichmentPromises.push(
+          scrapeCharityNavigator(mappedCharity.ein).then((result) => {
+            cnData = result;
+          }),
+        );
       }
-      if (scraped.programs && !mappedCharity.programs_list) {
-        mappedCharity.programs_list = scraped.programs;
+
+      await Promise.all(enrichmentPromises);
+    }
+
+    // Merge website scrape data
+    if (websiteScraped.mission && !mappedCharity.mission_statement) {
+      mappedCharity.mission_statement = websiteScraped.mission;
+    }
+    if (websiteScraped.description) {
+      if (!mappedCharity.mission_statement) {
+        mappedCharity.mission_statement = websiteScraped.description;
       }
-      if (scraped.targetPopulation && !mappedCharity.target_population) {
-        mappedCharity.target_population = scraped.targetPopulation;
+      if (!mappedCharity.full_description) {
+        mappedCharity.full_description = websiteScraped.description;
+      } else if (websiteScraped.description.length > 50) {
+        mappedCharity.full_description = websiteScraped.description + " " + mappedCharity.full_description;
+      }
+    }
+    if (websiteScraped.programs && !mappedCharity.programs_list) {
+      mappedCharity.programs_list = websiteScraped.programs;
+    }
+    if (websiteScraped.targetPopulation && !mappedCharity.target_population) {
+      mappedCharity.target_population = websiteScraped.targetPopulation;
+    }
+    if (websiteScraped.logoUrl) {
+      mappedCharity.logo_url = websiteScraped.logoUrl;
+    }
+    if (websiteScraped.annualReportUrl && !mappedCharity.annual_report_url) {
+      mappedCharity.annual_report_url = websiteScraped.annualReportUrl;
+    }
+
+    // Merge Charity Navigator expense data (fills the biggest gap)
+    if (cnData) {
+      if (cnData.programExpPct != null && mappedCharity.program_expense_percentage == null) {
+        mappedCharity.program_expense_percentage = Math.round(cnData.programExpPct * 10) / 10;
+      }
+      if (cnData.adminExpPct != null && mappedCharity.admin_expense_percentage == null) {
+        mappedCharity.admin_expense_percentage = Math.round(cnData.adminExpPct * 10) / 10;
+      }
+      if (cnData.fundraisingExpPct != null && mappedCharity.fundraising_expense_percentage == null) {
+        mappedCharity.fundraising_expense_percentage = Math.round(cnData.fundraisingExpPct * 10) / 10;
       }
     }
 
@@ -687,6 +985,11 @@ Deno.serve(async (req: Request) => {
           people_served_annually: mappedCharity.people_served_annually,
           target_population: mappedCharity.target_population,
           programs_list: mappedCharity.programs_list,
+          logo_url: mappedCharity.logo_url,
+          accepts_direct_donation: websiteScraped.hasDonateButton ?? true,
+          allows_donation_tracking: false,
+          allows_donor_recipient_contact: false,
+          offers_donor_perks: false,
           score_financial_efficiency: scores.financial_efficiency,
           score_transparency: scores.transparency,
           score_longevity: scores.longevity,
@@ -706,17 +1009,37 @@ Deno.serve(async (req: Request) => {
           })
           .eq("id", charity_request_id);
       } else {
+        // ── 8. Post-insert: online review sources + community rating ──
+        const charityId = inserted.id;
+
+        // Insert 4 online_review_sources rows (CN, GuideStar, BBB, GNP)
+        await insertOnlineReviewSources(supabase, charityId, cnData, mappedCharity.ein);
+
+        // Compute initial community_rating_average from CN star rating
+        if (cnData?.starRating != null) {
+          // Normalize CN 0-4 scale to 0-5 scale
+          const normalized = (cnData.starRating / 4) * 5;
+          const rounded = Math.round(normalized * 100) / 100;
+          await supabase
+            .from("charities")
+            .update({
+              community_rating_average: rounded,
+              community_rating_count: 1,
+            })
+            .eq("id", charityId);
+        }
+
         decision = "auto_approved";
         await supabase
           .from("charity_requests")
           .update({
             status: "auto_approved",
             auto_approved: true,
-            charity_id: inserted.id,
+            charity_id: charityId,
             computed_scores: scores,
             verification_status: verificationStatus,
             propublica_data: propublicaData,
-            admin_notes: `Auto-approved. Charity ID: ${inserted.id}. Score: ${scores.overall}`,
+            admin_notes: `Auto-approved. Charity ID: ${charityId}. Score: ${scores.overall}`,
           })
           .eq("id", charity_request_id);
 
@@ -725,7 +1048,7 @@ Deno.serve(async (req: Request) => {
             status: "auto_approved",
             charity_name: mappedCharity.name,
             score: scores.overall,
-            charity_id: inserted.id,
+            charity_id: charityId,
           }),
           { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
