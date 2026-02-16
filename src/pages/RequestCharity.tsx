@@ -12,6 +12,7 @@ type SubmitResult = {
   charity_name?: string;
   score?: number;
   message?: string;
+  charity_id?: string;
 };
 
 const COUNTRIES = [
@@ -253,6 +254,21 @@ const RequestCharity = () => {
               <div className="glass-dark rounded-2xl p-8 text-center">
                 {renderResult()}
                 <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+                  {result?.charity_id ? (
+                    <Link
+                      to={`/charity/${result.charity_id}`}
+                      className="inline-flex items-center gap-2 gradient-orange text-accent-foreground font-semibold px-6 py-2.5 rounded-2xl glow-orange hover:scale-[1.02] transition-all duration-300"
+                    >
+                      View Charity Profile
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/charities"
+                      className="inline-flex items-center gap-2 gradient-orange text-accent-foreground font-semibold px-6 py-2.5 rounded-2xl glow-orange hover:scale-[1.02] transition-all duration-300"
+                    >
+                      Explore Charities
+                    </Link>
+                  )}
                   <Button
                     onClick={resetForm}
                     variant="outline"
@@ -260,12 +276,6 @@ const RequestCharity = () => {
                   >
                     Submit Another
                   </Button>
-                  <Link
-                    to="/charities"
-                    className="inline-flex items-center gap-2 gradient-orange text-accent-foreground font-semibold px-6 py-2.5 rounded-2xl glow-orange hover:scale-[1.02] transition-all duration-300"
-                  >
-                    Explore Charities
-                  </Link>
                 </div>
               </div>
             ) : (
