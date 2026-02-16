@@ -110,8 +110,8 @@ export const CharityCard = memo(function CharityCard({ charity }: CharityCardPro
             {charity.mission}
           </p>
 
-          <div className="mt-4 flex items-center text-sm font-semibold text-orange-light opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <span>Learn more &rarr;</span>
+          <div className="mt-4 flex items-center text-sm font-semibold text-orange-light/60 group-hover:text-orange-light transition-colors duration-300">
+            <span>View profile &rarr;</span>
           </div>
         </div>
       </div>
