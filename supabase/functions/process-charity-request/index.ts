@@ -322,12 +322,17 @@ async function scrapeWebsite(url: string): Promise<WebsiteScrapResult> {
     // Normalize base URL
     const baseUrl = url.replace(/\/+$/, "");
 
-    // Fetch homepage + /about + /programs in parallel
-    const [homeHtml, aboutHtml, programsHtml] = await Promise.all([
+    // Fetch homepage + common subpages in parallel
+    const [homeHtml, aboutHtml, ...programPages] = await Promise.all([
       fetchPage(baseUrl),
       fetchPage(`${baseUrl}/about`),
       fetchPage(`${baseUrl}/programs`),
+      fetchPage(`${baseUrl}/what-we-do`),
+      fetchPage(`${baseUrl}/services`),
+      fetchPage(`${baseUrl}/our-work`),
     ]);
+    // Use the first programs/services page that returned content
+    const programsHtml = programPages.find((p) => p && p.length > 500) ?? null;
 
     if (!homeHtml) return result;
 
@@ -408,10 +413,11 @@ async function scrapeWebsite(url: string): Promise<WebsiteScrapResult> {
       }
     }
 
-    // ── Extract programs from /programs page first, then homepage ─
+    // ── Extract programs from subpages first, then homepage ─────────
     const programsText = programsHtml ? extractTextContent(programsHtml) : "";
     const programSearchText = programsText.length > 200 ? programsText : combinedText;
 
+    // Strategy 1: Look for a programs/services section with bullet-style items
     const programSection = programSearchText.match(
       /(?:programs?|services?|what\s+we\s+do|our\s+work)[:\s]+([\s\S]{50,800}?)(?:learn\s+more|read\s+more|contact|donate|©)/i
     );
@@ -419,22 +425,53 @@ async function scrapeWebsite(url: string): Promise<WebsiteScrapResult> {
       const lines = programSection[1]
         .split(/[•\-–—|]|\d+\.\s/)
         .map((s: string) => s.trim())
-        .filter((s: string) => s.length > 5 && s.length < 100);
+        .filter(
+          (s: string) =>
+            s.length > 5 &&
+            s.length < 100 &&
+            !s.includes("©") &&
+            !/^(we |our |you |interested|typical|learn more)/i.test(s) &&
+            s.split(" ").length <= 10,
+        );
       if (lines.length >= 2) {
-        result.programs = lines.slice(0, 10);
+        result.programs = lines.slice(0, 12);
       }
     }
 
-    // If /programs page exists but no structured list found, try extracting headings
+    // Strategy 2: Extract h2/h3/h4 headings from the programs/services subpage
     if (!result.programs && programsHtml) {
-      const headingMatches = programsHtml.matchAll(/<h[2-4][^>]*>([^<]{5,80})<\/h[2-4]>/gi);
+      const headingMatches = programsHtml.matchAll(/<h[2-4][^>]*>([\s\S]*?)<\/h[2-4]>/gi);
       const headings: string[] = [];
       for (const m of headingMatches) {
-        const text = m[1].replace(/&\w+;/g, " ").trim();
-        if (text.length > 5 && text.length < 80) headings.push(text);
+        const text = m[1].replace(/<[^>]+>/g, "").replace(/&\w+;/g, " ").trim();
+        if (text.length > 3 && text.length < 80) headings.push(text);
       }
-      if (headings.length >= 2) {
-        result.programs = headings.slice(0, 10);
+      // Filter out generic/noisy headings
+      const filtered = headings.filter(
+        (h) =>
+          !/^(menu|navigation|footer|header|home|contact|donate|search|follow|©|info|action|submit|sign up|subscribe|get started|back to top)$/i.test(h) &&
+          !/^\d+$/.test(h) && // just numbers
+          !h.includes("©") && // copyright
+          !/^(we |our |you |interested|typical|learn more|read more)/i.test(h) && // taglines
+          h.split(" ").length <= 8, // too long = probably a sentence, not a program name
+      );
+      if (filtered.length >= 2) {
+        result.programs = filtered.slice(0, 12);
+      }
+    }
+
+    // Strategy 3: Extract from nav links pointing to service/program subpages
+    if (!result.programs && homeHtml) {
+      const navLinkMatches = homeHtml.matchAll(
+        /<a[^>]+href=["'][^"']*(?:program|service|what-we-do|our-work)[^"']*["'][^>]*>([^<]{3,60})<\/a>/gi,
+      );
+      const navPrograms: string[] = [];
+      for (const m of navLinkMatches) {
+        const text = m[1].replace(/&\w+;/g, " ").trim();
+        if (text.length > 3 && text.length < 60) navPrograms.push(text);
+      }
+      if (navPrograms.length >= 2) {
+        result.programs = navPrograms.slice(0, 12);
       }
     }
 
