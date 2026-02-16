@@ -51,7 +51,7 @@ const RequestCharity = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!charityName.trim()) return;
+    if (!charityName.trim() || !ein.trim()) return;
 
     setSubmitting(true);
     try {
@@ -288,11 +288,12 @@ const RequestCharity = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="ein" className="block text-sm font-medium text-white/80 mb-1.5">
-                      EIN / Registration Number
+                      EIN / Registration Number <span className="text-orange-light">*</span>
                     </label>
                     <input
                       id="ein"
                       type="text"
+                      required
                       value={ein}
                       onChange={(e) => setEin(e.target.value)}
                       placeholder="XX-XXXXXXX"
@@ -391,7 +392,7 @@ const RequestCharity = () => {
 
                 <Button
                   type="submit"
-                  disabled={submitting || !charityName.trim()}
+                  disabled={submitting || !charityName.trim() || !ein.trim()}
                   className="w-full gradient-orange text-accent-foreground font-semibold rounded-2xl glow-orange hover:scale-[1.01] transition-all duration-300 disabled:opacity-50"
                 >
                   {submitting ? (
