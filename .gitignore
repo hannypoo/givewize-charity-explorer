@@ -25,3 +25,4 @@ dist-ssr
 
 # Temp files
 tmp_*.json
+__pycache__/
