@@ -56,10 +56,15 @@ const RequestCharity = () => {
 
     setSubmitting(true);
     try {
-      // Insert the charity request
-      const { data: insertData, error: insertError } = await supabase
+      // Insert the charity request.
+      // The id is generated client-side because the table is intentionally
+      // insert-only for anonymous users (no SELECT policy — reading rows back
+      // would expose other submitters' contact info).
+      const requestId = crypto.randomUUID();
+      const { error: insertError } = await supabase
         .from("charity_requests")
         .insert({
+          id: requestId,
           charity_name: charityName.trim(),
           charity_website: charityWebsite.trim() || null,
           requester_email: requesterEmail.trim() || null,
@@ -68,9 +73,7 @@ const RequestCharity = () => {
           ein: ein.trim() || null,
           country,
           charity_contact_email: charityContactEmail.trim() || null,
-        })
-        .select("id")
-        .single();
+        });
 
       if (insertError) throw insertError;
 
@@ -81,7 +84,7 @@ const RequestCharity = () => {
       // Invoke the processing Edge Function
       const { data: fnData, error: fnError } = await supabase.functions.invoke(
         "process-charity-request",
-        { body: { charity_request_id: insertData.id } }
+        { body: { charity_request_id: requestId } }
       );
 
       if (fnError) {

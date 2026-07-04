@@ -78,10 +78,11 @@ const SubmitCharityInfo = () => {
         return;
       }
 
-      const { data, error: fetchErr } = await supabase
-        .from("charity_info_requests")
-        .select("*")
-        .eq("token", token)
+      // Token-gated lookup via SECURITY DEFINER function — the table itself has
+      // no public SELECT policy (it holds contact emails). Possessing the emailed
+      // token is the authorization. Cast needed until Supabase types are regenerated.
+      const { data, error: fetchErr } = await (supabase as any)
+        .rpc("get_charity_info_request", { p_token: token })
         .single();
 
       if (fetchErr || !data) {
@@ -150,16 +151,14 @@ const SubmitCharityInfo = () => {
         }
       }
 
-      // Update the info request with submitted data
-      const { error: updateErr } = await supabase
-        .from("charity_info_requests")
-        .update({
-          submitted_data: processedData,
-          status: "submitted",
-        })
-        .eq("token", token);
+      // Submit via SECURITY DEFINER function (token-gated; table has no public
+      // UPDATE policy). Returns false if the token is invalid or already used.
+      const { data: ok, error: updateErr } = await (supabase as any).rpc(
+        "submit_charity_info",
+        { p_token: token, p_data: processedData }
+      );
 
-      if (updateErr) throw updateErr;
+      if (updateErr || !ok) throw updateErr ?? new Error("Submission was not accepted.");
 
       // Re-invoke the processing function
       await supabase.functions.invoke("process-charity-request", {
@@ -306,19 +305,4 @@ const SubmitCharityInfo = () => {
                   {submitting ? (
                     "Submitting..."
                   ) : (
-                    <>
-                      <Send className="h-4 w-4 mr-2" />
-                      Submit Information
-                    </>
-                  )}
-                </Button>
-              </form>
-            )}
-          </div>
-        </div>
-      </div>
-    </Layout>
-  );
-};
-
-export default SubmitCharityInfo;
+        
