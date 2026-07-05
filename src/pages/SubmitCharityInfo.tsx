@@ -305,4 +305,19 @@ const SubmitCharityInfo = () => {
                   {submitting ? (
                     "Submitting..."
                   ) : (
-        
+                    <>
+                      <Send className="h-4 w-4 mr-2" />
+                      Submit Information
+                    </>
+                  )}
+                </Button>
+              </form>
+            )}
+          </div>
+        </div>
+      </div>
+    </Layout>
+  );
+};
+
+export default SubmitCharityInfo;
