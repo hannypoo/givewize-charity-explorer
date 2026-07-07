@@ -1,0 +1,9 @@
+# Pre-commit hooks — scan for secrets before every commit.
+# Setup (one time):  pip install pre-commit   &&   pre-commit install
+# After that, gitleaks runs on every `git commit` and blocks it if a
+# secret is found in your staged changes.
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.24.3
+    hooks:
+      - id: gitleaks
